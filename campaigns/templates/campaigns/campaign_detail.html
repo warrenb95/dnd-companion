@@ -1,0 +1,90 @@
+{% extends "campaigns/base.html" %}
+{% block title %}{{ campaign.title }}{% endblock %}
+{% block content %}
+{% load markdown_extras %}
+<h2>{{ campaign.title }}</h2>
+
+<p>{{ campaign.user_description }}</p>
+
+<p>{{ campaign.generated_summary|markdown }}</p>
+
+<a href="{% url 'campaigns:campaign_chat' campaign.id %}" class="btn btn-outline-dark">
+    Open Campaign Builder Chat
+</a>
+
+<a href="{% url 'campaigns:export_markdown' campaign.id %}" class="btn btn-outline-secondary">
+    Download Campaign (.md)
+</a>
+
+<br>
+
+<h4>Chapters</h4>
+<ul>
+    {% for chapter in campaign.chapters.all %}
+    <li>
+      {{ chapter.order }}. {{ chapter.title }} - {{ chapter.status }}
+      <a href="{% url 'campaigns:chapter_edit' chapter.id %}" class="btn btn-sm btn-link">Edit</a>
+    </li>
+    <h5>Session Notes</h5>
+    <ul>
+      {% for note in chapter.session_notes.all %}
+        <li>
+          <strong>{{ note.date }}</strong><br>
+          {{ note.notes|linebreaks }}
+          {% if note.summary %}
+            <div class="mt-2">
+              <em>Summary:</em><br>
+              {{ note.summary|linebreaks }}
+            </div>
+          {% else %}
+            <form method="post" action="{% url 'campaigns:generate_summary' note.id %}">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-info mt-2">Generate Summary</button>
+            </form>
+          {% endif %}
+        </li>
+      {% empty %}
+        <li>No session notes yet.</li>
+      {% endfor %}
+    </ul>
+    <a href="{% url 'campaigns:session_create' chapter.id %}" class="btn btn-sm btn-outline-primary">Add Session Notes</a>
+
+    {% empty %}
+        <li>No chapters added yet.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'campaigns:chapter_chat' campaign.id %}" class="btn btn-sm btn-outline-primary">Add New Chapter</a>
+
+<br>
+
+<h4>Locations</h4>
+<ul>
+  {% for location in campaign.locations.all %}
+    <li>
+      <strong>{{ location.name }}</strong> - {{ location.region }}
+      <a href="{% url 'campaigns:location_edit' location.id %}" class="btn btn-sm btn-link">Edit</a>
+    </li>
+  {% empty %}
+    <li>No locations yet.</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'campaigns:location_create' campaign.id %}" class="btn btn-sm btn-outline-primary">Add Location</a>
+
+<h4 class="mt-4">NPCs</h4>
+<ul>
+  {% for npc in campaign.npcs.all %}
+    <li>
+      {{ npc.name }} ({{ npc.role }}) - {{ npc.status }}
+      <a href="{% url 'campaigns:npc_edit' npc.id %}" class="btn btn-sm btn-link">Edit</a>
+    </li>
+  {% empty %}
+    <li>No NPCs yet.</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'campaigns:npc_create' campaign.id %}" class="btn btn-sm btn-outline-primary">Add NPC</a>
+
+<br>
+
+<a href="{% url 'campaigns:campaign_list' %}" class="btn btn-secondary mt-3">Back to Campaigns</a>
+{% endblock %}

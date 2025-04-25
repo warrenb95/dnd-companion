@@ -1,0 +1,28 @@
+{% extends "campaigns/base.html" %}
+{% load markdown_extras %}
+
+{% block title %}Chapter Chat — {{ campaign.title }}{% endblock %}
+{% block content %}
+<h2>🧠 Chapter Builder Chat for {{ campaign.title }}</h2>
+
+<div class="border rounded p-3 mb-3 bg-light" style="max-height: 60vh; overflow-y: auto;">
+  {% for msg in messages %}
+    <div class="mb-3">
+      <strong>{{ msg.role|capfirst }}:</strong><br>
+      <div class="p-2" style="white-space: pre-wrap;">{{ msg.content|markdown }}</div>
+    </div>
+  {% endfor %}
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+<a href="{% url 'campaigns:generate_chapter' campaign.id %}" class="btn btn-outline-success mt-3">
+  Generate Chapter from This Chat
+</a>
+
+<a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn btn-link mt-2">← Back to Campaign</a>
+{% endblock %}

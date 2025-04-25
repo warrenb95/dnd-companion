@@ -1,0 +1,13 @@
+{% extends "campaigns/base.html" %}
+{% block title %}Your Campaigns{% endblock %}
+{% block content %}
+<h2>All Campaigns</h2>
+<ul>
+    {% for campaign in campaigns %}
+        <li><a href="{% url 'campaigns:campaign_detail' campaign.id %}">{{ campaign.title }}</a></li>
+    {% empty %}
+        <li>No campaigns yet.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'campaigns:campaign_create' %}" class="btn btn-primary mt-3">Create New Campaign</a>
+{% endblock %}
