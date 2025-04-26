@@ -17,7 +17,7 @@ Write in the past tense. Summarize character decisions, story events, and any no
 """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",  # Or gpt-4 if available
+        model="gpt-3.5-turbo",  # Or gpt-4 if available
         messages=[
             {"role": "system", "content": "You summarize D&D game sessions."},
             {"role": "user", "content": prompt},
@@ -37,7 +37,7 @@ def get_campaign_chat_response(campaign, messages):
         history.append({"role": msg.role, "content": msg.content})
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini", messages=history, temperature=0.8, max_tokens=600
+        model="gpt-3.5-turbo", messages=history, temperature=0.8, max_tokens=600
     )
 
     return response.choices[0].message.content.strip()
@@ -61,7 +61,7 @@ Here's the message to extract from:
 """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {
                 "role": "system",
@@ -96,7 +96,7 @@ Here's the message:
 """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {
                 "role": "system",
@@ -152,7 +152,7 @@ Keep it concise but helpful for session planning.
 """
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-3.5-turbo",
         messages=[
             {
                 "role": "system",
@@ -178,7 +178,7 @@ def get_chapter_chat_response(campaign, messages):
         history.append({"role": msg.role, "content": msg.content})
 
     response = client.chat.completions.create(
-        model="gpt-4o-mini", messages=history, temperature=0.7, max_tokens=600
+        model="gpt-3.5-turbo", messages=history, temperature=0.7, max_tokens=600
     )
 
     return response.choices[0].message.content.strip()

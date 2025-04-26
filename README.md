@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 Create a `.env` file or set an environment variable:
 
-```
+```bash
 OPENAI_API_KEY=your-openai-api-key-here
 ```
 
@@ -84,7 +84,7 @@ python manage.py runserver
 
 ## 📁 Project Structure
 
-```
+```bash
 campaigns/
 ├── models.py       # Campaign, Chapter, NPC, Location, etc.
 ├── views.py        # Campaign & chat views
