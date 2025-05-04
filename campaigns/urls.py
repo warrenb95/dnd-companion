@@ -18,6 +18,8 @@ from .views import (
     create_from_chat,
     create_locations_from_chat,
     chapter_chat_view,
+    add_character,
+    update_character,
 )
 from .views import ChatMessageEditView, ChatMessageDeleteView
 
@@ -81,4 +83,8 @@ urlpatterns = [
         confirm_generated_chapter_view,
         name="confirm_generated_chapter",
     ),
+    path(
+        "campaign/<int:campaign_id>/add_character/", add_character, name="add_character"
+    ),
+    path("character/<int:pk>/edit/", update_character, name="update_character"),
 ]

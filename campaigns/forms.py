@@ -5,6 +5,7 @@ from .models import Location, NPC
 from .models import SessionNote
 from .models import ChatMessage
 from .models import ChapterChatMessage
+from .models import CharacterSummary
 
 
 class ChapterForm(forms.ModelForm):
@@ -65,3 +66,9 @@ class ChapterChatMessageForm(forms.ModelForm):
                 attrs={"rows": 3, "placeholder": "Plan your next chapter..."}
             ),
         }
+
+
+class CharacterSummaryForm(forms.ModelForm):
+    class Meta:
+        model = CharacterSummary
+        exclude = ["campaign"]

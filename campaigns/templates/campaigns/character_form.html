@@ -1,0 +1,10 @@
+{% extends "campaigns/base.html" %} 
+{% block title %}Character form{% endblock %} 
+{% block content %}
+<h2>{{ campaign.name }} - {{ form.instance.pk|yesno:"Edit,Add" }} Character</h2>
+
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+</form>
+{% endblock %}

@@ -148,6 +148,10 @@ Based on the above, create the next chapter outline. Return your answer in this 
   "suggested_locations": [ "Location 1", "Location 2" ]
 }}
 
+Return only strict JSON. 
+Use double quotes for all keys and strings. 
+No trailing commas. No comments. No markdown formatting. No extra text.
+
 Keep it concise but helpful for session planning.
 """
 
