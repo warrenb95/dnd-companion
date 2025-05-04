@@ -25,6 +25,7 @@ from .models import (
     SessionNote,
     ChatMessage,
     ChapterChatMessage,
+    CharacterSummary,
 )
 from .forms import (
     ChatMessageForm,
@@ -33,6 +34,7 @@ from .forms import (
     NPCForm,
     SessionNoteForm,
     ChapterChatMessageForm,
+    CharacterSummaryForm,
 )
 from .llm import (
     extract_multiple_npcs,
@@ -460,7 +462,11 @@ def confirm_generated_chapter_view(request, campaign_id):
 
     try:
         raw = request.POST.get("chapter_json", "")
-        parsed = json.loads(raw)
+        print(f"raw: {raw}\n")
+        clean = clean_llm_json(raw)
+        print(f"clean: {clean}\n")
+        parsed = json.loads(clean)
+        print(parsed)
 
         # Auto-increment order
         last_chapter = campaign.chapters.order_by("-order").first()
@@ -479,4 +485,54 @@ def confirm_generated_chapter_view(request, campaign_id):
 
     except Exception as e:
         messages.error(request, f"Could not confirm chapter: {e}")
+        print(f"Could not confirm chapter: {e}")
         return redirect("campaigns:generate_chapter", campaign_id=campaign.id)
+
+
+def clean_llm_json(raw_text):
+    # Remove markdown code block
+    clean = re.sub(r"^```(json)?|```$", "", raw_text.strip(), flags=re.MULTILINE)
+
+    # Replace all single quotes with double quotes
+    clean = clean.replace("'", '"')
+
+    # Fix bad quotes inside text: change something like entity"s to entity's
+    clean = re.sub(r'(\w)"(\w)', r"\1'\2", clean)
+
+    # Remove trailing commas
+    clean = re.sub(r",\s*}", "}", clean)
+    clean = re.sub(r",\s*]", "]", clean)
+
+    return clean
+
+
+def add_character(request, campaign_id):
+    campaign = get_object_or_404(Campaign, id=campaign_id)
+    if request.method == "POST":
+        form = CharacterSummaryForm(request.POST)
+        if form.is_valid():
+            character = form.save(commit=False)
+            character.campaign = campaign
+            character.save()
+        return redirect("campaigns:campaign_detail", pk=campaign.id)
+    else:
+        form = CharacterSummaryForm()
+    return render(
+        request, "campaigns/character_form.html", {"form": form, "campaign": campaign}
+    )
+
+
+def update_character(request, pk):
+    character = get_object_or_404(CharacterSummary, pk=pk)
+    if request.method == "POST":
+        form = CharacterSummaryForm(request.POST, instance=character)
+        if form.is_valid():
+            form.save()
+            return redirect("campaigns:campaign_detail", pk=character.campaign.id)
+    else:
+        form = CharacterSummaryForm(instance=character)
+    return render(
+        request,
+        "campaigns/character_form.html",
+        {"form": form, "campaign": character.campaign},
+    )

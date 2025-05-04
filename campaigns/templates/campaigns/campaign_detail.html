@@ -4,6 +4,24 @@
 {% load markdown_extras %}
 <h2>{{ campaign.title }}</h2>
 
+<h2>Player Characters</h2>
+<ul>
+    {% for character in campaign.characters.all %}
+        <li>
+            <strong>{{ character.character_name }}</strong>
+            (Level {{ character.level }} {{ character.race }} {{ character.character_class }}) —
+            HP: {{ character.current_hit_points }},
+            AC: {{ character.armor_class }},
+            Passive Perception: {{ character.passive_perception }}
+            [<a href="{% url 'campaigns:update_character' character.pk %}">Edit</a>]
+        </li>
+    {% empty %}
+        <li>No characters yet.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'campaigns:add_character' campaign.id %}">Add a New Character</a>
+
 <p>{{ campaign.user_description }}</p>
 
 <p>{{ campaign.generated_summary|markdown }}</p>
