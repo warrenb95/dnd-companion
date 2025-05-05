@@ -40,8 +40,9 @@
 <ul>
     {% for chapter in campaign.chapters.all %}
     <li>
-      {{ chapter.order }}. {{ chapter.title }} - {{ chapter.status }}
+      {{ chapter.number }}. {{ chapter.title }} - {{ chapter.status }}
       <a href="{% url 'campaigns:chapter_edit' chapter.id %}" class="btn btn-sm btn-link">Edit</a>
+      <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn btn-sm btn-link">View</a>
     </li>
     <h5>Session Notes</h5>
     <ul>
@@ -73,6 +74,7 @@
 </ul>
 
 <a href="{% url 'campaigns:chapter_chat' campaign.id %}" class="btn btn-sm btn-outline-primary">Add New Chapter</a>
+<a href="{% url 'campaigns:upload_chapter_pdf' campaign.id %}">Upload a new Chapter from PDF</a>
 
 <br>
 

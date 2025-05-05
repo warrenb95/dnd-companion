@@ -7,8 +7,10 @@ from .views import (
     confirm_generated_chapter_view,
     generate_chapter_view,
     save_campaign_summary,
+    ChapterCreateFromPDFView,
+    ChapterDetailView,
 )
-from .views import ChapterCreateView, ChapterUpdateView
+from .views import ChapterCreateView, ChapterUpdateView, ChapterPreviewView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
 from .views import GenerateSessionSummaryView, SessionNoteCreateView
@@ -34,7 +36,18 @@ urlpatterns = [
         ChapterCreateView.as_view(),
         name="chapter_create",
     ),
+    path(
+        "<int:campaign_id>/chapters/upload/",
+        ChapterCreateFromPDFView.as_view(),
+        name="upload_chapter_pdf",
+    ),
     path("chapters/<int:pk>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
+    path(
+        "chapters/<int:pk>/preview/",
+        ChapterPreviewView.as_view(),
+        name="chapter_preview",
+    ),
+    path("chapters/<int:pk>/", ChapterDetailView.as_view(), name="chapter_detail"),
     path(
         "<int:campaign_id>/locations/add/",
         LocationCreateView.as_view(),

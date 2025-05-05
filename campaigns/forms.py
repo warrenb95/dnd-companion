@@ -72,3 +72,7 @@ class CharacterSummaryForm(forms.ModelForm):
     class Meta:
         model = CharacterSummary
         exclude = ["campaign"]
+
+
+class ChapterUploadForm(forms.Form):
+    pdf_file = forms.FileField(label="Adventure Chapter PDF")

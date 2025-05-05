@@ -1,6 +1,11 @@
+import json
+import fitz
+
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+
+from campaigns.llm import parse_text_with_llm
 
 
 class Campaign(models.Model):
@@ -26,15 +31,73 @@ class Chapter(models.Model):
     campaign = models.ForeignKey(
         Campaign, on_delete=models.CASCADE, related_name="chapters"
     )
+    number = models.PositiveIntegerField()
     title = models.CharField(max_length=200)
     summary = models.TextField(blank=True)
-    order = models.PositiveIntegerField()
     status = models.CharField(
         max_length=20, choices=STATUS_CHOICES, default="not_started"
     )
+    level_range = models.CharField(max_length=50, blank=True)
+    adventure_hook = models.TextField(
+        help_text="Trigger or reason for party to start the chapter."
+    )
+    overview = models.TextField(
+        help_text="Brief summary of the chapter's events and objectives."
+    )
+    background = models.TextField(
+        help_text="World context and relevant history.", blank=True
+    )
+    dm_guidance = models.TextField(
+        help_text="Tips and guidance for running the chapter.", blank=True
+    )
+
+    locations_description = models.TextField(
+        help_text="DM notes for locations, including read-aloud text and hidden details.",
+        blank=True,
+    )
+
+    conclusion = models.TextField(
+        help_text="How the chapter ends and transitions forward.", blank=True
+    )
 
     def __str__(self):
-        return f"{self.title} (Order {self.order})"
+        return f"{self.number} - {self.title}"
+
+
+class Encounter(models.Model):
+    CHOICES = [
+        ("combat", "Combat"),
+        ("social", "Social"),
+        ("puzzle", "Puzzle"),
+        ("exploration", "Exploration"),
+        ("mixed", "Mixed/Other"),
+    ]
+
+    chapter = models.ForeignKey(
+        Chapter, on_delete=models.CASCADE, related_name="encounters"
+    )
+    title = models.CharField(max_length=200)
+    type = models.CharField(max_length=20, choices=CHOICES, default="combat")
+    level_range = models.CharField(max_length=50, blank=True)
+
+    summary = models.TextField(help_text="Purpose and context of the encounter.")
+    setup = models.TextField(help_text="Initial conditions and encounter details.")
+    read_aloud = models.TextField(help_text="Narrative for the DM to read to players.")
+    tactics = models.TextField(
+        help_text="Enemy strategy and dynamic notes.", blank=True
+    )
+    stat_blocks = models.TextField(
+        help_text="Stat blocks or reference notes.", blank=True
+    )
+    treasure = models.TextField(
+        help_text="Loot and rewards after the encounter.", blank=True
+    )
+    map_reference = models.TextField(
+        help_text="Map or layout references for this encounter.", blank=True
+    )
+
+    def __str__(self):
+        return f"{self.title} (Chapter {self.chapter.number})"
 
 
 class Location(models.Model):
@@ -138,3 +201,51 @@ class CharacterSummary(models.Model):
 
     def __str__(self):
         return f"{self.character_name} ({self.player_name})"
+
+
+def create_chapter_and_encounters_from_llm(pdf_file, campaign):
+    text = extract_text_from_pdf(pdf_file)
+    print(f"text: {text}")
+    llm_response = parse_text_with_llm(text)
+    print(f"llm response: {llm_response}")
+
+    try:
+        structured_data = json.loads(llm_response)
+        print(f"structured_data: {structured_data}")
+    except json.JSONDecodeError:
+        raise Exception("LLM did not return valid JSON.")
+
+    chapter = Chapter.objects.create(
+        title=structured_data["title"],
+        number=1,
+        campaign=campaign,
+        level_range=structured_data.get("level_range", ""),
+        adventure_hook=structured_data.get("adventure_hook", ""),
+        overview=structured_data.get("overview", ""),
+        dm_guidance=structured_data.get("dm_guidance", ""),
+        conclusion=structured_data.get("conclusion", ""),
+    )
+    print(f"chapter {chapter}")
+
+    for enc in structured_data.get("encounters", []):
+        Encounter.objects.create(
+            chapter=chapter,
+            title=enc["title"],
+            type=enc["type"],
+            level_range=enc.get("level_range", ""),
+            summary=enc["summary"],
+            setup=enc["setup"],
+            read_aloud=enc["read_aloud"],
+            tactics=enc.get("tactics", ""),
+            stat_blocks=enc.get("stat_blocks", ""),
+            treasure=enc.get("treasure", ""),
+            map_reference=enc.get("map_reference", ""),
+        )
+        print(f"encounter {enc}")
+
+    return chapter
+
+
+def extract_text_from_pdf(pdf_file):
+    with fitz.open(stream=pdf_file.read(), filetype="pdf") as doc:
+        return "\n".join([page.get_text() for page in doc])

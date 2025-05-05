@@ -1,0 +1,35 @@
+{% extends "campaigns/base.html" %}
+{% block title %}Chapter Details{%endblock%}
+{% block content %}
+<h1>Chapter: {{ chapter.title }}</h1>
+
+<h3>Level Range:</h3>
+<p>{{ chapter.level_range }}</p>
+
+<h3>Adventure Hook:</h3>
+<p>{{ chapter.adventure_hook }}</p>
+
+<h3>Overview:</h3>
+<p>{{ chapter.overview }}</p>
+
+<h3>DM Guidance:</h3>
+<p>{{ chapter.dm_guidance }}</p>
+
+<h3>Encounters:</h3>
+{% for enc in encounters %}
+<div style="border: 1px solid #ccc; padding: 1em; margin-bottom: 1em">
+  <h4>{{ enc.title }} ({{ enc.type }})</h4>
+  <p><strong>Level Range:</strong> {{ enc.level_range }}</p>
+  <p><strong>Summary:</strong> {{ enc.summary }}</p>
+  <p><strong>Setup:</strong> {{ enc.setup }}</p>
+  <p><strong>Read-Aloud:</strong> {{ enc.read_aloud }}</p>
+  <p><strong>Tactics:</strong> {{ enc.tactics }}</p>
+  <p><strong>Stat Blocks:</strong> {{ enc.stat_blocks }}</p>
+  <p><strong>Treasure:</strong> {{ enc.treasure }}</p>
+  <p><strong>Map Ref:</strong> {{ enc.map_reference }}</p>
+</div>
+{% endfor %}
+
+<h3>Conclusion:</h3>
+<p>{{ chapter.conclusion }}</p>
+{% endblock %}

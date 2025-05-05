@@ -26,6 +26,7 @@ from .models import (
     ChatMessage,
     ChapterChatMessage,
     CharacterSummary,
+    create_chapter_and_encounters_from_llm,
 )
 from .forms import (
     ChatMessageForm,
@@ -35,6 +36,7 @@ from .forms import (
     SessionNoteForm,
     ChapterChatMessageForm,
     CharacterSummaryForm,
+    ChapterUploadForm,
 )
 from .llm import (
     extract_multiple_npcs,
@@ -81,8 +83,8 @@ class ChapterCreateView(CreateView):
         form.instance.campaign = campaign
 
         # Auto-increment order field
-        last_chapter = campaign.chapters.order_by("-order").first()
-        form.instance.order = (last_chapter.order + 1) if last_chapter else 1
+        last_chapter = campaign.chapters.order_by("-number").first()
+        form.instance.number = (last_chapter.number + 1) if last_chapter else 1
 
         return super().form_valid(form)
 
@@ -212,9 +214,9 @@ def export_campaign_markdown(request, campaign_id):
 
     lines += ["", "---", "", "## 📖 Chapters"]
 
-    for chapter in campaign.chapters.order_by("order"):
+    for chapter in campaign.chapters.order_by("number"):
         lines += [
-            f"### Chapter {chapter.order}: {chapter.title}",
+            f"### Chapter {chapter.number}: {chapter.title}",
             f"**Status:** {chapter.status.replace('_', ' ').capitalize()}",
             "",
             chapter.summary or "_No summary yet_",
@@ -420,11 +422,11 @@ def chapter_chat_view(request, campaign_id):
 def generate_chapter_view(request, campaign_id):
     campaign = get_object_or_404(Campaign, pk=campaign_id)
     messages = campaign.chapter_chat_messages.order_by("created_at")
-    previous_chapters = campaign.chapters.order_by("order")
+    previous_chapters = campaign.chapters.order_by("number")
     recent_notes = (
         Chapter.objects.filter(campaign=campaign)
         .prefetch_related("session_notes")
-        .order_by("-order")
+        .order_by("-number")
     )
 
     try:
@@ -469,14 +471,14 @@ def confirm_generated_chapter_view(request, campaign_id):
         print(parsed)
 
         # Auto-increment order
-        last_chapter = campaign.chapters.order_by("-order").first()
-        next_order = (last_chapter.order + 1) if last_chapter else 1
+        last_chapter = campaign.chapters.order_by("-number").first()
+        next_order = (last_chapter.number + 1) if last_chapter else 1
 
         chapter = Chapter.objects.create(
             campaign=campaign,
             title=parsed.get("title", "Untitled Chapter"),
             summary=parsed.get("summary", ""),
-            order=next_order,
+            number=next_order,
             status="not_started",  # or whatever your default status is
         )
 
@@ -536,3 +538,46 @@ def update_character(request, pk):
         "campaigns/character_form.html",
         {"form": form, "campaign": character.campaign},
     )
+
+
+class ChapterCreateFromPDFView(View):
+    template_name = "campaigns/upload.html"
+
+    def get(self, request, campaign_id):
+        form = ChapterUploadForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request, campaign_id):
+        form = ChapterUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            pdf_file = form.cleaned_data["pdf_file"]
+            try:
+                campaign = get_object_or_404(Campaign, id=campaign_id)
+                chapter = create_chapter_and_encounters_from_llm(pdf_file, campaign)
+                chapter.save()
+                return redirect("campaigns:chapter_preview", pk=chapter.pk)
+            except Exception as e:
+                form.add_error(None, f"Error processing PDF: {str(e)}")
+        return render(request, self.template_name, {"form": form})
+
+
+class ChapterPreviewView(View):
+    template_name = "campaigns/chapter_preview.html"
+
+    def get(self, request, pk):
+        chapter = get_object_or_404(Chapter, pk=pk)
+        encounters = chapter.encounters.all()
+        return render(
+            request, self.template_name, {"chapter": chapter, "encounters": encounters}
+        )
+
+
+class ChapterDetailView(View):
+    template_name = "campaigns/chapter_detail.html"
+
+    def get(self, request, pk):
+        chapter = get_object_or_404(Chapter, pk=pk)
+        encounters = chapter.encounters.all()
+        return render(
+            request, self.template_name, {"chapter": chapter, "encounters": encounters}
+        )

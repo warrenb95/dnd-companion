@@ -184,5 +184,54 @@ def get_chapter_chat_response(campaign, messages):
     response = client.chat.completions.create(
         model="gpt-3.5-turbo", messages=history, temperature=0.7, max_tokens=600
     )
-
     return response.choices[0].message.content.strip()
+
+
+def parse_text_with_llm(chapter_text):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a D&D module assistant. Given the full text of a chapter, extract structured chapter and encounter data for use in a DM campaign app.",
+            },
+            {
+                "role": "user",
+                "content": f"Here is the chapter text:\n\n{chapter_text}\n\nPlease return structured JSON in this format: {CHAPTER_JSON_FORMAT}",
+            },
+        ],
+        temperature=0.6,
+    )
+    return response.choices[0].message.content.strip()
+
+
+# --- Template for the LLM to follow ---
+CHAPTER_JSON_FORMAT = """{
+  "title": "",
+  "level_range": "",
+  "adventure_hook": "",
+  "overview": "",
+  "dm_guidance": "",
+  "locations": [
+    {
+      "name": "",
+      "read_aloud": "",
+      "dm_notes": ""
+    }
+  ],
+  "encounters": [
+    {
+      "title": "",
+      "type": "",
+      "level_range": "",
+      "summary": "",
+      "setup": "",
+      "read_aloud": "",
+      "tactics": "",
+      "stat_blocks": "",
+      "treasure": "",
+      "map_reference": ""
+    }
+  ],
+  "conclusion": ""
+}"""
