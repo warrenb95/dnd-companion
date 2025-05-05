@@ -2,7 +2,7 @@
 {% block title %}Chapter Upload{% endblock %}
 {% block content %}
 <h2>Chapter Upload</h2>
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Save</button>

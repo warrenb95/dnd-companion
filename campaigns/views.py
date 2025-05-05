@@ -1,5 +1,6 @@
 import json
 import re
+import logging
 
 from django.views.generic import (
     ListView,
@@ -46,6 +47,9 @@ from .llm import (
     generate_chapter_from_context,
     get_chapter_chat_response,
 )
+
+logger = logging.getLogger(__name__)
+logger.setLevel(level="DEBUG")
 
 
 class CampaignListView(ListView):
@@ -558,6 +562,9 @@ class ChapterCreateFromPDFView(View):
                 return redirect("campaigns:chapter_preview", pk=chapter.pk)
             except Exception as e:
                 form.add_error(None, f"Error processing PDF: {str(e)}")
+        else:
+            logger.warning("Form submission failed. Errors: %s", form.errors)
+            logger.info("Cleaned data (partial): %s", form.cleaned_data)
         return render(request, self.template_name, {"form": form})
 
 
