@@ -532,20 +532,14 @@ class CreateCharacterView(CreateView):
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
-def update_character(request, pk):
-    character = get_object_or_404(CharacterSummary, pk=pk)
-    if request.method == "POST":
-        form = CharacterSummaryForm(request.POST, instance=character)
-        if form.is_valid():
-            form.save()
-            return redirect("campaigns:campaign_detail", pk=character.campaign.id)
-    else:
-        form = CharacterSummaryForm(instance=character)
-    return render(
-        request,
-        "campaigns/character_form.html",
-        {"form": form, "campaign": character.campaign},
-    )
+
+class UpdateCharacterView(UpdateView):
+    model = CharacterSummary
+    form_class = CharacterSummaryForm
+    template_name = "campaigns/character_form.html"
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
 
 
 class ChapterCreateFromPDFView(View):
