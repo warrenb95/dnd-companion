@@ -215,9 +215,13 @@ def create_chapter_and_encounters_from_llm(pdf_file, campaign):
     except json.JSONDecodeError:
         raise Exception("LLM did not return valid JSON.")
 
+    # Auto-increment order field
+    last_chapter = campaign.chapters.order_by("-number").first()
+    chapter_number = (last_chapter.number + 1) if last_chapter else 1
+
     chapter = Chapter.objects.create(
         title=structured_data["title"],
-        number=1,
+        number=chapter_number,
         campaign=campaign,
         level_range=structured_data.get("level_range", ""),
         adventure_hook=structured_data.get("adventure_hook", ""),

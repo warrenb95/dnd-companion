@@ -11,6 +11,7 @@ from .views import (
     ChapterDetailView,
 )
 from .views import ChapterCreateView, ChapterUpdateView, ChapterPreviewView
+from .views import CreateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
 from .views import GenerateSessionSummaryView, SessionNoteCreateView
@@ -20,7 +21,6 @@ from .views import (
     create_from_chat,
     create_locations_from_chat,
     chapter_chat_view,
-    add_character,
     update_character,
 )
 from .views import ChatMessageEditView, ChatMessageDeleteView
@@ -97,7 +97,7 @@ urlpatterns = [
         name="confirm_generated_chapter",
     ),
     path(
-        "campaign/<int:campaign_id>/add_character/", add_character, name="add_character"
+        "campaign/<int:campaign_id>/add_character/", CreateCharacterView.as_view(), name="add_character"
     ),
     path("character/<int:pk>/edit/", update_character, name="update_character"),
 ]
