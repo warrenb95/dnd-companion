@@ -512,36 +512,34 @@ def clean_llm_json(raw_text):
     return clean
 
 
-def add_character(request, campaign_id):
-    campaign = get_object_or_404(Campaign, id=campaign_id)
-    if request.method == "POST":
-        form = CharacterSummaryForm(request.POST)
-        if form.is_valid():
-            character = form.save(commit=False)
-            character.campaign = campaign
-            character.save()
-        return redirect("campaigns:campaign_detail", pk=campaign.id)
-    else:
-        form = CharacterSummaryForm()
-    return render(
-        request, "campaigns/character_form.html", {"form": form, "campaign": campaign}
-    )
+class CreateCharacterView(CreateView):
+    model = CharacterSummary
+    form_class = CharacterSummaryForm
+    template_name = "campaigns/character_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        context["campaign"] = campaign
+        return context
+
+    def form_valid(self, form):
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        form.instance.campaign = campaign
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
 
 
-def update_character(request, pk):
-    character = get_object_or_404(CharacterSummary, pk=pk)
-    if request.method == "POST":
-        form = CharacterSummaryForm(request.POST, instance=character)
-        if form.is_valid():
-            form.save()
-            return redirect("campaigns:campaign_detail", pk=character.campaign.id)
-    else:
-        form = CharacterSummaryForm(instance=character)
-    return render(
-        request,
-        "campaigns/character_form.html",
-        {"form": form, "campaign": character.campaign},
-    )
+class UpdateCharacterView(UpdateView):
+    model = CharacterSummary
+    form_class = CharacterSummaryForm
+    template_name = "campaigns/character_form.html"
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
 
 
 class ChapterCreateFromPDFView(View):
@@ -559,7 +557,7 @@ class ChapterCreateFromPDFView(View):
                 campaign = get_object_or_404(Campaign, id=campaign_id)
                 chapter = create_chapter_and_encounters_from_llm(pdf_file, campaign)
                 chapter.save()
-                return redirect("campaigns:chapter_preview", pk=chapter.pk)
+                return redirect("campaigns:chapter_preview", pk=chapter.pk, )
             except Exception as e:
                 form.add_error(None, f"Error processing PDF: {str(e)}")
         else:
