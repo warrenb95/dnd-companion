@@ -22,13 +22,10 @@
 
 <a href="{% url 'campaigns:add_character' campaign.id %}">Add a New Character</a>
 
-<p>{{ campaign.user_description }}</p>
+<p>{{ campaign.description }}</p>
 
 <p>{{ campaign.generated_summary|markdown }}</p>
 
-<a href="{% url 'campaigns:campaign_chat' campaign.id %}" class="btn btn-outline-dark">
-    Open Campaign Builder Chat
-</a>
 
 <a href="{% url 'campaigns:export_markdown' campaign.id %}" class="btn btn-outline-secondary">
     Download Campaign (.md)
@@ -73,7 +70,6 @@
     {% endfor %}
 </ul>
 
-<a href="{% url 'campaigns:chapter_chat' campaign.id %}" class="btn btn-sm btn-outline-primary">Add New Chapter</a>
 <a href="{% url 'campaigns:upload_chapter_pdf' campaign.id %}">Upload a new Chapter from PDF</a>
 
 <br>

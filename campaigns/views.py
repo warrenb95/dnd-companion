@@ -16,7 +16,6 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib import messages
-from django.views.decorators.http import require_POST
 
 from .models import (
     Campaign,
@@ -25,27 +24,21 @@ from .models import (
     NPC,
     SessionNote,
     ChatMessage,
-    ChapterChatMessage,
     CharacterSummary,
     create_chapter_and_encounters_from_llm,
 )
 from .forms import (
-    ChatMessageForm,
     ChapterForm,
     LocationForm,
     NPCForm,
     SessionNoteForm,
-    ChapterChatMessageForm,
     CharacterSummaryForm,
     ChapterUploadForm,
 )
 from .llm import (
     extract_multiple_npcs,
     extract_locations_from_text,
-    get_campaign_chat_response,
     generate_session_summary,
-    generate_chapter_from_context,
-    get_chapter_chat_response,
 )
 
 logger = logging.getLogger(__name__)
@@ -251,57 +244,6 @@ def export_campaign_markdown(request, campaign_id):
     )
     return response
 
-
-def campaign_chat_view(request, campaign_id):
-    campaign = get_object_or_404(Campaign, pk=campaign_id)
-    chat_history = campaign.chat_messages.order_by("created_at")
-    form = ChatMessageForm()
-
-    if request.method == "POST":
-        form = ChatMessageForm(request.POST)
-        if form.is_valid():
-            user_message = form.save(commit=False)
-            user_message.campaign = campaign
-            user_message.role = "user"
-            user_message.save()
-
-            # Get LLM response
-            assistant_reply = get_campaign_chat_response(
-                campaign, chat_history | ChatMessage.objects.filter(pk=user_message.pk)
-            )
-            ChatMessage.objects.create(
-                campaign=campaign, role="assistant", content=assistant_reply
-            )
-            return redirect("campaigns:campaign_chat", campaign_id=campaign.id)
-
-    return render(
-        request,
-        "campaigns/campaign_chat.html",
-        {"campaign": campaign, "messages": chat_history, "form": form},
-    )
-
-
-class ChatMessageEditView(UpdateView):
-    model = ChatMessage
-    fields = ["content"]
-    template_name = "campaigns/chat_edit.html"
-
-    def get_success_url(self):
-        return reverse_lazy(
-            "campaigns:campaign_chat", kwargs={"campaign_id": self.object.campaign.id}
-        )
-
-
-class ChatMessageDeleteView(DeleteView):
-    model = ChatMessage
-    template_name = "campaigns/chat_confirm_delete.html"
-
-    def get_success_url(self):
-        return reverse_lazy(
-            "campaigns:campaign_chat", kwargs={"campaign_id": self.object.campaign.id}
-        )
-
-
 def save_campaign_summary(request, campaign_id):
     if request.method == "POST":
         content = request.POST.get("content")
@@ -310,7 +252,6 @@ def save_campaign_summary(request, campaign_id):
         campaign.generated_summary = content
         campaign.save()
         return redirect(campaign.get_absolute_url())
-
 
 def create_from_chat(request, campaign_id):
     if request.method == "POST":
@@ -388,112 +329,6 @@ def create_locations_from_chat(request, campaign_id):
         except Exception as e:
             messages.error(request, f"Location parsing failed: {e}")
             return redirect("campaigns:campaign_chat", campaign_id=campaign_id)
-
-
-def chapter_chat_view(request, campaign_id):
-    campaign = get_object_or_404(Campaign, pk=campaign_id)
-    messages = campaign.chapter_chat_messages.order_by("created_at")
-    form = ChapterChatMessageForm()
-
-    if request.method == "POST":
-        form = ChapterChatMessageForm(request.POST)
-        if form.is_valid():
-            user_msg = form.save(commit=False)
-            user_msg.campaign = campaign
-            user_msg.role = "user"
-            user_msg.save()
-
-            # Generate LLM reply
-            llm_response = get_chapter_chat_response(
-                campaign, messages | ChapterChatMessage.objects.filter(pk=user_msg.pk)
-            )
-            ChapterChatMessage.objects.create(
-                campaign=campaign, role="assistant", content=llm_response
-            )
-            return redirect("campaigns:chapter_chat", campaign_id=campaign.id)
-
-    return render(
-        request,
-        "campaigns/chapter_chat.html",
-        {
-            "campaign": campaign,
-            "messages": messages,
-            "form": form,
-        },
-    )
-
-
-def generate_chapter_view(request, campaign_id):
-    campaign = get_object_or_404(Campaign, pk=campaign_id)
-    messages = campaign.chapter_chat_messages.order_by("created_at")
-    previous_chapters = campaign.chapters.order_by("number")
-    recent_notes = (
-        Chapter.objects.filter(campaign=campaign)
-        .prefetch_related("session_notes")
-        .order_by("-number")
-    )
-
-    try:
-        chapter_json = generate_chapter_from_context(
-            campaign,
-            messages,
-            previous_chapters,
-            recent_notes,
-        )
-        # Strip markdown code block if present
-        clean_json = re.sub(
-            r"^```(json)?|```$", "", chapter_json.strip(), flags=re.MULTILINE
-        )
-
-        parsed = json.loads(clean_json)
-
-        return render(
-            request,
-            "campaigns/chapter_draft_preview.html",
-            {
-                "campaign": campaign,
-                "chapter_json_raw": clean_json,
-                "draft": parsed,  # ✅ this is what you'll render in the template
-            },
-        )
-
-    except Exception as e:
-        messages.error(request, f"Chapter generation failed: {e}")
-        return redirect("campaigns:chapter_chat", campaign_id=campaign.id)
-
-
-@require_POST
-def confirm_generated_chapter_view(request, campaign_id):
-    campaign = get_object_or_404(Campaign, pk=campaign_id)
-
-    try:
-        raw = request.POST.get("chapter_json", "")
-        print(f"raw: {raw}\n")
-        clean = clean_llm_json(raw)
-        print(f"clean: {clean}\n")
-        parsed = json.loads(clean)
-        print(parsed)
-
-        # Auto-increment order
-        last_chapter = campaign.chapters.order_by("-number").first()
-        next_order = (last_chapter.number + 1) if last_chapter else 1
-
-        chapter = Chapter.objects.create(
-            campaign=campaign,
-            title=parsed.get("title", "Untitled Chapter"),
-            summary=parsed.get("summary", ""),
-            number=next_order,
-            status="not_started",  # or whatever your default status is
-        )
-
-        messages.success(request, f"Chapter '{chapter.title}' added to campaign.")
-        return redirect("campaigns:campaign_detail", campaign_id=campaign.id)
-
-    except Exception as e:
-        messages.error(request, f"Could not confirm chapter: {e}")
-        print(f"Could not confirm chapter: {e}")
-        return redirect("campaigns:generate_chapter", campaign_id=campaign.id)
-
 
 def clean_llm_json(raw_text):
     # Remove markdown code block

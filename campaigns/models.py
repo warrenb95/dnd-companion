@@ -10,7 +10,7 @@ from campaigns.llm import parse_text_with_llm
 
 class Campaign(models.Model):
     title = models.CharField(max_length=200)
-    user_description = models.TextField(blank=True)
+    description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     generated_summary = models.TextField(blank=True)
 
