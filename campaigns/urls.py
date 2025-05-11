@@ -1,28 +1,17 @@
 from django.urls import path
 
-from .views import (
-    CampaignListView,
-    CampaignDetailView,
-    CampaignCreateView,
-    confirm_generated_chapter_view,
-    generate_chapter_view,
-    save_campaign_summary,
-    ChapterCreateFromPDFView,
-    ChapterDetailView,
-)
-from .views import ChapterCreateView, ChapterUpdateView, ChapterPreviewView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView
+from .views import ChapterCreateView, ChapterUpdateView, ChapterPreviewView, ChapterCreateFromPDFView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
 from .views import GenerateSessionSummaryView, SessionNoteCreateView
 from .views import (
     export_campaign_markdown,
-    campaign_chat_view,
     create_from_chat,
     create_locations_from_chat,
-    chapter_chat_view,
+    save_campaign_summary,
 )
-from .views import ChatMessageEditView, ChatMessageDeleteView
 
 app_name = "campaigns"
 
@@ -68,9 +57,6 @@ urlpatterns = [
         name="session_create",
     ),
     path("<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
-    path("<int:campaign_id>/chat/", campaign_chat_view, name="campaign_chat"),
-    path("chat/<int:pk>/edit/", ChatMessageEditView.as_view(), name="chat_edit"),
-    path("chat/<int:pk>/delete/", ChatMessageDeleteView.as_view(), name="chat_delete"),
     path(
         "<int:campaign_id>/chat/add-entity/", create_from_chat, name="create_from_chat"
     ),
@@ -83,17 +69,6 @@ urlpatterns = [
         "<int:campaign_id>/save-campaign-summary/",
         save_campaign_summary,
         name="save_campaign_summary",
-    ),
-    path("<int:campaign_id>/chapter-chat/", chapter_chat_view, name="chapter_chat"),
-    path(
-        "<int:campaign_id>/generate-chapter/",
-        generate_chapter_view,
-        name="generate_chapter",
-    ),
-    path(
-        "<int:campaign_id>/chapters/confirm/",
-        confirm_generated_chapter_view,
-        name="confirm_generated_chapter",
     ),
     path(
         "campaign/<int:campaign_id>/add_character/", CreateCharacterView.as_view(), name="add_character"

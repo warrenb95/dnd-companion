@@ -46,28 +46,6 @@ class SessionNoteForm(forms.ModelForm):
         }
 
 
-class ChatMessageForm(forms.ModelForm):
-    class Meta:
-        model = ChatMessage
-        fields = ["content"]
-        widgets = {
-            "content": forms.Textarea(
-                attrs={"rows": 3, "placeholder": "Ask the LLM something..."}
-            )
-        }
-
-
-class ChapterChatMessageForm(forms.ModelForm):
-    class Meta:
-        model = ChapterChatMessage
-        fields = ["content"]
-        widgets = {
-            "content": forms.Textarea(
-                attrs={"rows": 3, "placeholder": "Plan your next chapter..."}
-            ),
-        }
-
-
 class CharacterSummaryForm(forms.ModelForm):
     class Meta:
         model = CharacterSummary
