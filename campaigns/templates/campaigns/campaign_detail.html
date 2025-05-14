@@ -40,6 +40,7 @@
       {{ chapter.number }}. {{ chapter.title }} - {{ chapter.status }}
       <a href="{% url 'campaigns:chapter_edit' chapter.id %}" class="btn btn-sm btn-link">Edit</a>
       <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn btn-sm btn-link">View</a>
+      <a href="{% url 'campaigns:chapter_delete' chapter.id %}" class="btn btn-sm btn-danger">Delete</a>
     </li>
     <h5>Session Notes</h5>
     <ul>
@@ -69,6 +70,8 @@
         <li>No chapters added yet.</li>
     {% endfor %}
 </ul>
+
+<a href="{% url 'campaigns:chapter_create' campaign.id %}" class="btn btn-primary">Add new chapter</a>
 
 <br>
 

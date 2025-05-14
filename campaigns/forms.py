@@ -9,12 +9,7 @@ from .models import CharacterSummary
 class ChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
-        fields = ["title", "summary", "status"]
-        widgets = {
-            "content": forms.Textarea(
-                attrs={"rows": 3, "placeholder": "Ask the LLM something..."}
-            )
-        }
+        exclude = ["campaign", "number"]
 
 
 class LocationForm(forms.ModelForm):
