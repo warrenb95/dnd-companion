@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ view.object.title|default:"Update Chapter" }}{% endblock %}
+{% block content %}
+<h2>{{ view.object.title|default:"Update Chapter" }}</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}" class="btn btn-danger">Cancel</a>
+</form>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView
 from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -21,6 +21,11 @@ urlpatterns = [
         "<int:campaign_id>/chapters/add/",
         ChapterCreateView.as_view(),
         name="chapter_create",
+    ),
+    path(
+        "chapters/<int:pk>/delete/",
+        ChapterDeleteView.as_view(),
+        name="chapter_delete",
     ),
     path("chapters/<int:pk>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
     path("chapters/<int:pk>/", ChapterDetailView.as_view(), name="chapter_detail"),

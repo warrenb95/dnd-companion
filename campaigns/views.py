@@ -1,6 +1,7 @@
 import logging
 
 from django.views.generic import (
+    DeleteView,
     ListView,
     DetailView,
     CreateView,
@@ -58,7 +59,7 @@ class CampaignCreateView(CreateView):
 class ChapterCreateView(CreateView):
     model = Chapter
     form_class = ChapterForm
-    template_name = "chapters/chapter_form.html"
+    template_name = "chapters/chapter_create_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,11 +80,17 @@ class ChapterCreateView(CreateView):
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
+class ChapterDeleteView(DeleteView):
+    model = Chapter
+    template_name = "chapters/chapter_delete_confirmation.html"
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
 
 class ChapterUpdateView(UpdateView):
     model = Chapter
     form_class = ChapterForm
-    template_name = "chapters/chapter_form.html"
+    template_name = "chapters/chapter_update_form.html"
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()

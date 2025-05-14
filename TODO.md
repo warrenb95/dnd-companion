@@ -4,7 +4,7 @@
 - [x] remove old AI flows
 - [x] make views classy
 - [x] organise templates: sub folders for different model templates
-- [ ] cancel redirects to campaign and not list of campaigns
+- [x] cancel redirects to campaign and not list of campaigns
 - [ ] chapter create
 - [ ] character details view
 - [ ] manual create chapter
