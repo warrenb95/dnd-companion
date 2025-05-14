@@ -3,8 +3,6 @@ from django import forms
 from .models import Chapter
 from .models import Location, NPC
 from .models import SessionNote
-from .models import ChatMessage
-from .models import ChapterChatMessage
 from .models import CharacterSummary
 
 

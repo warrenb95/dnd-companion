@@ -1,7 +1,7 @@
-{% extends "campaigns/base.html" %}
-{% block title %}{{ view.object.name|default:"New Location" }}{% endblock %}
+{% extends "base.html" %}
+{% block title %}{{ view.object.name|default:"New NPC" }}{% endblock %}
 {% block content %}
-<h2>{{ view.object.name|default:"Add Location" }}</h2>
+<h2>{{ view.object.name|default:"Add NPC" }}</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
