@@ -2,8 +2,10 @@
 
 - [x] fork a branch with the old chapter and campaign AI generation code
 - [x] remove old AI flows
-- [ ] make views classy
-- [ ] organise templates: sub folders for different model templates
+- [x] make views classy
+- [x] organise templates: sub folders for different model templates
+- [ ] cancel redirects to campaign and not list of campaigns
+- [ ] chapter create
 - [ ] character details view
 - [ ] manual create chapter
 - [ ] manual update chapter
