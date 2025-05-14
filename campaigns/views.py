@@ -27,7 +27,6 @@ from .forms import (
     NPCForm,
     SessionNoteForm,
     CharacterSummaryForm,
-    ChapterUploadForm,
 )
 from .llm import (
     generate_session_summary,
@@ -95,6 +94,12 @@ class LocationCreateView(CreateView):
     form_class = LocationForm
     template_name = "locations/location_form.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        context["campaign"] = campaign
+        return context
+
     def form_valid(self, form):
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
         form.instance.campaign = campaign
@@ -109,6 +114,12 @@ class LocationUpdateView(UpdateView):
     form_class = LocationForm
     template_name = "locations/location_form.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        context["campaign"] = campaign
+        return context
+
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
@@ -117,6 +128,12 @@ class NPCCreateView(CreateView):
     model = NPC
     form_class = NPCForm
     template_name = "npcs/npc_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        context["campaign"] = campaign
+        return context
 
     def form_valid(self, form):
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
@@ -131,6 +148,12 @@ class NPCUpdateView(UpdateView):
     model = NPC
     form_class = NPCForm
     template_name = "npcs/npc_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
+        context["campaign_id"] = campaign
+        return context
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -155,6 +178,13 @@ class SessionNoteCreateView(CreateView):
     model = SessionNote
     form_class = SessionNoteForm
     template_name = "sessions/session_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
+        context["campaign"] = chapter.campaign
+        return context
+
 
     def form_valid(self, form):
         chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
