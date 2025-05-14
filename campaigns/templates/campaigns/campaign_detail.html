@@ -2,106 +2,145 @@
 {% block title %}{{ campaign.title }}{% endblock %}
 {% block content %}
 {% load markdown_extras %}
-<h2>{{ campaign.title }}</h2>
+<div class="container my-5">
+  <h1 class="mb-4">{{ campaign.title }}</h1>
 
-<h2>Player Characters</h2>
-<ul>
-    {% for character in campaign.characters.all %}
-        <li>
-            <strong>{{ character.character_name }}</strong>
-            (Level {{ character.level }} {{ character.race }} {{ character.character_class }}) —
-            HP: {{ character.current_hit_points }},
-            AC: {{ character.armor_class }},
-            Passive Perception: {{ character.passive_perception }}
-            [<a href="{% url 'campaigns:update_character' character.pk %}">Edit</a>]
-        </li>
-    {% empty %}
-        <li>No characters yet.</li>
-    {% endfor %}
-</ul>
+  <!-- Campaign Description -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5 mb-0">Campaign Description</h2>
+      <p class="card-text">{{ campaign.description }}</p>
+      <hr>
+      <a href="{% url 'campaigns:export_markdown' campaign.id %}" class="btn btn-outline-secondary mt-3">
+        Download Campaign (.md)
+      </a>
+    </div>
+  </div>
 
-<a href="{% url 'campaigns:add_character' campaign.id %}">Add a New Character</a>
-
-<p>{{ campaign.description }}</p>
-
-<p>{{ campaign.generated_summary|markdown }}</p>
-
-
-<a href="{% url 'campaigns:export_markdown' campaign.id %}" class="btn btn-outline-secondary">
-    Download Campaign (.md)
-</a>
-
-<br>
-
-<h4>Chapters</h4>
-<ul>
-    {% for chapter in campaign.chapters.all %}
-    <li>
-      {{ chapter.number }}. {{ chapter.title }} - {{ chapter.status }}
-      <a href="{% url 'campaigns:chapter_edit' chapter.id %}" class="btn btn-sm btn-link">Edit</a>
-      <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn btn-sm btn-link">View</a>
-      <a href="{% url 'campaigns:chapter_delete' chapter.id %}" class="btn btn-sm btn-danger">Delete</a>
-    </li>
-    <h5>Session Notes</h5>
-    <ul>
-      {% for note in chapter.session_notes.all %}
-        <li>
-          <strong>{{ note.date }}</strong><br>
-          {{ note.notes|linebreaks }}
-          {% if note.summary %}
-            <div class="mt-2">
-              <em>Summary:</em><br>
-              {{ note.summary|linebreaks }}
-            </div>
-          {% else %}
-            <form method="post" action="{% url 'campaigns:generate_summary' note.id %}">
-              {% csrf_token %}
-              <button class="btn btn-sm btn-outline-info mt-2">Generate Summary</button>
-            </form>
-          {% endif %}
-        </li>
+  <!-- Chapters -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Chapters</h2>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for chapter in campaign.chapters.all %}
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>{{ chapter.number }}. {{ chapter.title }} <em class="text-secondary">({{ chapter.status }})</em></span>
+          <div>
+            <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn btn-sm btn-primary">View</a>
+            <a href="{% url 'campaigns:chapter_edit' chapter.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'campaigns:chapter_delete' chapter.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </div>
+        </div>
+        <div class="mt-3 ps-3">
+          <h6 class="mb-2">Session Notes</h6>
+          <ul class="list-unstyled">
+            {% for note in chapter.session_notes.all %}
+            <li class="mb-3">
+              <strong>{{ note.date }}</strong><br>
+              {{ note.notes|linebreaks }}
+              {% if note.summary %}
+              <div class="mt-2">
+                <em>Summary:</em><br>
+                {{ note.summary|linebreaks }}
+              </div>
+              {% else %}
+              <form method="post" action="{% url 'campaigns:generate_summary' note.id %}" class="mt-2">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-info">Generate Summary</button>
+              </form>
+              {% endif %}
+            </li>
+            {% empty %}
+            <li class="text-muted">No session notes yet.</li>
+            {% endfor %}
+          </ul>
+          <a href="{% url 'campaigns:session_create' chapter.id %}" class="btn btn-sm btn-outline-primary">Add Session Notes</a>
+        </div>
+      </li>
       {% empty %}
-        <li>No session notes yet.</li>
+      <li class="list-group-item">No chapters added yet.</li>
       {% endfor %}
     </ul>
-    <a href="{% url 'campaigns:session_create' chapter.id %}" class="btn btn-sm btn-outline-primary">Add Session Notes</a>
+    <div class="card-footer">
+      <a href="{% url 'campaigns:chapter_create' campaign.id %}" class="btn btn-primary">Add New Chapter</a>
+    </div>
+  </div>
 
-    {% empty %}
-        <li>No chapters added yet.</li>
-    {% endfor %}
-</ul>
+  <!-- Player Characters -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Player Characters</h2>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for character in campaign.characters.all %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ character.character_name }}</strong>
+          <span class="text-muted">(Lvl {{ character.level }} {{ character.race }} {{ character.character_class }})</span>
+          <div class="small">
+            HP: {{ character.current_hit_points }} &middot;
+            AC: {{ character.armor_class }} &middot;
+            PP: {{ character.passive_perception }}
+          </div>
+        </div>
+        <div>
+          <a href="{% url 'campaigns:view_character' character.pk %}" class="btn btn-sm btn-primary">View</a>
+          <a href="{% url 'campaigns:update_character' character.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        </div>
+      </li>
+      {% empty %}
+      <li class="list-group-item">No characters yet.</li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer">
+      <a href="{% url 'campaigns:add_character' campaign.id %}" class="btn btn-primary">Add New Character</a>
+    </div>
+  </div>
 
-<a href="{% url 'campaigns:chapter_create' campaign.id %}" class="btn btn-primary">Add new chapter</a>
+  <!-- Locations -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="h5 mb-0">Locations</h2>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for location in campaign.locations.all %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span><strong>{{ location.name }}</strong> &ndash; {{ location.region }}</span>
+        <a href="{% url 'campaigns:location_edit' location.id %}" class="btn btn-sm btn-link">Edit</a>
+      </li>
+      {% empty %}
+      <li class="list-group-item">No locations yet.</li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer">
+      <a href="{% url 'campaigns:location_create' campaign.id %}" class="btn btn-outline-primary">Add Location</a>
+    </div>
+  </div>
 
-<br>
+  <!-- NPCs -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h2 class="h5 mb-0">NPCs</h2>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for npc in campaign.npcs.all %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ npc.name }} ({{ npc.role }}) &ndash; {{ npc.status }}</span>
+        <a href="{% url 'campaigns:npc_edit' npc.id %}" class="btn btn-sm btn-link">Edit</a>
+      </li>
+      {% empty %}
+      <li class="list-group-item">No NPCs yet.</li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer">
+      <a href="{% url 'campaigns:npc_create' campaign.id %}" class="btn btn-outline-primary">Add NPC</a>
+    </div>
+  </div>
 
-<h4>Locations</h4>
-<ul>
-  {% for location in campaign.locations.all %}
-    <li>
-      <strong>{{ location.name }}</strong> - {{ location.region }}
-      <a href="{% url 'campaigns:location_edit' location.id %}" class="btn btn-sm btn-link">Edit</a>
-    </li>
-  {% empty %}
-    <li>No locations yet.</li>
-  {% endfor %}
-</ul>
-<a href="{% url 'campaigns:location_create' campaign.id %}" class="btn btn-sm btn-outline-primary">Add Location</a>
-
-<h4 class="mt-4">NPCs</h4>
-<ul>
-  {% for npc in campaign.npcs.all %}
-    <li>
-      {{ npc.name }} ({{ npc.role }}) - {{ npc.status }}
-      <a href="{% url 'campaigns:npc_edit' npc.id %}" class="btn btn-sm btn-link">Edit</a>
-    </li>
-  {% empty %}
-    <li>No NPCs yet.</li>
-  {% endfor %}
-</ul>
-<a href="{% url 'campaigns:npc_create' campaign.id %}" class="btn btn-sm btn-outline-primary">Add NPC</a>
-
-<br>
-
-<a href="{% url 'campaigns:campaign_list' %}" class="btn btn-secondary mt-3">Back to Campaigns</a>
+  <div class="text-end">
+    <a href="{% url 'campaigns:campaign_list' %}" class="btn btn-secondary">Back to Campaigns</a>
+  </div>
+</div>
 {% endblock %}

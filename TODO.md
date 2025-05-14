@@ -5,11 +5,10 @@
 - [x] make views classy
 - [x] organise templates: sub folders for different model templates
 - [x] cancel redirects to campaign and not list of campaigns
-- [ ] chapter create
+- [x] chapter create
+- [x] chapter delete
 - [ ] character details view
-- [ ] manual create chapter
-- [ ] manual update chapter
-- [ ] delete chapter
+- [ ] clean up UI buttons
 - [ ] improve the chapter pdf upload
   - [ ] processed text preview
   - [ ] llm output preview

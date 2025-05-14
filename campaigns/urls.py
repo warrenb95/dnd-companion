@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView
 from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -59,4 +59,5 @@ urlpatterns = [
         "campaign/<int:campaign_id>/add_character/", CreateCharacterView.as_view(), name="add_character"
     ),
     path("character/<int:pk>/edit/", UpdateCharacterView.as_view(), name="update_character"),
+    path("character/<int:pk>/view/", CharacterDetailView.as_view(), name="view_character"),
 ]
