@@ -1,8 +1,8 @@
-{% extends "campaigns/base.html" %}
-{% block title %}Chapter Upload{% endblock %}
+{% extends "base.html" %}
+{% block title %}{{ view.object.name|default:"New Location" }}{% endblock %}
 {% block content %}
-<h2>Chapter Upload</h2>
-<form method="post" enctype="multipart/form-data">
+<h2>{{ view.object.name|default:"Add Location" }}</h2>
+<form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-success">Save</button>

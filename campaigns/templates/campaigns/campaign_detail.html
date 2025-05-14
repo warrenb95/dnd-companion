@@ -1,4 +1,4 @@
-{% extends "campaigns/base.html" %}
+{% extends "base.html" %}
 {% block title %}{{ campaign.title }}{% endblock %}
 {% block content %}
 {% load markdown_extras %}
@@ -69,8 +69,6 @@
         <li>No chapters added yet.</li>
     {% endfor %}
 </ul>
-
-<a href="{% url 'campaigns:upload_chapter_pdf' campaign.id %}">Upload a new Chapter from PDF</a>
 
 <br>
 

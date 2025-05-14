@@ -1,5 +1,3 @@
-import json
-import re
 import logging
 
 from django.views.generic import (
@@ -7,7 +5,6 @@ from django.views.generic import (
     DetailView,
     CreateView,
     UpdateView,
-    DeleteView,
 )
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render, redirect
@@ -15,7 +12,6 @@ from django.views import View
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import HttpResponse
-from django.contrib import messages
 
 from .models import (
     Campaign,
@@ -23,9 +19,7 @@ from .models import (
     Location,
     NPC,
     SessionNote,
-    ChatMessage,
     CharacterSummary,
-    create_chapter_and_encounters_from_llm,
 )
 from .forms import (
     ChapterForm,
@@ -36,8 +30,6 @@ from .forms import (
     ChapterUploadForm,
 )
 from .llm import (
-    extract_multiple_npcs,
-    extract_locations_from_text,
     generate_session_summary,
 )
 
@@ -67,7 +59,7 @@ class CampaignCreateView(CreateView):
 class ChapterCreateView(CreateView):
     model = Chapter
     form_class = ChapterForm
-    template_name = "campaigns/chapter_form.html"
+    template_name = "chapters/chapter_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,7 +84,7 @@ class ChapterCreateView(CreateView):
 class ChapterUpdateView(UpdateView):
     model = Chapter
     form_class = ChapterForm
-    template_name = "campaigns/chapter_form.html"
+    template_name = "chapters/chapter_form.html"
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -101,7 +93,7 @@ class ChapterUpdateView(UpdateView):
 class LocationCreateView(CreateView):
     model = Location
     form_class = LocationForm
-    template_name = "campaigns/location_form.html"
+    template_name = "locations/location_form.html"
 
     def form_valid(self, form):
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
@@ -115,7 +107,7 @@ class LocationCreateView(CreateView):
 class LocationUpdateView(UpdateView):
     model = Location
     form_class = LocationForm
-    template_name = "campaigns/location_form.html"
+    template_name = "locations/location_form.html"
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -124,7 +116,7 @@ class LocationUpdateView(UpdateView):
 class NPCCreateView(CreateView):
     model = NPC
     form_class = NPCForm
-    template_name = "campaigns/npc_form.html"
+    template_name = "npcs/npc_form.html"
 
     def form_valid(self, form):
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
@@ -138,7 +130,7 @@ class NPCCreateView(CreateView):
 class NPCUpdateView(UpdateView):
     model = NPC
     form_class = NPCForm
-    template_name = "campaigns/npc_form.html"
+    template_name = "npcs/npc_form.html"
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -162,7 +154,7 @@ class GenerateSessionSummaryView(View):
 class SessionNoteCreateView(CreateView):
     model = SessionNote
     form_class = SessionNoteForm
-    template_name = "campaigns/session_form.html"
+    template_name = "sessions/session_form.html"
 
     def form_valid(self, form):
         chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
@@ -253,104 +245,10 @@ def save_campaign_summary(request, campaign_id):
         campaign.save()
         return redirect(campaign.get_absolute_url())
 
-def create_from_chat(request, campaign_id):
-    if request.method == "POST":
-        content = request.POST.get("content")
-        campaign = get_object_or_404(Campaign, pk=campaign_id)
-
-        try:
-            npc_data_json = extract_multiple_npcs(content)
-            # Strip markdown code block if present
-            clean_json = re.sub(
-                r"^```(json)?|```$", "", npc_data_json.strip(), flags=re.MULTILINE
-            )
-
-            npc_list = json.loads(clean_json)
-            print("🔍 LLM RAW NPC JSON:\n", npc_list)
-            npc_list = json.loads(npc_data_json)
-            created_npcs = []
-
-            for npc_data in npc_list:
-                npc = NPC.objects.create(
-                    campaign=campaign,
-                    name=npc_data.get("name", "Unnamed"),
-                    description=npc_data.get("description", ""),
-                    role=npc_data.get("role", ""),
-                    tags=", ".join(npc_data.get("tags", [])),
-                    status=npc_data.get("status", "alive"),
-                )
-
-                npc.save()
-                created_npcs.append(npc.name)
-
-            messages.success(
-                request,
-                f"Created {len(created_npcs)} NPC(s): {', '.join(created_npcs)}.",
-            )
-            return redirect("campaigns:campaign_chat", campaign_id=campaign_id)
-
-        except Exception as e:
-            messages.error(request, f"NPC parsing failed: {e}")
-            return redirect("campaigns:campaign_chat", campaign_id=campaign_id)
-
-
-def create_locations_from_chat(request, campaign_id):
-    if request.method == "POST":
-        content = request.POST.get("content")
-        campaign = get_object_or_404(Campaign, pk=campaign_id)
-
-        try:
-            location_data_json = extract_locations_from_text(content)
-            # Strip markdown code block if present
-            clean_json = re.sub(
-                r"^```(json)?|```$", "", location_data_json.strip(), flags=re.MULTILINE
-            )
-            location_list = json.loads(clean_json)
-            print("🔍 LLM RAW NPC JSON:\n", location_list)
-            created_locs = []
-
-            for loc in location_list:
-                location = Location.objects.create(
-                    campaign=campaign,
-                    name=loc.get("name", "Unnamed"),
-                    description=loc.get("description", ""),
-                    region=loc.get("region", ""),
-                    tags=", ".join(loc.get("tags", [])),
-                )
-                location.save()
-                created_locs.append(location.name)
-
-            messages.success(
-                request,
-                f"Created {len(created_locs)} Location(s): {', '.join(created_locs)}.",
-            )
-            return redirect("campaigns:campaign_chat", campaign_id=campaign_id)
-
-        except Exception as e:
-            messages.error(request, f"Location parsing failed: {e}")
-            return redirect("campaigns:campaign_chat", campaign_id=campaign_id)
-
-def clean_llm_json(raw_text):
-    # Remove markdown code block
-    clean = re.sub(r"^```(json)?|```$", "", raw_text.strip(), flags=re.MULTILINE)
-
-    # Replace all single quotes with double quotes
-    clean = clean.replace("'", '"')
-
-    # Fix bad quotes inside text: change something like entity"s to entity's
-    clean = re.sub(r'(\w)"(\w)', r"\1'\2", clean)
-
-    # Remove trailing commas
-    clean = re.sub(r",\s*}", "}", clean)
-    clean = re.sub(r",\s*]", "]", clean)
-
-    return clean
-
-
 class CreateCharacterView(CreateView):
     model = CharacterSummary
     form_class = CharacterSummaryForm
-    template_name = "campaigns/character_form.html"
+    template_name = "characters//character_form.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -371,49 +269,13 @@ class CreateCharacterView(CreateView):
 class UpdateCharacterView(UpdateView):
     model = CharacterSummary
     form_class = CharacterSummaryForm
-    template_name = "campaigns/character_form.html"
+    template_name = "characters/character_form.html"
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
-
-class ChapterCreateFromPDFView(View):
-    template_name = "campaigns/upload.html"
-
-    def get(self, request, campaign_id):
-        form = ChapterUploadForm()
-        return render(request, self.template_name, {"form": form})
-
-    def post(self, request, campaign_id):
-        form = ChapterUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            pdf_file = form.cleaned_data["pdf_file"]
-            try:
-                campaign = get_object_or_404(Campaign, id=campaign_id)
-                chapter = create_chapter_and_encounters_from_llm(pdf_file, campaign)
-                chapter.save()
-                return redirect("campaigns:chapter_preview", pk=chapter.pk, )
-            except Exception as e:
-                form.add_error(None, f"Error processing PDF: {str(e)}")
-        else:
-            logger.warning("Form submission failed. Errors: %s", form.errors)
-            logger.info("Cleaned data (partial): %s", form.cleaned_data)
-        return render(request, self.template_name, {"form": form})
-
-
-class ChapterPreviewView(View):
-    template_name = "campaigns/chapter_preview.html"
-
-    def get(self, request, pk):
-        chapter = get_object_or_404(Chapter, pk=pk)
-        encounters = chapter.encounters.all()
-        return render(
-            request, self.template_name, {"chapter": chapter, "encounters": encounters}
-        )
-
-
 class ChapterDetailView(View):
-    template_name = "campaigns/chapter_detail.html"
+    template_name = "chapters/chapter_detail.html"
 
     def get(self, request, pk):
         chapter = get_object_or_404(Chapter, pk=pk)

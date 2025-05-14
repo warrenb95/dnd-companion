@@ -1,15 +1,13 @@
 from django.urls import path
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView
-from .views import ChapterCreateView, ChapterUpdateView, ChapterPreviewView, ChapterCreateFromPDFView, ChapterDetailView
+from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
 from .views import GenerateSessionSummaryView, SessionNoteCreateView
 from .views import (
     export_campaign_markdown,
-    create_from_chat,
-    create_locations_from_chat,
     save_campaign_summary,
 )
 
@@ -24,17 +22,7 @@ urlpatterns = [
         ChapterCreateView.as_view(),
         name="chapter_create",
     ),
-    path(
-        "<int:campaign_id>/chapters/upload/",
-        ChapterCreateFromPDFView.as_view(),
-        name="upload_chapter_pdf",
-    ),
     path("chapters/<int:pk>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
-    path(
-        "chapters/<int:pk>/preview/",
-        ChapterPreviewView.as_view(),
-        name="chapter_preview",
-    ),
     path("chapters/<int:pk>/", ChapterDetailView.as_view(), name="chapter_detail"),
     path(
         "<int:campaign_id>/locations/add/",
@@ -57,14 +45,6 @@ urlpatterns = [
         name="session_create",
     ),
     path("<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
-    path(
-        "<int:campaign_id>/chat/add-entity/", create_from_chat, name="create_from_chat"
-    ),
-    path(
-        "<int:campaign_id>/chat/add-locations/",
-        create_locations_from_chat,
-        name="create_locations_from_chat",
-    ),
     path(
         "<int:campaign_id>/save-campaign-summary/",
         save_campaign_summary,

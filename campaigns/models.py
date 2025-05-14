@@ -5,9 +5,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
-from campaigns.llm import parse_text_with_llm
-
-
 class Campaign(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -202,54 +199,3 @@ class CharacterSummary(models.Model):
     def __str__(self):
         return f"{self.character_name} ({self.player_name})"
 
-
-def create_chapter_and_encounters_from_llm(pdf_file, campaign):
-    text = extract_text_from_pdf(pdf_file)
-    print(f"text: {text}")
-    llm_response = parse_text_with_llm(text)
-    print(f"llm response: {llm_response}")
-
-    try:
-        structured_data = json.loads(llm_response)
-        print(f"structured_data: {structured_data}")
-    except json.JSONDecodeError:
-        raise Exception("LLM did not return valid JSON.")
-
-    # Auto-increment order field
-    last_chapter = campaign.chapters.order_by("-number").first()
-    chapter_number = (last_chapter.number + 1) if last_chapter else 1
-
-    chapter = Chapter.objects.create(
-        title=structured_data["title"],
-        number=chapter_number,
-        campaign=campaign,
-        level_range=structured_data.get("level_range", ""),
-        adventure_hook=structured_data.get("adventure_hook", ""),
-        overview=structured_data.get("overview", ""),
-        dm_guidance=structured_data.get("dm_guidance", ""),
-        conclusion=structured_data.get("conclusion", ""),
-    )
-    print(f"chapter {chapter}")
-
-    for enc in structured_data.get("encounters", []):
-        Encounter.objects.create(
-            chapter=chapter,
-            title=enc["title"],
-            type=enc["type"],
-            level_range=enc.get("level_range", ""),
-            summary=enc["summary"],
-            setup=enc["setup"],
-            read_aloud=enc["read_aloud"],
-            tactics=enc.get("tactics", ""),
-            stat_blocks=enc.get("stat_blocks", ""),
-            treasure=enc.get("treasure", ""),
-            map_reference=enc.get("map_reference", ""),
-        )
-        print(f"encounter {enc}")
-
-    return chapter
-
-
-def extract_text_from_pdf(pdf_file):
-    with fitz.open(stream=pdf_file.read(), filetype="pdf") as doc:
-        return "\n".join([page.get_text() for page in doc])
