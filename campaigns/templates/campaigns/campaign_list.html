@@ -1,13 +1,27 @@
 {% extends "base.html" %}
 {% block title %}Your Campaigns{% endblock %}
 {% block content %}
-<h2>All Campaigns</h2>
-<ul>
-    {% for campaign in campaigns %}
-        <li><a href="{% url 'campaigns:campaign_detail' campaign.id %}">{{ campaign.title }}</a></li>
-    {% empty %}
-        <li>No campaigns yet.</li>
-    {% endfor %}
-</ul>
-<a href="{% url 'campaigns:campaign_create' %}" class="btn btn-primary mt-3">Create New Campaign</a>
+<div class="container my-5">
+  <div class="card shadow-sm">
+    <div class="card-header bg-light">
+      <h2 class="h5 mb-0">All Campaigns</h2>
+    </div>
+    <ul class="list-group list-group-flush">
+      {% for campaign in campaigns %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="stretched-link text-decoration-none">
+          {{ campaign.title }}
+        </a>
+      </li>
+      {% empty %}
+      <li class="list-group-item text-muted">No campaigns yet.</li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer text-end">
+      <a href="{% url 'campaigns:campaign_create' %}" class="btn btn-primary">
+        Create New Campaign
+      </a>
+    </div>
+  </div>
+</div>
 {% endblock %}

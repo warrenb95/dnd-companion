@@ -123,8 +123,8 @@ class LocationUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        context["campaign"] = campaign
+        location: Location = self.object
+        context["campaign"] = location.campaign
         return context
 
     def get_success_url(self):
@@ -158,8 +158,8 @@ class NPCUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        context["campaign_id"] = campaign
+        npc: NPC = self.object
+        context["campaign"] = npc.campaign
         return context
 
     def get_success_url(self):
@@ -282,6 +282,11 @@ def save_campaign_summary(request, campaign_id):
         campaign.save()
         return redirect(campaign.get_absolute_url())
 
+class CharacterDetailView(DetailView):
+    model = CharacterSummary
+    template_name = "characters/details.html"
+    context_object_name = "character"
+
 class CreateCharacterView(CreateView):
     model = CharacterSummary
     form_class = CharacterSummaryForm
@@ -307,6 +312,12 @@ class UpdateCharacterView(UpdateView):
     model = CharacterSummary
     form_class = CharacterSummaryForm
     template_name = "characters/character_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        character: CharacterSummary = self.object
+        context["campaign"] = character.campaign
+        return context
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
