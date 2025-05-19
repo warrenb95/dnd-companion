@@ -28,6 +28,9 @@ load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
