@@ -89,10 +89,6 @@
                 <li class="text-muted">No session notes yet.</li>
                 {% endfor %}
               </ul>
-              <a href="{% url 'campaigns:session_create' chapter.id %}"
-                class="btn btn-sm btn-outline-primary">
-                Add Session Notes
-              </a>
             </div>
           </div>
         </div>
@@ -122,6 +118,7 @@
             HP: {{ character.current_hit_points }} &middot;
             AC: {{ character.armor_class }} &middot;
             PP: {{ character.passive_perception }}
+            HI: {{character.heroic_inspiration}}
           </div>
         </div>
         <div>
