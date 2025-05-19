@@ -228,7 +228,7 @@ class SessionNoteCreateView(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
-        context["campaign"] = chapter.campaign
+        context["chapter"] = chapter
         return context
 
 
@@ -238,7 +238,7 @@ class SessionNoteCreateView(CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return self.object.chapter.campaign.get_absolute_url()
+        return self.object.chapter.get_absolute_url()
 
 
 def export_campaign_markdown(request, campaign_id):

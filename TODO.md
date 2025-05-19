@@ -8,18 +8,18 @@
 - [x] chapter create
 - [x] chapter delete
 - [x] character details view
-- [ ] encounters
+- [x] encounters
   - [x] map images: <https://learndjango.com/tutorials/django-file-and-image-uploads-tutorial#urls>
         <https://www.geeksforgeeks.org/python-uploading-images-in-django/>
-  - [ ] show encounter titles on the right side of chapters in campaign view
-- [ ] remove the CUD and use the admin ui to do this for now
+  - [x] show encounter titles on the right side of chapters in campaign view
 - [ ] session view with content in a main container and then an editable player stats section on the side
   - [ ] add heroic inspiration stat to characters
   - [ ] use ai to gen the template
   - [ ] view: not sure how to do have the editable section, maybe create a new form?
   - [ ] url route
   - [ ] update forms views with if statements around the differences between create and update bits
-  - use ai to gen the template
+  - [ ] use ai to gen the template
+- [ ] remove the CUD and use the admin ui to do this for now
 - [ ] session summary for all the session notes, not individual notes
 - [ ] improve the chapter pdf upload
   - [ ] processed text preview
