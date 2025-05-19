@@ -1,15 +1,23 @@
 {% extends "base.html" %}
-{% block title %}{{ view.object.title|default:"Update Chapter" }}{% endblock %}
+{% block title %}{{ chapter.title|default:"Update Chapter" }}{% endblock %}
 {% block content %}
 <div class="container my-5">
   <div class="card shadow-sm">
     <div class="card-header bg-light">
-      <h2>{{ view.object.title|default:"Update Chapter" }}</h2>
+      <h2>Campaign {{campaign.title}} - {{ chapter.title|default:"Update Chapter" }}</h2>
     </div>
     <div class="card-body">
       <form method="post">
         {% csrf_token %}
         {{form.as_p}}
+
+        <table>
+          {{ formset.management_form }}
+          {% for enc_form in formset %}
+            <h3>Encounter</h3>
+            {{ enc_form.as_p }}
+          {% endfor %}
+        </table>
         <div class="d-flex">
           <button type="submit" class="btn btn-success me-2">Save</button>
           <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}" class="btn btn-secondary">Cancel</a>

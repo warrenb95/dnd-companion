@@ -92,6 +92,7 @@ class Encounter(models.Model):
     map_reference = models.TextField(
         help_text="Map or layout references for this encounter.", blank=True
     )
+    map_image = models.ImageField(upload_to="images/", blank=True)
 
     def __str__(self):
         return f"{self.title} (Chapter {self.chapter.number})"

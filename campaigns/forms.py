@@ -1,6 +1,9 @@
 import datetime
+
 from django import forms
-from .models import Chapter
+from django.forms import inlineformset_factory
+
+from .models import Chapter, Encounter
 from .models import Location, NPC
 from .models import SessionNote
 from .models import CharacterSummary
@@ -11,6 +14,19 @@ class ChapterForm(forms.ModelForm):
         model = Chapter
         exclude = ["campaign", "number"]
 
+class EncounterForm(forms.ModelForm):
+    class Meta:
+        model = Encounter
+        exclude = ['chapter']
+
+# Create an inline formset: relate Encounter to Chapter
+EncounterFormSet = inlineformset_factory(
+    Chapter,
+    Encounter,
+    form = EncounterForm,
+    extra = 5,            # how many blank encounter forms to show by default
+    can_delete = True,    # allow users to remove encounters
+)
 
 class LocationForm(forms.ModelForm):
     class Meta:

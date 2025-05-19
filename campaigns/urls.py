@@ -1,4 +1,7 @@
 from django.urls import path
+from django.conf.urls.static import static
+
+from dnd_companion import settings
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView
 from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
@@ -61,3 +64,4 @@ urlpatterns = [
     path("character/<int:pk>/edit/", UpdateCharacterView.as_view(), name="update_character"),
     path("character/<int:pk>/view/", CharacterDetailView.as_view(), name="view_character"),
 ]
+

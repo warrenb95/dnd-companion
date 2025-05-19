@@ -24,6 +24,7 @@ from .models import (
 )
 from .forms import (
     ChapterForm,
+    EncounterFormSet,
     LocationForm,
     NPCForm,
     SessionNoteForm,
@@ -65,16 +66,32 @@ class ChapterCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
         context["campaign"] = campaign
+
+        if self.request.POST:
+            context['formset'] = EncounterFormSet(self.request.POST)
+        else:
+            context['formset'] = EncounterFormSet()
         return context
 
     def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+
         campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
         form.instance.campaign = campaign
 
         # Auto-increment order field
         last_chapter = campaign.chapters.order_by("-number").first()
         form.instance.number = (last_chapter.number + 1) if last_chapter else 1
+        
+        self.object = form.save()
+        encounters = formset.save(commit=False)
 
+        for enc in encounters:
+            enc.chapter = self.object
+            enc.save()
+
+        formset.save_m2m()
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -91,6 +108,27 @@ class ChapterUpdateView(UpdateView):
     model = Chapter
     form_class = ChapterForm
     template_name = "chapters/chapter_update_form.html"
+
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['formset'] = EncounterFormSet(self.request.POST, instance=self.object)
+        else:
+            data['formset'] = EncounterFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['formset']
+        if formset.is_valid():
+            # Save the Chapter first
+            self.object = form.save()
+            # Save all associated Encounter forms (create/update/delete)
+            formset.save()
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -167,6 +205,7 @@ class NPCUpdateView(UpdateView):
 
 
 class GenerateSessionSummaryView(View):
+
     def post(self, request, pk):
         session = SessionNote.objects.get(pk=pk)
         if not session.notes:
