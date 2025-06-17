@@ -1,5 +1,6 @@
 import logging
 
+from django.template import context
 from django.views.generic import (
     DeleteView,
     ListView,
@@ -368,5 +369,5 @@ class ChapterDetailView(View):
         chapter = get_object_or_404(Chapter, pk=pk)
         encounters = chapter.encounters.all()
         return render(
-            request, self.template_name, {"chapter": chapter, "encounters": encounters}
+            request, self.template_name, {"chapter": chapter, "encounters": encounters, "campaign": chapter.campaign}
         )

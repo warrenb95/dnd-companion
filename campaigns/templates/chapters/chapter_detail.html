@@ -122,13 +122,10 @@
             <li class="list-group-item">
               <strong>{{ character.character_name }}</strong>
               <div class="small text-muted">
-                Lvl {{ character.level }} {{ character.race }} {{ character.character_class }}
+                Lvl {{ character.level }} {{ character.race }} {{ character.character_class }} - {{ character.character_sub_class }}
               </div>
               <div class="small">
-                HP: {{ character.current_hit_points }} &middot;
-                AC: {{ character.armor_class }} &middot;
-                PP: {{ character.passive_perception }} &middot;
-                HI: {{ character.heroic_inspiration }}
+                Passive Perception: {{ character.passive_perception }}
               </div>
             </li>
             {% empty %}

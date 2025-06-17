@@ -23,7 +23,7 @@
       <h2 class="h5 mb-0">Chapters</h2>
     </div>
     <ul class="list-group list-group-flush">
-      {% for chapter in campaign.chapters.all %}
+      {% for chapter in campaign.chapters.all|dictsort:"number" %}
       <li class="list-group-item">
         <div class="container-fluid">
           <div class="row">

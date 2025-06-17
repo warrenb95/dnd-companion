@@ -12,11 +12,11 @@
   - [x] map images: <https://learndjango.com/tutorials/django-file-and-image-uploads-tutorial#urls>
         <https://www.geeksforgeeks.org/python-uploading-images-in-django/>
   - [x] show encounter titles on the right side of chapters in campaign view
+- [x] order chapters by number
 - [ ] session view with content in a main container and then an editable player stats section on the side
-  - [ ] add heroic inspiration stat to characters
-  - [ ] use ai to gen the template
+  - [x] add heroic inspiration stat to characters
+  - [x] use ai to gen the template
   - [ ] view: not sure how to do have the editable section, maybe create a new form?
-  - [ ] url route
   - [ ] update forms views with if statements around the differences between create and update bits
   - [ ] use ai to gen the template
 - [ ] remove the CUD and use the admin ui to do this for now
@@ -33,3 +33,7 @@
   - [ ] build flows for this and datastructures
   - [ ] work on user flow using chatGPT to first
   - [ ] campaign chapter creator chat model, views and urls
+
+## Nice to have
+
+- Local Raspberry Pi SQL Server to sync state between laptop and PC
