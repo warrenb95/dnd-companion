@@ -1,0 +1,61 @@
+<li class="border-b border-gray-700 last:border-b-0 px-6 py-4">
+  <div class="flex flex-col md:flex-row md:space-x-8">
+    <div class="md:w-1/3 mb-4 md:mb-0">
+      <h5 class="text-lg font-medium mb-2 text-white">
+        {{ chapter.number }}. {{ chapter.title }}
+        <span class="text-gray-400 text-sm">({{ chapter.status }})</span>
+      </h5>
+      <div class="flex space-x-2 mb-3">
+        <a
+          href="{% url 'campaigns:chapter_detail' chapter.id %}"
+          class="px-3 py-1 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600"
+          >View</a
+        >
+      </div>
+    </div>
+    <div class="md:w-2/3">
+      <h6 class="font-semibold text-white mb-2">Encounters</h6>
+      {% if chapter.encounters.all %}
+      <ul class="list-disc list-inside text-gray-300 mb-2">
+        {% for encounter in chapter.encounters.all %}
+        <li class="py-1">{{ encounter.title }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-gray-500">No encounters yet.</p>
+      {% endif %}
+    </div>
+  </div>
+  <div class="mt-6 pl-2">
+    <h6 class="font-semibold text-white mb-2">Session Notes</h6>
+    <ul>
+      {% for note in chapter.session_notes.all %}
+      <li class="mb-4">
+        <strong class="text-gray-200">{{ note.date }}</strong><br />
+        <span class="block text-gray-300">{{ note.notes|linebreaks }}</span>
+        {% if note.summary %}
+        <div class="mt-2 text-gray-400">
+          <em>Summary:</em><br />
+          <span class="block">{{ note.summary|linebreaks }}</span>
+        </div>
+        {% else %}
+        <form
+          method="post"
+          action="{% url 'campaigns:generate_summary' note.id %}"
+          class="mt-2"
+        >
+          {% csrf_token %}
+          <button
+            class="px-3 py-1 text-sm border border-indigo-400 text-indigo-300 rounded hover:bg-indigo-600 hover:text-white"
+          >
+            Generate Summary
+          </button>
+        </form>
+        {% endif %}
+      </li>
+      {% empty %}
+      <li class="text-gray-500">No session notes yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</li>

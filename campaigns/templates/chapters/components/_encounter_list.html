@@ -1,0 +1,14 @@
+<div class="bg-gray-800 rounded-lg shadow">
+  <div class="border-b border-gray-700 px-6 py-4">
+    <h2 class="text-2xl font-semibold text-white">Encounters</h2>
+  </div>
+  <div class="p-6 space-y-6">
+    {% if encounters %} 
+      {% for enc in encounters %} 
+        {% include "chapters/components/_encounter_card.html" with enc=enc %}
+      {% endfor %}
+    {%else %}
+      <p class="text-gray-500">No encounters added yet.</p>
+    {% endif %}
+  </div>
+</div>

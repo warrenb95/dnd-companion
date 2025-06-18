@@ -1,0 +1,19 @@
+<div class="bg-gray-800 rounded-lg shadow mb-8">
+  <div class="border-b border-gray-700 px-6 py-4">
+    <h2 class="text-2xl font-semibold text-white">Chapters</h2>
+  </div>
+  <ul>
+    {% for chapter in campaign.chapters.all %} 
+      {% include "campaigns/components/_chapter_item.html" with chapter=chapter %} 
+    {% empty %}
+    <li class="px-6 py-4 text-gray-500">No chapters added yet.</li>
+    {% endfor %}
+  </ul>
+  <div class="border-t border-gray-700 px-6 py-4 bg-gray-900">
+    <a
+      href="{% url 'campaigns:chapter_create' campaign.id %}"
+      class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+      >Add New Chapter</a
+    >
+  </div>
+</div>
