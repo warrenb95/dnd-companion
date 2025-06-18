@@ -1,11 +1,32 @@
 {% extends "base.html" %} 
 {% block title %}{{ view.object.title|default:"Delete Chapter" }}{% endblock %} 
+
 {% block content %}
-<h2>{{ view.object.title|default:"Delete Chapter" }}</h2>
-<form method="post">
-  {% csrf_token %}
-  <p>Are you sure you want to delete "{{ view.object.title }}"?</p>
-  {{ form }}
-  <button type="submit" class="btn btn-success">Confirm</button>
-</form>
+<div class="my-12 max-w-xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow p-6 text-gray-200">
+    <h2 class="text-2xl font-bold text-white mb-4">
+      {{ view.object.title|default:"Delete Chapter" }}
+    </h2>
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      <p class="text-gray-300">
+        Are you sure you want to delete <strong class="text-white">"{{ view.object.title }}"</strong>?
+      </p>
+
+      {{ form }}
+
+      <div class="flex gap-4">
+        <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+          Confirm
+        </button>
+        <a href="{% url 'campaigns:campaign_detail' view.object.campaign.id %}"
+           class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded-lg transition">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

@@ -1,0 +1,48 @@
+<div class="bg-gray-800 rounded-lg shadow mb-8">
+  <div class="border-b border-gray-700 px-6 py-4">
+    <h2 class="text-2xl font-semibold text-white">Player Characters</h2>
+  </div>
+  <ul>
+    {% for character in campaign.characters.all %}
+    <li
+      class="flex justify-between items-center border-b border-gray-700 last:border-b-0 px-6 py-4"
+    >
+      <div>
+        <strong class="text-lg text-white"
+          >{{ character.character_name }}</strong
+        >
+        <span class="text-gray-400 ml-2"
+          >(Lvl {{ character.level }} {{ character.race }} {{
+          character.character_class }})</span
+        >
+        <div class="text-sm text-gray-400 mt-1">
+          HP: {{ character.current_hit_points }} &middot; AC: {{
+          character.armor_class }} &middot; PP: {{ character.passive_perception
+          }} &middot; HI: {{character.heroic_inspiration}}
+        </div>
+      </div>
+      <div class="flex space-x-2">
+        <a
+          href="{% url 'campaigns:view_character' character.pk %}"
+          class="px-3 py-1 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600"
+          >View</a
+        >
+        <a
+          href="{% url 'campaigns:update_character' character.pk %}"
+          class="px-3 py-1 text-sm bg-yellow-400 text-white rounded hover:bg-yellow-500"
+          >Edit</a
+        >
+      </div>
+    </li>
+    {% empty %}
+    <li class="px-6 py-4 text-gray-500">No characters yet.</li>
+    {% endfor %}
+  </ul>
+  <div class="border-t border-gray-700 px-6 py-4 bg-gray-900">
+    <a
+      href="{% url 'campaigns:add_character' campaign.id %}"
+      class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+      >Add New Character</a
+    >
+  </div>
+</div>
