@@ -1,6 +1,5 @@
 import logging
 
-
 from django.views.generic import (
     DeleteView,
     ListView,
@@ -16,6 +15,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import (
     Campaign,
@@ -52,89 +52,84 @@ class CampaignListView(ListView):
     template_name = "campaigns/campaign_list.html"
     context_object_name = "campaigns"
 
+    def get_queryset(self):
+        return Campaign.objects.filter(owner=self.request.user)
 
-class CampaignDetailView(DetailView):
+
+class CampaignDetailView(LoginRequiredMixin, DetailView):
     model = Campaign
     template_name = "campaigns/campaign_detail.html"
     context_object_name = "campaign"
 
+    def get_queryset(self):
+        return Campaign.objects.filter(owner=self.request.user)
 
-class CampaignCreateView(CreateView):
+
+class CampaignCreateView(LoginRequiredMixin, CreateView):
     model = Campaign
     fields = ["title", "description"]
     template_name = "campaigns/campaign_form.html"
     success_url = reverse_lazy("campaigns:campaign_list")
 
+    def form_valid(self, form):
+        # Assign the campaign to the logged-in user
+        form.instance.owner = self.request.user
+        messages.success(self.request, "Campaign created successfully.")
+        return super().form_valid(form)
 
-class ChapterCreateView(CreateView):
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Optionally: add Tailwind CSS classes to form fields
+        for field in form.fields.values():
+            field.widget.attrs.update({
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-300 text-black'
+            })
+        return form
+
+
+class ChapterCreateView(LoginRequiredMixin, CreateView):
     model = Chapter
     form_class = ChapterForm
     template_name = "chapters/chapter_create_form.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Fetch and cache the campaign object once
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        context["campaign"] = campaign
-
+        context["campaign"] = self.campaign
         if self.request.POST:
-            context['formset'] = EncounterFormSet(self.request.POST)
+            context["formset"] = EncounterFormSet(self.request.POST)
         else:
-            context['formset'] = EncounterFormSet()
+            context["formset"] = EncounterFormSet()
         return context
 
     def form_valid(self, form):
         context = self.get_context_data()
-        formset = context['formset']
+        formset = context["formset"]
 
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        form.instance.campaign = campaign
+        form.instance.campaign = self.campaign
+        form.instance.owner = self.request.user
 
-        # Auto-increment order field
-        last_chapter = campaign.chapters.order_by("-number").first()
+        # Auto-increment chapter number
+        last_chapter = self.campaign.chapters.order_by("-number").first()
         form.instance.number = (last_chapter.number + 1) if last_chapter else 1
-        
-        self.object = form.save()
-        encounters = formset.save(commit=False)
 
-        for enc in encounters:
-            enc.chapter = self.object
-            enc.save()
-
-        formset.save_m2m()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return self.object.campaign.get_absolute_url()
-
-class ChapterDeleteView(DeleteView):
-    model = Chapter
-    template_name = "chapters/chapter_delete_confirmation.html"
-
-    def get_success_url(self):
-        return self.object.campaign.get_absolute_url()
-
-class ChapterUpdateView(UpdateView):
-    model = Chapter
-    form_class = ChapterForm
-    template_name = "chapters/chapter_update_form.html"
-
-
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            data['formset'] = EncounterFormSet(self.request.POST, instance=self.object)
-        else:
-            data['formset'] = EncounterFormSet(instance=self.object)
-        return data
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        formset = context['formset']
         if formset.is_valid():
-            # Save the Chapter first
             self.object = form.save()
-            # Save all associated Encounter forms (create/update/delete)
-            formset.save()
+            encounters = formset.save(commit=False)
+
+            for enc in encounters:
+                enc.chapter = self.object
+                enc.save()
+
+            formset.save_m2m()
+            messages.success(self.request, "Chapter created successfully.")
             return super().form_valid(form)
         else:
             return self.form_invalid(form)
@@ -143,71 +138,152 @@ class ChapterUpdateView(UpdateView):
         return self.object.campaign.get_absolute_url()
 
 
-class LocationCreateView(CreateView):
+class ChapterDeleteView(LoginRequiredMixin, DeleteView):
+    model = Chapter
+    template_name = "chapters/chapter_delete_confirmation.html"
+
+    def get_queryset(self):
+        # Ensure only the chapter owner can delete
+        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(request, f"Chapter '{self.object.title}' deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
+
+
+class ChapterUpdateView(LoginRequiredMixin, UpdateView):
+    model = Chapter
+    form_class = ChapterForm
+    template_name = "chapters/chapter_update_form.html"
+
+    def get_queryset(self):
+        # Only allow editing chapters if the user owns the parent campaign
+        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context["formset"] = EncounterFormSet(self.request.POST, instance=self.object)
+        else:
+            context["formset"] = EncounterFormSet(instance=self.object)
+        context["campaign"] = self.object.campaign
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context["formset"]
+
+        if formset.is_valid():
+            self.object = form.save()
+            formset.save()
+            messages.success(self.request, "Chapter and encounters updated.")
+            return super().form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
+
+
+class LocationCreateView(LoginRequiredMixin, CreateView):
     model = Location
     form_class = LocationForm
     template_name = "locations/location_form.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        context["campaign"] = campaign
+        context["campaign"] = self.campaign
         return context
 
     def form_valid(self, form):
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        form.instance.campaign = campaign
+        form.instance.campaign = self.campaign
+        form.instance.owner = self.request.user
+        messages.success(self.request, "Location created successfully.")
         return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
 
-class LocationUpdateView(UpdateView):
+class LocationUpdateView(LoginRequiredMixin, UpdateView):
     model = Location
     form_class = LocationForm
     template_name = "locations/location_form.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        location: Location = self.object
-        context["campaign"] = location.campaign
-        return context
-
-    def get_success_url(self):
-        return self.object.campaign.get_absolute_url()
-
-
-class NPCCreateView(CreateView):
-    model = NPC
-    form_class = NPCForm
-    template_name = "npcs/npc_form.html"
+    def get_queryset(self):
+        # Only allow access to locations owned via campaign
+        return Location.objects.select_related('campaign').filter(campaign__owner=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        context["campaign"] = campaign
+        context["campaign"] = self.object.campaign
         return context
 
     def form_valid(self, form):
-        campaign = get_object_or_404(Campaign, pk=self.kwargs["campaign_id"])
-        form.instance.campaign = campaign
+        messages.success(self.request, "Location updated successfully.")
         return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
 
-class NPCUpdateView(UpdateView):
+class NPCCreateView(LoginRequiredMixin, CreateView):
     model = NPC
     form_class = NPCForm
     template_name = "npcs/npc_form.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Restrict access to only campaigns owned by the user
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        npc: NPC = self.object
-        context["campaign"] = npc.campaign
+        context["campaign"] = self.campaign
         return context
+
+    def form_valid(self, form):
+        form.instance.campaign = self.campaign
+        form.instance.owner = self.request.user
+        messages.success(self.request, "NPC created successfully.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
+
+
+class NPCUpdateView(LoginRequiredMixin, UpdateView):
+    model = NPC
+    form_class = NPCForm
+    template_name = "npcs/npc_form.html"
+
+    def get_queryset(self):
+        # Enforce ownership by checking related campaign
+        return NPC.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.object.campaign
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "NPC updated successfully.")
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -229,21 +305,28 @@ class GenerateSessionSummaryView(View):
         return HttpResponseRedirect(session.chapter.campaign.get_absolute_url())
 
 
-class SessionNoteCreateView(CreateView):
+class SessionNoteCreateView(LoginRequiredMixin, CreateView):
     model = SessionNote
     form_class = SessionNoteForm
     template_name = "sessions/session_form.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Securely fetch the chapter through campaign ownership
+        self.chapter = get_object_or_404(
+            Chapter.objects.select_related('campaign').filter(campaign__owner=request.user),
+            pk=self.kwargs["chapter_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
-        context["chapter"] = chapter
+        context["chapter"] = self.chapter
         return context
 
-
     def form_valid(self, form):
-        chapter = get_object_or_404(Chapter, pk=self.kwargs["chapter_id"])
-        form.instance.chapter = chapter
+        form.instance.chapter = self.chapter
+        form.instance.owner = self.request.user
+        messages.success(self.request, "Session note added.")
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -356,29 +439,41 @@ class CreateCharacterView(CreateView):
         return self.object.campaign.get_absolute_url()
 
 
-class UpdateCharacterView(UpdateView):
+class UpdateCharacterView(LoginRequiredMixin, UpdateView):
     model = CharacterSummary
     form_class = CharacterSummaryForm
     template_name = "characters/character_form.html"
 
+    def get_queryset(self):
+        # Restrict updates to only characters owned by this user via the campaign
+        return CharacterSummary.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        character: CharacterSummary = self.object
-        context["campaign"] = character.campaign
+        context["campaign"] = self.object.campaign
         return context
+
+    def form_valid(self, form):
+        messages.success(self.request, "Character updated successfully.")
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
 
-class ChapterDetailView(View):
-    template_name = "chapters/chapter_detail.html"
 
-    def get(self, request, pk):
-        chapter = get_object_or_404(Chapter, pk=pk)
-        encounters = chapter.encounters.all()
-        return render(
-            request, self.template_name, {"chapter": chapter, "encounters": encounters}
-        )
+class ChapterDetailView(LoginRequiredMixin, DetailView):
+    model = Chapter
+    template_name = "chapters/chapter_detail.html"
+    context_object_name = "chapter"
+
+    def get_queryset(self):
+        # Restrict chapters to ones owned by the current user via their campaign
+        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["encounters"] = self.object.encounters.all()
+        return context
 
 
 class LoginView(View):

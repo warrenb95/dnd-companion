@@ -23,8 +23,8 @@
   - [ ] npcs
   - [ ] sessions
 - [x] Setup basic URL routing and home page placeholder
-- [ ] Add basic user model with invite-only registration flow (disable public signup)
-- [ ] Implement authentication (login/logout) with Django’s built-in views
+- [x] Add basic user model with invite-only registration flow (disable public signup)
+- [x] Implement authentication (login/logout) with Django’s built-in views
 
 ---
 
