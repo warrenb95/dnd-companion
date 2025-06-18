@@ -1,14 +1,16 @@
 from django.urls import path
 from django.conf.urls.static import static
+from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, HomeView
 from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
 from .views import GenerateSessionSummaryView, SessionNoteCreateView
+from .views import LoginView
 from .views import (
     export_campaign_markdown,
     save_campaign_summary,
@@ -17,7 +19,10 @@ from .views import (
 app_name = "campaigns"
 
 urlpatterns = [
-    path("", CampaignListView.as_view(), name="campaign_list"),
+    path("", HomeView.as_view(), name="home"),
+    path("campaigns/", CampaignListView.as_view(), name="campaign_list"),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='campaigns:home'), name='logout'),
     path("<int:pk>/", CampaignDetailView.as_view(), name="campaign_detail"),
     path("create/", CampaignCreateView.as_view(), name="campaign_create"),
     path(

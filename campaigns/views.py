@@ -1,5 +1,6 @@
 import logging
 
+
 from django.views.generic import (
     DeleteView,
     ListView,
@@ -13,6 +14,8 @@ from django.views import View
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.http import HttpResponse
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
 
 from .models import (
     Campaign,
@@ -29,6 +32,7 @@ from .forms import (
     NPCForm,
     SessionNoteForm,
     CharacterSummaryForm,
+    StyledAuthenticationForm,
 )
 from .llm import (
     generate_session_summary,
@@ -37,6 +41,11 @@ from .llm import (
 logger = logging.getLogger(__name__)
 logger.setLevel(level="DEBUG")
 
+class HomeView(View):
+    def get(self, request):
+        if request.user.is_authenticated:
+            return redirect('campaigns:campaign_list') 
+        return render(request, 'landing.html')
 
 class CampaignListView(ListView):
     model = Campaign
@@ -370,3 +379,22 @@ class ChapterDetailView(View):
         return render(
             request, self.template_name, {"chapter": chapter, "encounters": encounters}
         )
+
+
+class LoginView(View):
+    template_name = 'accounts/login.html'
+
+    def get(self, request):
+        form = StyledAuthenticationForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = StyledAuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('campaigns:home')
+        else:
+            messages.error(request, 'Invalid username or password.')
+        return render(request, self.template_name, {'form': form})
+
