@@ -21,7 +21,6 @@
   - [ ] encounters
   - [ ] locations
   - [ ] npcs
-  - [ ] sessions
 - [x] Setup basic URL routing and home page placeholder
 - [x] Add basic user model with invite-only registration flow (disable public signup)
 - [x] Implement authentication (login/logout) with Django’s built-in views
@@ -36,7 +35,7 @@
 - [ ] Implement invite-only user creation in admin panel
 - [ ] Add model fields for metadata (tags, statuses, timestamps, cover images)
 - [ ] Implement file storage backend for uploaded files (local for dev)
-- [ ] Add basic permissions so users only access their own campaigns/sessions
+- [x] Add basic permissions so users only access their own campaigns/sessions
 
 ---
 

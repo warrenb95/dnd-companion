@@ -4,12 +4,12 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, HomeView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, HomeView, empty_fragment
 from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
-from .views import GenerateSessionSummaryView, SessionNoteCreateView
+from .views import GenerateSessionSummaryView
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
@@ -52,11 +52,8 @@ urlpatterns = [
         GenerateSessionSummaryView.as_view(),
         name="generate_summary",
     ),
-    path(
-        "chapters/<int:chapter_id>/sessions/add/",
-        SessionNoteCreateView.as_view(),
-        name="session_create",
-    ),
+    path("<int:encounter_id>/note-form/", EncounterNoteFormView.as_view(), name="encounter_note_form"),
+    path("create-encounter-note/", EncounterNoteCreateView.as_view(), name="encounter_note_create"),
     path("<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
     path(
         "<int:campaign_id>/save-campaign-summary/",
@@ -68,5 +65,6 @@ urlpatterns = [
     ),
     path("character/<int:pk>/edit/", UpdateCharacterView.as_view(), name="update_character"),
     path("character/<int:pk>/view/", CharacterDetailView.as_view(), name="view_character"),
+    path("empty/", empty_fragment, name="empty_fragment"),
 ]
 

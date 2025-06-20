@@ -1,0 +1,41 @@
+<div class="bg-gray-800 rounded-lg shadow">
+  <div class="border-b border-gray-700 px-6 py-4">
+    <h2 class="text-2xl font-semibold text-white">Encounters & Notes</h2>
+  </div>
+  <div class="p-6 space-y-10">
+    {% if encounters %} {% for enc in encounters %}
+    <div class="bg-gray-700 rounded-lg overflow-hidden shadow">
+      <div class="flex flex-col lg:flex-row">
+        <!-- Encounter Info -->
+        <div class="lg:w-1/2 p-4 text-gray-300 space-y-2">
+          <h3 class="text-xl font-semibold text-white">
+            {{ enc.title }}
+            <span class="text-sm text-gray-400">({{ enc.type }})</span>
+          </h3>
+          <p><strong>Level Range:</strong> {{ enc.level_range }}</p>
+          <p><strong>Summary:</strong> {{ enc.summary }}</p>
+          <p><strong>Setup:</strong> {{ enc.setup }}</p>
+          <p><strong>Read-Aloud:</strong> {{ enc.read_aloud }}</p>
+          <p><strong>Tactics:</strong> {{ enc.tactics }}</p>
+          <p><strong>Map Ref:</strong> {{ enc.map_reference }}</p>
+        </div>
+
+        <!-- Encounter Map -->
+        {% if enc.map_image %}
+        <div class="lg:w-1/2">
+          <img
+            src="{{ enc.map_image.url }}"
+            class="w-full h-full object-cover rounded-b-lg lg:rounded-l-none lg:rounded-r-lg"
+            alt="Map for {{ enc.title }}"
+          />
+        </div>
+        {% endif %}
+      </div>
+
+      {% include "encounters/components/_notes_list.html" %}
+    </div>
+    {% endfor %} {% else %}
+    <p class="text-gray-500">No encounters added yet.</p>
+    {% endif %}
+  </div>
+</div>

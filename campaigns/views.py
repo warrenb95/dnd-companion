@@ -10,7 +10,7 @@ from django.views.generic import (
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
@@ -20,6 +20,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import (
     Campaign,
     Chapter,
+    Encounter,
     Location,
     NPC,
     SessionNote,
@@ -30,7 +31,6 @@ from .forms import (
     EncounterFormSet,
     LocationForm,
     NPCForm,
-    SessionNoteForm,
     CharacterSummaryForm,
     StyledAuthenticationForm,
 )
@@ -305,33 +305,24 @@ class GenerateSessionSummaryView(View):
         return HttpResponseRedirect(session.chapter.campaign.get_absolute_url())
 
 
-class SessionNoteCreateView(LoginRequiredMixin, CreateView):
-    model = SessionNote
-    form_class = SessionNoteForm
-    template_name = "sessions/session_form.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        # Securely fetch the chapter through campaign ownership
-        self.chapter = get_object_or_404(
-            Chapter.objects.select_related('campaign').filter(campaign__owner=request.user),
-            pk=self.kwargs["chapter_id"]
-        )
-        return super().dispatch(request, *args, **kwargs)
+class EncounterNoteFormView(View):
+    def get(self, request, encounter_id):
+        encounter = get_object_or_404(Encounter, pk=encounter_id)
+        return render(request, "encounters/components/_note_form.html", {"encounter": encounter})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["chapter"] = self.chapter
-        return context
+class EncounterNoteCreateView(View):
+    def post(self, request):
+        content = request.POST.get("content")
+        encounter_id = request.POST.get("encounter")
+        encounter = None
 
-    def form_valid(self, form):
-        form.instance.chapter = self.chapter
-        form.instance.owner = self.request.user
-        messages.success(self.request, "Session note added.")
-        return super().form_valid(form)
+        if content and encounter_id:
+            encounter = get_object_or_404(Encounter, pk=encounter_id)
+            SessionNote.objects.create(encounter=encounter, content=content, owner=request.user)
 
-    def get_success_url(self):
-        return self.object.chapter.get_absolute_url()
-
+        # Re-render the updated notes list as HTML
+        return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
 
 def export_campaign_markdown(request, campaign_id):
     campaign = get_object_or_404(Campaign, pk=campaign_id)
@@ -493,3 +484,5 @@ class LoginView(View):
             messages.error(request, 'Invalid username or password.')
         return render(request, self.template_name, {'form': form})
 
+def empty_fragment(request):
+    return HttpResponse("")

@@ -44,7 +44,7 @@ class NPCForm(forms.ModelForm):
 class SessionNoteForm(forms.ModelForm):
     class Meta:
         model = SessionNote
-        fields = ["date", "notes"]
+        fields = ["date", "content"]
         widgets = {
             "date": forms.DateInput(
                 attrs={
@@ -52,7 +52,7 @@ class SessionNoteForm(forms.ModelForm):
                     "value": datetime.date.today().isoformat(),  # sets default to today
                 }
             ),
-            "notes": forms.Textarea(attrs={"rows": 6}),
+            "content": forms.Textarea(attrs={"rows": 6}),
         }
 
 
