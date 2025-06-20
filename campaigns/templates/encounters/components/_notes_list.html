@@ -1,0 +1,28 @@
+<div id="notes-list-{{ enc.id }}">
+  {% if enc.session_notes.all %}
+  <ul class="space-y-2 text-gray-300 list-disc list-inside mt-2">
+    {% for note in enc.session_notes.all %}
+    <li>
+      <span class="text-gray-400 text-sm">
+        {{ note.date|date:"M d, Y" }}:
+      </span>
+      {{ note.content }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p class="text-gray-500 mt-2">No notes for this encounter yet.</p>
+  {% endif %}
+
+  <button
+    type="button"
+    hx-get="{% url 'campaigns:encounter_note_form' enc.id %}"
+    hx-target="#note-form-{{ enc.id }}"
+    hx-swap="innerHTML"
+    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow mt-2"
+  >
+    + Add Note
+  </button>
+
+  <div id="note-form-{{ enc.id }}"></div>
+</div>

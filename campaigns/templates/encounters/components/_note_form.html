@@ -1,0 +1,41 @@
+<form
+  method="post"
+  hx-post="{% url 'campaigns:encounter_note_create' %}"
+  hx-target="#notes-list-{{ encounter.id }}"
+  hx-swap="outerHTML"
+  class="bg-gray-900 border border-gray-700 rounded-lg px-6 py-4 space-y-4 w-full max-w-full mx-auto"
+  id="note-form-{{ encounter.id }}"
+>
+  {% csrf_token %}
+  <h3 class="text-lg font-semibold text-white">Add Session Note</h3>
+
+  <textarea
+    name="content"
+    rows="4"
+    class="w-full p-3 rounded-md bg-gray-800 text-gray-100 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    placeholder="Write your session note here..."
+  ></textarea>
+
+  <input type="hidden" name="encounter" value="{{ encounter.id }}" />
+
+  <div class="flex justify-end gap-3">
+    <!-- Cancel Button (HTMX version) -->
+    <button
+      type="button"
+      hx-get="/empty/"
+      hx-target="#note-form-{{ encounter.id }}"
+      hx-swap="outerHTML"
+      class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md"
+    >
+      Cancel
+    </button>
+
+    <!-- Submit Button -->
+    <button
+      type="submit"
+      class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md shadow"
+    >
+      Save Note
+    </button>
+  </div>
+</form>
