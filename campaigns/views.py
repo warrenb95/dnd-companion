@@ -117,15 +117,24 @@ class ChapterCreateView(LoginRequiredMixin, CreateView):
         form.instance.owner = self.request.user
 
         # Auto-increment chapter number
-        last_chapter = self.campaign.chapters.order_by("-number").first()
-        form.instance.number = (last_chapter.number + 1) if last_chapter else 1
+        last_chapter = self.campaign.chapters.order_by("-order").first()
+        form.instance.order = (last_chapter.order + 1) if last_chapter else 1
 
         if formset.is_valid():
             self.object = form.save()
             encounters = formset.save(commit=False)
 
+            # Get the highest order number for existing encounters
+            last_encounter = self.object.encounters.order_by("-order").first()
+            next_order = (last_encounter.order + 1) if last_encounter else 1
+
             for enc in encounters:
                 enc.chapter = self.object
+                enc.owner = self.request.user
+                # Only set order for new encounters (those without an ID)
+                if not enc.id:
+                    enc.order = next_order
+                    next_order += 1
                 enc.save()
 
             formset.save_m2m()
@@ -179,7 +188,20 @@ class ChapterUpdateView(LoginRequiredMixin, UpdateView):
 
         if formset.is_valid():
             self.object = form.save()
-            formset.save()
+            encounters = formset.save(commit=False)
+
+            # Get the highest order number for existing encounters
+            last_encounter = self.object.encounters.order_by("-order").first()
+            next_order = (last_encounter.order + 1) if last_encounter else 1
+
+            for enc in encounters:
+                # Only set order for new encounters (those without an ID)
+                if not enc.id:
+                    enc.order = next_order
+                    next_order += 1
+                enc.save()
+
+            formset.save_m2m()
             messages.success(self.request, "Chapter and encounters updated.")
             return super().form_valid(form)
         else:
@@ -362,9 +384,9 @@ def export_campaign_markdown(request, campaign_id):
 
     lines += ["", "---", "", "## 📖 Chapters"]
 
-    for chapter in campaign.chapters.order_by("number"):
+    for chapter in campaign.chapters.order_by("order"):
         lines += [
-            f"### Chapter {chapter.number}: {chapter.title}",
+            f"### Chapter {chapter.order}: {chapter.title}",
             f"**Status:** {chapter.status.replace('_', ' ').capitalize()}",
             "",
             chapter.summary or "_No summary yet_",
@@ -463,7 +485,7 @@ class ChapterDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["encounters"] = self.object.encounters.all()
+        context["encounters"] = self.object.encounters.order_by('order')
         return context
 
 

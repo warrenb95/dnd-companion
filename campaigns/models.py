@@ -27,7 +27,7 @@ class Chapter(models.Model):
     campaign = models.ForeignKey(
         Campaign, on_delete=models.CASCADE, related_name="chapters"
     )
-    number = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(default=1, help_text="Order of the chapter in the campaign")
     title = models.CharField(max_length=200)
     summary = models.TextField(blank=True)
     status = models.CharField(
@@ -60,8 +60,12 @@ class Chapter(models.Model):
     def get_absolute_url(self):
         return reverse("campaigns:chapter_detail", args=[str(self.id)])
 
+    class Meta:
+        ordering = ['order']  # Ascending order by default
+
+
     def __str__(self):
-        return f"{self.number} - {self.title}"
+        return f"{self.order} - {self.title}"
 
 
 class Encounter(models.Model):
@@ -97,9 +101,13 @@ class Encounter(models.Model):
     )
     map_image = models.ImageField(upload_to="images/", blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='encounters')
+    order = models.PositiveIntegerField(default=1, help_text="Order of the encounter in the chapter")
+
+    class Meta:
+        ordering = ['order']  # Ascending order by default
 
     def __str__(self):
-        return f"{self.title} (Chapter {self.chapter.number})"
+        return f"{self.title} (Chapter {self.chapter.order})"
 
 
 class Location(models.Model):
@@ -154,7 +162,7 @@ class SessionNote(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_notes')
 
     def __str__(self):
-        return f"Session on {self.date} - Chapter {self.chapter.title}"
+        return f"Session on {self.date} - {self.encounter.title if self.encounter else 'Unknown'}"
 
 
 class ChatMessage(models.Model):
