@@ -12,13 +12,25 @@
       <div class="flex flex-col lg:flex-row">
         <!-- Encounter Info -->
         <div class="lg:w-1/2 p-4 text-gray-300 space-y-2">
-          <h3 class="text-xl font-semibold text-white">
-            {{ enc.order }}. {{ enc.title }}
-            <span class="text-sm text-gray-400">({{ enc.type }})</span>
-            {% if enc.is_optional %}
-            <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Optional</span>
-            {% endif %}
-          </h3>
+          <div class="flex justify-between items-start">
+            <h3 class="text-xl font-semibold text-white">
+              {{ enc.order }}. {{ enc.title }}
+              <span class="text-sm text-gray-400">({{ enc.type }})</span>
+              {% if enc.is_optional %}
+              <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">Optional</span>
+              {% endif %}
+            </h3>
+            <div class="flex gap-2">
+              <a href="{% url 'campaigns:encounter_edit' enc.id %}" 
+                 class="bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200">
+                Edit
+              </a>
+              <a href="{% url 'campaigns:encounter_delete' enc.id %}" 
+                 class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200">
+                Delete
+              </a>
+            </div>
+          </div>
           
           {% if enc.danger_level %}
           <div class="mb-2">

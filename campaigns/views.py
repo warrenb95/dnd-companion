@@ -525,6 +525,46 @@ class EncounterCreateView(LoginRequiredMixin, CreateView):
         return self.chapter.get_absolute_url()
 
 
+class EncounterUpdateView(LoginRequiredMixin, UpdateView):
+    model = Encounter
+    form_class = EncounterForm
+    template_name = "encounters/encounter_form.html"
+
+    def get_queryset(self):
+        # Only allow editing encounters if the user owns the parent campaign
+        return Encounter.objects.select_related('chapter__campaign').filter(chapter__campaign__owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["chapter"] = self.object.chapter
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Encounter '{form.instance.title}' updated successfully.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirect back to chapter detail view after success
+        return self.object.chapter.get_absolute_url()
+
+
+class EncounterDeleteView(LoginRequiredMixin, DeleteView):
+    model = Encounter
+    template_name = "encounters/encounter_delete_confirmation.html"
+
+    def get_queryset(self):
+        # Ensure only the encounter owner can delete (via campaign ownership)
+        return Encounter.objects.select_related('chapter__campaign').filter(chapter__campaign__owner=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(request, f"Encounter '{self.object.title}' deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return self.object.chapter.get_absolute_url()
+
+
 class LoginView(View):
     template_name = 'accounts/login.html'
 
