@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Add Encounter - {{ chapter.title }}{% endblock %}
+
+{% block content %}
+<div class="my-8 max-w-4xl mx-auto">
+  <a href="{% url 'campaigns:chapter_detail' chapter.id %}"
+     class="inline-block mb-6 text-indigo-400 hover:underline">
+    ← Back to Chapter
+  </a>
+
+  <div class="bg-gray-800 rounded-lg shadow-xl">
+    <div class="border-b border-gray-700 px-6 py-4">
+      <h2 class="text-2xl font-semibold text-white">Add New Encounter</h2>
+      <p class="text-gray-400 mt-1">Chapter: {{ chapter.title }}</p>
+    </div>
+    
+    <div class="p-6">
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Title -->
+          <div>
+            <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              Title *
+            </label>
+            {{ form.title|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+            {% if form.title.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.title.errors }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Type -->
+          <div>
+            <label for="{{ form.type.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              Type *
+            </label>
+            {{ form.type|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+            {% if form.type.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.type.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div>
+          <label for="{{ form.summary.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Summary *
+          </label>
+          {{ form.summary|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+          {% if form.summary.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.summary.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Setup -->
+        <div>
+          <label for="{{ form.setup.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Setup
+          </label>
+          {{ form.setup|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+          {% if form.setup.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.setup.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Read-Aloud -->
+        <div>
+          <label for="{{ form.read_aloud.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Read-Aloud Text
+          </label>
+          {{ form.read_aloud|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+          {% if form.read_aloud.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.read_aloud.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- DM Notes -->
+        <div>
+          <label for="{{ form.dm_notes.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            DM Notes
+          </label>
+          {{ form.dm_notes|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+          {% if form.dm_notes.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.dm_notes.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Map Reference -->
+          <div>
+            <label for="{{ form.map_reference.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              Map Reference
+            </label>
+            {{ form.map_reference|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+            {% if form.map_reference.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.map_reference.errors }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Danger Level -->
+          <div>
+            <label for="{{ form.danger_level.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              Danger Level
+            </label>
+            {{ form.danger_level|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+            {% if form.danger_level.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.danger_level.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Map Image -->
+        <div>
+          <label for="{{ form.map_image.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Map Image
+          </label>
+          {{ form.map_image|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" }}
+          {% if form.map_image.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.map_image.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Tags -->
+        <div>
+          <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Tags
+          </label>
+          {{ form.tags|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"|attr:"placeholder=e.g., boss, undead, trap, ambush (comma-separated)" }}
+          {% if form.tags.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.tags.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Optional Checkbox -->
+        <div class="flex items-center">
+          {{ form.is_optional|add_class:"h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-600 rounded bg-gray-700" }}
+          <label for="{{ form.is_optional.id_for_label }}" class="ml-2 text-sm text-gray-300">
+            This encounter is optional/skippable
+          </label>
+          {% if form.is_optional.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.is_optional.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="flex justify-end space-x-3 pt-6 border-t border-gray-700">
+          <a href="{% url 'campaigns:chapter_detail' chapter.id %}" 
+             class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition duration-200">
+            Cancel
+          </a>
+          <button type="submit" 
+                  class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200">
+            Save Encounter
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

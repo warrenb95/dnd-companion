@@ -5,7 +5,7 @@ from django.contrib.auth.views import LogoutView
 from dnd_companion import settings
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, HomeView, empty_fragment
-from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView
+from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
@@ -37,6 +37,11 @@ urlpatterns = [
     ),
     path("chapters/<int:pk>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
     path("chapters/<int:pk>/", ChapterDetailView.as_view(), name="chapter_detail"),
+    path(
+        "chapters/<int:chapter_id>/encounters/add/",
+        EncounterCreateView.as_view(),
+        name="encounter_create",
+    ),
     path(
         "<int:campaign_id>/locations/add/",
         LocationCreateView.as_view(),
