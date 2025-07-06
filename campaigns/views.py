@@ -10,7 +10,7 @@ from django.views.generic import (
 from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
@@ -143,6 +143,39 @@ class ChapterCreateView(LoginRequiredMixin, CreateView):
             return super().form_valid(form)
         else:
             return self.form_invalid(form)
+
+    def get_success_url(self):
+        return self.object.campaign.get_absolute_url()
+
+
+class ChapterQuickCreateView(LoginRequiredMixin, CreateView):
+    model = Chapter
+    form_class = ChapterForm
+    template_name = "chapters/chapter_quick_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # Fetch and cache the campaign object once
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+    def form_valid(self, form):
+        form.instance.campaign = self.campaign
+        form.instance.owner = self.request.user
+
+        # Auto-increment chapter number
+        last_chapter = self.campaign.chapters.order_by("-order").first()
+        form.instance.order = (last_chapter.order + 1) if last_chapter else 1
+
+        messages.success(self.request, f"Chapter '{form.instance.title}' created successfully.")
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
@@ -593,3 +626,47 @@ class LoginView(View):
 
 def empty_fragment(request):
     return HttpResponse()
+
+
+class ChapterStatusToggleView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        chapter = get_object_or_404(
+            Chapter.objects.select_related('campaign').filter(campaign__owner=request.user),
+            pk=pk
+        )
+        
+        # Cycle through status options
+        status_cycle = {
+            'not_started': 'in_progress',
+            'in_progress': 'completed', 
+            'completed': 'not_started'
+        }
+        
+        chapter.status = status_cycle.get(chapter.status, 'not_started')
+        chapter.save()
+        
+        # Return updated status for HTMX
+        return render(request, 'chapters/components/_status_badge.html', {
+            'chapter': chapter
+        })
+
+
+class ChapterReorderView(LoginRequiredMixin, View):
+    def post(self, request, campaign_id):
+        campaign = get_object_or_404(
+            Campaign.objects.filter(owner=request.user),
+            pk=campaign_id
+        )
+        
+        # Get the new order from the request
+        chapter_ids = request.POST.getlist('chapter_order')
+        
+        # Update each chapter's order
+        for index, chapter_id in enumerate(chapter_ids):
+            Chapter.objects.filter(
+                id=chapter_id, 
+                campaign=campaign
+            ).update(order=index + 1)
+        
+        messages.success(request, "Chapter order updated successfully.")
+        return JsonResponse({'status': 'success'})

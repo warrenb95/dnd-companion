@@ -25,7 +25,7 @@ EncounterFormSet = inlineformset_factory(
     Chapter,
     Encounter,
     form = EncounterForm,
-    extra = 5,            # how many blank encounter forms to show by default
+    extra = 1,            # start with 1 blank encounter form
     can_delete = True,    # allow users to remove encounters
 )
 

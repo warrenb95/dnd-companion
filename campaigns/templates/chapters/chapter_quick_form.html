@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Quick Add Chapter{% endblock %}
+
+{% block content %}
+<div class="my-10 max-w-2xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+      <h2 class="text-2xl font-semibold text-white">
+        Add Chapter to {{ campaign.title }}
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Create a chapter outline - you can add encounters later</p>
+    </div>
+
+    <div class="p-6">
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Title -->
+        <div>
+          <label for="id_title" class="block text-sm font-medium text-white mb-2">Chapter Title *</label>
+          {{ form.title }}
+          {% if form.title.help_text %}
+          <p class="text-gray-400 text-sm mt-1">{{ form.title.help_text }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Summary -->
+        <div>
+          <label for="id_summary" class="block text-sm font-medium text-white mb-2">Summary</label>
+          {{ form.summary }}
+          {% if form.summary.help_text %}
+          <p class="text-gray-400 text-sm mt-1">{{ form.summary.help_text }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Intro -->
+        <div>
+          <label for="id_intro" class="block text-sm font-medium text-white mb-2">Introduction/Hook</label>
+          {{ form.intro }}
+          {% if form.intro.help_text %}
+          <p class="text-gray-400 text-sm mt-1">{{ form.intro.help_text }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Level Range and Status -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="id_level_range" class="block text-sm font-medium text-white mb-2">Level Range</label>
+            {{ form.level_range }}
+            {% if form.level_range.help_text %}
+            <p class="text-gray-400 text-sm mt-1">{{ form.level_range.help_text }}</p>
+            {% endif %}
+          </div>
+          <div>
+            <label for="id_status" class="block text-sm font-medium text-white mb-2">Status</label>
+            {{ form.status }}
+            {% if form.status.help_text %}
+            <p class="text-gray-400 text-sm mt-1">{{ form.status.help_text }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Optional Chapter -->
+        <div class="flex items-center">
+          {{ form.is_optional }}
+          <label for="id_is_optional" class="ml-2 text-white">
+            Optional Chapter
+            {% if form.is_optional.help_text %}
+            <span class="block text-gray-400 text-sm">{{ form.is_optional.help_text }}</span>
+            {% endif %}
+          </label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-4 border-t border-gray-700">
+          <button type="submit"
+                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg transition">
+            Create Chapter
+          </button>
+          <a href="{% url 'campaigns:campaign_detail' campaign.id %}"
+             class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded-lg transition">
+            Cancel
+          </a>
+          <a href="{% url 'campaigns:chapter_create' campaign.id %}"
+             class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+            Create with Encounters
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Style form fields */
+form input[type="text"], 
+form textarea, 
+form select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+form input[type="text"]:focus, 
+form textarea:focus, 
+form select:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+form input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.25rem;
+}
+
+form textarea {
+  min-height: 4rem;
+  resize: vertical;
+}
+</style>
+{% endblock %}

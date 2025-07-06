@@ -11,4 +11,127 @@
     <a href="{% url 'campaigns:campaign_list' %}" class="inline-block px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Back to Campaigns</a>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggle-reorder');
+    const chapterList = document.getElementById('chapter-list');
+    let isReorderMode = false;
+    
+    if (!toggleBtn || !chapterList) return;
+    
+    toggleBtn.addEventListener('click', function() {
+        isReorderMode = !isReorderMode;
+        
+        if (isReorderMode) {
+            enableReorderMode();
+            toggleBtn.textContent = 'Save Order';
+            toggleBtn.className = 'text-sm bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded';
+        } else {
+            saveOrder();
+        }
+    });
+    
+    function enableReorderMode() {
+        const dragHandles = document.querySelectorAll('.drag-handle');
+        const items = document.querySelectorAll('.chapter-item');
+        
+        dragHandles.forEach(handle => handle.classList.remove('hidden'));
+        items.forEach(item => {
+            item.draggable = true;
+            item.style.cursor = 'move';
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragover', handleDragOver);
+            item.addEventListener('drop', handleDrop);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+    }
+    
+    function disableReorderMode() {
+        const dragHandles = document.querySelectorAll('.drag-handle');
+        const items = document.querySelectorAll('.chapter-item');
+        
+        dragHandles.forEach(handle => handle.classList.add('hidden'));
+        items.forEach(item => {
+            item.draggable = false;
+            item.style.cursor = 'default';
+            item.removeEventListener('dragstart', handleDragStart);
+            item.removeEventListener('dragover', handleDragOver);
+            item.removeEventListener('drop', handleDrop);
+            item.removeEventListener('dragend', handleDragEnd);
+        });
+        
+        toggleBtn.textContent = 'Enable Reordering';
+        toggleBtn.className = 'text-sm text-indigo-400 hover:text-indigo-300';
+    }
+    
+    let draggedElement = null;
+    
+    function handleDragStart(e) {
+        draggedElement = this;
+        this.style.opacity = '0.5';
+    }
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        if (this !== draggedElement) {
+            const allItems = Array.from(chapterList.children);
+            const draggedIndex = allItems.indexOf(draggedElement);
+            const targetIndex = allItems.indexOf(this);
+            
+            if (draggedIndex < targetIndex) {
+                this.parentNode.insertBefore(draggedElement, this.nextSibling);
+            } else {
+                this.parentNode.insertBefore(draggedElement, this);
+            }
+            
+            updateOrderNumbers();
+        }
+    }
+    
+    function handleDragEnd(e) {
+        this.style.opacity = '1';
+        draggedElement = null;
+    }
+    
+    function updateOrderNumbers() {
+        const items = document.querySelectorAll('.chapter-item');
+        items.forEach((item, index) => {
+            const orderSpan = item.querySelector('.chapter-order');
+            if (orderSpan) orderSpan.textContent = index + 1;
+        });
+    }
+    
+    function saveOrder() {
+        const items = document.querySelectorAll('.chapter-item');
+        const chapterIds = Array.from(items).map(item => item.dataset.chapterId);
+        
+        const formData = new FormData();
+        chapterIds.forEach(id => formData.append('chapter_order', id));
+        
+        fetch(`{% url 'campaigns:chapter_reorder' campaign.id %}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                disableReorderMode();
+                isReorderMode = false;
+                // Optionally show success message
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+});
+</script>
+
+{% csrf_token %}
 {% endblock %}

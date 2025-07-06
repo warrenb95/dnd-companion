@@ -1,16 +1,28 @@
 <div class="bg-gray-800 p-6 rounded-lg shadow">
-  <div class="flex items-center gap-4 mb-4">
-    <h1 class="text-3xl font-bold text-white">{{ chapter.title }}</h1>
-    {% if chapter.is_optional %}
-    <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-full">Optional</span>
-    {% endif %}
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-4">
+      <h1 class="text-3xl font-bold text-white">{{ chapter.title }}</h1>
+      {% if chapter.is_optional %}
+      <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded-full">Optional</span>
+      {% endif %}
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <a href="{% url 'campaigns:chapter_edit' chapter.id %}"
+         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+        Edit Chapter
+      </a>
+    </div>
   </div>
   
-  <div class="flex gap-4 text-gray-400 mb-4">
+  <div class="flex gap-4 items-center mb-4">
     {% if chapter.level_range %}
-    <span>Level Range: {{ chapter.level_range }}</span>
+    <span class="text-gray-400">Level Range: {{ chapter.level_range }}</span>
     {% endif %}
-    <span class="capitalize">Status: {{ chapter.get_status_display }}</span>
+    <div class="flex items-center gap-2">
+      <span class="text-gray-400">Status:</span>
+      {% include "chapters/components/_status_badge.html" %}
+    </div>
   </div>
   
   <hr class="border-gray-700 mb-4" />
