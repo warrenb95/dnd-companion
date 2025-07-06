@@ -394,21 +394,30 @@ def export_campaign_markdown(request, campaign_id):
             "",
         ]
 
-        session_notes = chapter.session_notes.order_by("date")
-        for note in session_notes:
+        # Export encounters with their session notes
+        for encounter in chapter.encounters.order_by("order"):
             lines += [
-                "<details>",
-                f"<summary><strong>Session on {note.date}</strong></summary>",
-                "",
-                "#### Raw Notes:",
-                note.notes.strip(),
-                "",
-                "#### Summary:",
-                note.summary.strip() if note.summary else "_No summary available_",
-                "",
-                "</details>",
+                f"#### {encounter.order}. {encounter.title} ({encounter.type})",
+                f"**Summary:** {encounter.summary}",
                 "",
             ]
+            
+            # Add session notes for this encounter
+            session_notes = encounter.session_notes.order_by("date")
+            for note in session_notes:
+                lines += [
+                    "<details>",
+                    f"<summary><strong>Session on {note.date}</strong></summary>",
+                    "",
+                    "#### Raw Notes:",
+                    note.content.strip(),
+                    "",
+                    "#### Summary:",
+                    note.summary.strip() if note.summary else "_No summary available_",
+                    "",
+                    "</details>",
+                    "",
+                ]
 
     # Generate response
     markdown_text = "\n".join(lines)
