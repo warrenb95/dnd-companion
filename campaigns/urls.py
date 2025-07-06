@@ -9,7 +9,6 @@ from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView,
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
-from .views import GenerateSessionSummaryView
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
@@ -69,11 +68,6 @@ urlpatterns = [
     ),
     path("<int:campaign_id>/npcs/add/", NPCCreateView.as_view(), name="npc_create"),
     path("npcs/<int:pk>/edit/", NPCUpdateView.as_view(), name="npc_edit"),
-    path(
-        "sessions/<int:pk>/generate-summary/",
-        GenerateSessionSummaryView.as_view(),
-        name="generate_summary",
-    ),
     path("<int:encounter_id>/note-form/", EncounterNoteFormView.as_view(), name="encounter_note_form"),
     path("create-encounter-note/", EncounterNoteCreateView.as_view(), name="encounter_note_create"),
     path("<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),

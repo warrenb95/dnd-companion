@@ -12,29 +12,51 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-2gn4^%g*(+3(gvog^0l&#^oso#^(ibg5gqdq2is35*5ssyg3+o"
-
+# Load environment variables
 load_dotenv()
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-2gn4^%g*(+3(gvog^0l&#^oso#^(ibg5gqdq2is35*5ssyg3+o")
+
+# OpenAI API configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-MEDIA_ROOT =  os.path.join(BASE_DIR, 'media')
+# Media files configuration
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+# Production/Fly.io configuration
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".fly.dev",
+    "dnd-companion.fly.dev",
+]
+
+# Add fly.io internal network
+if os.getenv("FLY_APP_NAME"):
+    ALLOWED_HOSTS.append(f"{os.getenv('FLY_APP_NAME')}.fly.dev")
+    
+# Security settings for production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 
 
 # Application definition
@@ -52,6 +74,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -83,12 +106,27 @@ WSGI_APPLICATION = "dnd_companion.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# Use LiteFS in production, SQLite for development
+if os.getenv("LITEFS_DIR"):
+    # Production with LiteFS
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(os.getenv("LITEFS_DIR"), "db.sqlite3"),
+        }
     }
-}
+else:
+    # Development
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+# Allow database URL override (useful for testing)
+if os.getenv("DATABASE_URL"):
+    DATABASES["default"] = dj_database_url.parse(os.getenv("DATABASE_URL"))
 
 
 # Password validation
@@ -126,8 +164,40 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# WhiteNoise configuration for static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Additional static files directories
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+] if (BASE_DIR / "static").exists() else []
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Logging configuration for production
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+        },
+    }
