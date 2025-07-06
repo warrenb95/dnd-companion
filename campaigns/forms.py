@@ -18,7 +18,7 @@ class ChapterForm(forms.ModelForm):
 class EncounterForm(forms.ModelForm):
     class Meta:
         model = Encounter
-        exclude = ['chapter']
+        exclude = ['chapter', 'owner', 'order']
 
 # Create an inline formset: relate Encounter to Chapter
 EncounterFormSet = inlineformset_factory(

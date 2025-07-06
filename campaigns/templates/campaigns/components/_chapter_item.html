@@ -16,9 +16,36 @@
     <div class="md:w-2/3">
       <h6 class="font-semibold text-white mb-2">Encounters</h6>
       {% if chapter.encounters.all %}
-      <ul class="list-disc list-inside text-gray-300 mb-2">
+      <ul class="space-y-2 text-gray-300 mb-2">
         {% for encounter in chapter.encounters.all %}
-        <li class="py-1">{{ encounter.title }}</li>
+        <li class="py-1 flex items-center justify-between">
+          <div>
+            <span class="font-medium">{{ encounter.order }}. {{ encounter.title }}</span>
+            <span class="text-sm text-gray-400 ml-2">({{ encounter.type }})</span>
+            {% if encounter.is_optional %}
+            <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded ml-2">Optional</span>
+            {% endif %}
+            {% if encounter.danger_level %}
+            <span class="text-xs px-2 py-1 rounded ml-2
+              {% if encounter.danger_level == 'low' %}bg-green-600 text-white
+              {% elif encounter.danger_level == 'moderate' %}bg-yellow-600 text-white
+              {% elif encounter.danger_level == 'high' %}bg-orange-600 text-white
+              {% elif encounter.danger_level == 'deadly' %}bg-red-600 text-white
+              {% endif %}">
+              {{ encounter.get_danger_level_display }}
+            </span>
+            {% endif %}
+          </div>
+          {% if encounter.tags %}
+          <div class="flex flex-wrap gap-1">
+            {% for tag in encounter.tags_as_list %}
+            {% if tag.strip %}
+            <span class="text-xs bg-gray-600 text-white px-2 py-1 rounded">{{ tag.strip }}</span>
+            {% endif %}
+            {% endfor %}
+          </div>
+          {% endif %}
+        </li>
         {% endfor %}
       </ul>
       {% else %}
