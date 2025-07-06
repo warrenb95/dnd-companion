@@ -77,29 +77,39 @@ class Encounter(models.Model):
         ("mixed", "Mixed/Other"),
     ]
 
-    chapter = models.ForeignKey(
-        Chapter, on_delete=models.CASCADE, related_name="encounters"
-    )
+    chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name="encounters")
     title = models.CharField(max_length=200)
     type = models.CharField(max_length=20, choices=CHOICES, default="combat")
-    level_range = models.CharField(max_length=50, blank=True)
 
-    summary = models.TextField(help_text="Purpose and context of the encounter.")
-    setup = models.TextField(help_text="Initial conditions and encounter details.")
-    read_aloud = models.TextField(help_text="Narrative for the DM to read to players.")
-    tactics = models.TextField(
-        help_text="Enemy strategy and dynamic notes.", blank=True
+    summary = models.TextField(help_text="Quick description of the encounter purpose.")
+    setup = models.TextField(blank=True, help_text="Scene setup, triggers, and conditions.")
+    read_aloud = models.TextField(blank=True, help_text="Optional boxed text or narration.")
+    dm_notes = models.TextField(
+        blank=True,
+        help_text="All-purpose field: tactics, loot, stat block refs, etc."
     )
-    stat_blocks = models.TextField(
-        help_text="Stat blocks or reference notes.", blank=True
-    )
-    treasure = models.TextField(
-        help_text="Loot and rewards after the encounter.", blank=True
-    )
-    map_reference = models.TextField(
-        help_text="Map or layout references for this encounter.", blank=True
-    )
+
+    map_reference = models.CharField(max_length=100, blank=True)
     map_image = models.ImageField(upload_to="images/", blank=True)
+
+    tags = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Optional tags like 'boss', 'undead', 'trap', 'ambush' (comma-separated)"
+    )
+
+    danger_level = models.CharField(
+        max_length=20,
+        choices=[("low", "Low"), ("moderate", "Moderate"), ("high", "High"), ("deadly", "Deadly")],
+        blank=True,
+        help_text="At-a-glance danger estimation."
+    )
+
+    is_optional = models.BooleanField(
+        default=False,
+        help_text="Tick this if the encounter is skippable or side content."
+    )
+
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='encounters')
     order = models.PositiveIntegerField(default=1, help_text="Order of the encounter in the chapter")
 
