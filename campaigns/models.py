@@ -116,6 +116,10 @@ class Encounter(models.Model):
     class Meta:
         ordering = ['order']  # Ascending order by default
 
+    
+    def tags_as_list(self):
+        return self.tags.split(",")
+
     def __str__(self):
         return f"{self.title} (Chapter {self.chapter.order})"
 

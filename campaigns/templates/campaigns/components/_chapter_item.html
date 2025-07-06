@@ -38,7 +38,7 @@
           </div>
           {% if encounter.tags %}
           <div class="flex flex-wrap gap-1">
-            {% for tag in encounter.tags|split:"," %}
+            {% for tag in encounter.tags_as_list %}
             {% if tag.strip %}
             <span class="text-xs bg-gray-600 text-white px-2 py-1 rounded">{{ tag.strip }}</span>
             {% endif %}

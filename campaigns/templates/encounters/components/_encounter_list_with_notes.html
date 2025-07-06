@@ -54,7 +54,7 @@
           {% if enc.tags %}
           <div class="mt-2">
             <strong>Tags:</strong>
-            {% for tag in enc.tags|split:"," %}
+            {% for tag in enc.tags_as_list %}
             {% if tag.strip %}
             <span class="inline-block bg-gray-600 text-white px-2 py-1 text-xs rounded mr-1">{{ tag.strip }}</span>
             {% endif %}
