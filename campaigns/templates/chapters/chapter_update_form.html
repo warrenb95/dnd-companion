@@ -1,49 +1,287 @@
 {% extends "base.html" %}
-{% block title %}{{ chapter.title|default:"Update Chapter" }}{% endblock %}
+{% block title %}Edit {{ chapter.title }}{% endblock %}
 
 {% block content %}
-<div class="my-8 max-w-full mx-auto px-4">
+<div class="my-8 max-w-6xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
     <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
       <h2 class="text-2xl font-semibold text-white">
-        Campaign {{ campaign.title }} – {{ chapter.title|default:"Update Chapter" }}
+        Edit Chapter: {{ chapter.title }}
       </h2>
+      <p class="text-gray-400 text-sm mt-1">Campaign: {{ campaign.title }}</p>
     </div>
 
-    <div class="p-6 space-y-6 text-gray-300">
-      <form method="post" class="space-y-6">
+    <div class="p-6">
+      <form method="post" enctype="multipart/form-data" class="space-y-8">
         {% csrf_token %}
 
-        <!-- Chapter Form -->
-        <div class="space-y-4">
-          {{ form.as_p }}
+        <!-- Chapter Details Section -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6">Chapter Details</h3>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Title -->
+            <div class="lg:col-span-2">
+              <label for="id_title" class="block text-sm font-medium text-white mb-2">Chapter Title *</label>
+              {{ form.title }}
+            </div>
+
+            <!-- Summary -->
+            <div class="lg:col-span-2">
+              <label for="id_summary" class="block text-sm font-medium text-white mb-2">Summary</label>
+              {{ form.summary }}
+              {% if form.summary.help_text %}
+              <p class="text-gray-400 text-sm mt-1">{{ form.summary.help_text }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Intro -->
+            <div class="lg:col-span-2">
+              <label for="id_intro" class="block text-sm font-medium text-white mb-2">Introduction/Hook</label>
+              {{ form.intro }}
+              {% if form.intro.help_text %}
+              <p class="text-gray-400 text-sm mt-1">{{ form.intro.help_text }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Level Range and Status -->
+            <div>
+              <label for="id_level_range" class="block text-sm font-medium text-white mb-2">Level Range</label>
+              {{ form.level_range }}
+              {% if form.level_range.help_text %}
+              <p class="text-gray-400 text-sm mt-1">{{ form.level_range.help_text }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label for="id_status" class="block text-sm font-medium text-white mb-2">Status</label>
+              {{ form.status }}
+            </div>
+
+            <!-- DM Notes -->
+            <div class="lg:col-span-2">
+              <label for="id_dm_notes" class="block text-sm font-medium text-white mb-2">DM Notes</label>
+              {{ form.dm_notes }}
+              {% if form.dm_notes.help_text %}
+              <p class="text-gray-400 text-sm mt-1">{{ form.dm_notes.help_text }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Conclusion -->
+            <div class="lg:col-span-2">
+              <label for="id_conclusion" class="block text-sm font-medium text-white mb-2">Conclusion</label>
+              {{ form.conclusion }}
+              {% if form.conclusion.help_text %}
+              <p class="text-gray-400 text-sm mt-1">{{ form.conclusion.help_text }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Optional Chapter -->
+            <div class="lg:col-span-2">
+              <div class="flex items-center">
+                {{ form.is_optional }}
+                <label for="id_is_optional" class="ml-2 text-white">
+                  Optional Chapter
+                  {% if form.is_optional.help_text %}
+                  <span class="block text-gray-400 text-sm">{{ form.is_optional.help_text }}</span>
+                  {% endif %}
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Encounter Formset -->
-        <div class="space-y-4">
-          <h2 class="text-xl font-semibold text-white">Encounters</h2>
-          {{ formset.management_form }}
-          {% for enc_form in formset %}
-            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600 space-y-4">
-              <h3 class="text-lg font-bold text-white">Encounter {{ forloop.counter }}</h3>
-              {{ enc_form.as_p }}
+        <!-- Encounters Section -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-semibold text-white">Encounters</h3>
+            <div class="text-sm text-gray-400">
+              <a href="{% url 'campaigns:encounter_create' chapter.id %}" 
+                 class="text-indigo-400 hover:text-indigo-300">+ Add New Encounter</a>
             </div>
-          {% endfor %}
+          </div>
+          
+          {{ formset.management_form }}
+          {% if formset.forms %}
+          <div class="space-y-6">
+            {% for enc_form in formset %}
+            <div class="bg-gray-700 rounded-lg p-4 border border-gray-600">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-lg font-medium text-white">
+                  {% if enc_form.instance.title %}
+                    {{ enc_form.instance.title }}
+                  {% else %}
+                    New Encounter {{ forloop.counter }}
+                  {% endif %}
+                </h4>
+                {% if enc_form.instance.pk %}
+                <div class="flex gap-2">
+                  <a href="{% url 'campaigns:encounter_edit' enc_form.instance.pk %}" 
+                     class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded">
+                    Edit Details
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+              
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Title and Type -->
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Title</label>
+                  {{ enc_form.title }}
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Type</label>
+                  {{ enc_form.type }}
+                </div>
+
+                <!-- Summary -->
+                <div class="lg:col-span-2">
+                  <label class="block text-sm font-medium text-white mb-2">Summary</label>
+                  {{ enc_form.summary }}
+                </div>
+
+                <!-- Setup and Read Aloud -->
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Setup</label>
+                  {{ enc_form.setup }}
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Read Aloud</label>
+                  {{ enc_form.read_aloud }}
+                </div>
+
+                <!-- DM Notes -->
+                <div class="lg:col-span-2">
+                  <label class="block text-sm font-medium text-white mb-2">DM Notes</label>
+                  {{ enc_form.dm_notes }}
+                </div>
+
+                <!-- Additional Fields Row -->
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Tags</label>
+                  {{ enc_form.tags }}
+                  <p class="text-gray-400 text-xs mt-1">Comma-separated (e.g., boss, undead, trap)</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Danger Level</label>
+                  {{ enc_form.danger_level }}
+                </div>
+
+                <!-- Optional and Map Reference -->
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Map Reference</label>
+                  {{ enc_form.map_reference }}
+                </div>
+                <div class="flex items-center">
+                  {{ enc_form.is_optional }}
+                  <label class="ml-2 text-white text-sm">Optional Encounter</label>
+                </div>
+
+                <!-- Map Image -->
+                <div class="lg:col-span-2">
+                  <label class="block text-sm font-medium text-white mb-2">Map Image</label>
+                  {{ enc_form.map_image }}
+                  {% if enc_form.instance.map_image %}
+                  <p class="text-gray-400 text-xs mt-1">Current: {{ enc_form.instance.map_image.name }}</p>
+                  {% endif %}
+                </div>
+
+                <!-- Delete checkbox if available -->
+                {% if enc_form.DELETE %}
+                <div class="lg:col-span-2 pt-2 border-t border-gray-600">
+                  <div class="flex items-center">
+                    {{ enc_form.DELETE }}
+                    <label class="ml-2 text-red-400 text-sm">Delete this encounter</label>
+                  </div>
+                </div>
+                {% endif %}
+
+                <!-- Hidden fields -->
+                {% for hidden in enc_form.hidden_fields %}
+                  {{ hidden }}
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-8 text-gray-400">
+            <p>No encounters yet.</p>
+            <a href="{% url 'campaigns:encounter_create' chapter.id %}" 
+               class="text-indigo-400 hover:text-indigo-300">Add your first encounter</a>
+          </div>
+          {% endif %}
         </div>
 
         <!-- Action Buttons -->
         <div class="flex gap-4 pt-4 border-t border-gray-700">
           <button type="submit"
-                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-lg transition">
-            Save
+                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg transition">
+            Update Chapter
           </button>
-          <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}"
-             class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded-lg transition">
+          <a href="{% url 'campaigns:chapter_detail' chapter.id %}"
+             class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded-lg transition">
             Cancel
+          </a>
+          <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}"
+             class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+            Back to Campaign
           </a>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<style>
+/* Enhanced form field styling */
+form input[type="text"], 
+form textarea, 
+form select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+form input[type="text"]:focus, 
+form textarea:focus, 
+form select:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+form input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.25rem;
+}
+
+form textarea {
+  min-height: 4rem;
+  resize: vertical;
+}
+
+form input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+/* Custom bg color for section backgrounds */
+.bg-gray-750 {
+  background-color: #2D3748;
+}
+</style>
 {% endblock %}

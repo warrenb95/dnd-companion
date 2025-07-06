@@ -4,8 +4,8 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, HomeView, empty_fragment
-from .views import ChapterCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView
+from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
 from .views import NPCCreateView, NPCUpdateView
@@ -31,12 +31,19 @@ urlpatterns = [
         name="chapter_create",
     ),
     path(
+        "<int:campaign_id>/chapters/quick-add/",
+        ChapterQuickCreateView.as_view(),
+        name="chapter_quick_create",
+    ),
+    path(
         "chapters/<int:pk>/delete/",
         ChapterDeleteView.as_view(),
         name="chapter_delete",
     ),
     path("chapters/<int:pk>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
     path("chapters/<int:pk>/", ChapterDetailView.as_view(), name="chapter_detail"),
+    path("chapters/<int:pk>/toggle-status/", ChapterStatusToggleView.as_view(), name="chapter_status_toggle"),
+    path("<int:campaign_id>/chapters/reorder/", ChapterReorderView.as_view(), name="chapter_reorder"),
     path(
         "chapters/<int:chapter_id>/encounters/add/",
         EncounterCreateView.as_view(),

@@ -1,19 +1,33 @@
 <div class="bg-gray-800 rounded-lg shadow mb-8">
-  <div class="border-b border-gray-700 px-6 py-4">
+  <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
     <h2 class="text-2xl font-semibold text-white">Chapters</h2>
+    <div class="flex gap-2">
+      <a href="{% url 'campaigns:chapter_quick_create' campaign.id %}"
+         class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+        Quick Add
+      </a>
+      <a href="{% url 'campaigns:chapter_create' campaign.id %}"
+         class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+        Add with Encounters
+      </a>
+    </div>
   </div>
-  <ul>
-    {% for chapter in campaign.chapters.all %} 
-      {% include "campaigns/components/_chapter_item.html" with chapter=chapter %} 
+  
+  <ul id="chapter-list" class="divide-y divide-gray-700">
+    {% for chapter in campaign.chapters.all %}
+      {% include "campaigns/components/_chapter_item.html" %}
     {% empty %}
-    <li class="px-6 py-4 text-gray-500">No chapters added yet.</li>
+      <li class="px-6 py-8 text-center text-gray-500">
+        No chapters yet. <a href="{% url 'campaigns:chapter_create' campaign.id %}" class="text-indigo-400 hover:underline">Create your first chapter</a>
+      </li>
     {% endfor %}
   </ul>
-  <div class="border-t border-gray-700 px-6 py-4 bg-gray-900">
-    <a
-      href="{% url 'campaigns:chapter_create' campaign.id %}"
-      class="px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-      >Add New Chapter</a
-    >
+  
+  {% if campaign.chapters.all %}
+  <div class="px-6 py-3 bg-gray-750 border-t border-gray-700">
+    <button id="toggle-reorder" class="text-sm text-indigo-400 hover:text-indigo-300">
+      Enable Reordering
+    </button>
   </div>
+  {% endif %}
 </div>
