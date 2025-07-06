@@ -13,7 +13,7 @@ from .models import CharacterSummary
 class ChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
-        exclude = ["campaign", "number"]
+        exclude = ["campaign", "owner", "order"]
 
 class EncounterForm(forms.ModelForm):
     class Meta:

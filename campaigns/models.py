@@ -27,35 +27,50 @@ class Chapter(models.Model):
     campaign = models.ForeignKey(
         Campaign, on_delete=models.CASCADE, related_name="chapters"
     )
-    order = models.PositiveIntegerField(default=1, help_text="Order of the chapter in the campaign")
+    order = models.PositiveIntegerField() # add default ordering
     title = models.CharField(max_length=200)
-    summary = models.TextField(blank=True)
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="not_started"
-    )
-    level_range = models.CharField(max_length=50, blank=True)
-    adventure_hook = models.TextField(
-        help_text="Trigger or reason for party to start the chapter."
-    )
-    overview = models.TextField(
-        help_text="Brief summary of the chapter's events and objectives."
-    )
-    background = models.TextField(
-        help_text="World context and relevant history.", blank=True
-    )
-    dm_guidance = models.TextField(
-        help_text="Tips and guidance for running the chapter.", blank=True
-    )
 
-    locations_description = models.TextField(
-        help_text="DM notes for locations, including read-aloud text and hidden details.",
+    summary = models.TextField(
         blank=True,
+        help_text="One-paragraph overview of the chapter’s purpose."
+    )
+    
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="not_started",
+        help_text="Track campaign progress."
     )
 
-    conclusion = models.TextField(
-        help_text="How the chapter ends and transitions forward.", blank=True
+    intro = models.TextField(
+        blank=True,
+        help_text="Adventure hook or opening scene to kick things off."
     )
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chapters')
+    
+    dm_notes = models.TextField(
+        blank=True,
+        help_text="Flexible notes: secrets, pacing tips, foreshadowing, etc."
+    )
+    
+    conclusion = models.TextField(
+        blank=True,
+        help_text="How the chapter wraps up or links to future chapters."
+    )
+
+    level_range = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="E.g. Levels 4–5"
+    )
+
+    is_optional = models.BooleanField(
+        default=False,
+        help_text="Mark this chapter as a side quest or optional content."
+    )
+
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='chapters'
+    )
 
     def get_absolute_url(self):
         return reverse("campaigns:chapter_detail", args=[str(self.id)])
@@ -65,7 +80,7 @@ class Chapter(models.Model):
 
 
     def __str__(self):
-        return f"{self.order} - {self.title}"
+        return f"{self.order} - {self.title} (lvl {self.level_range})"
 
 
 class Encounter(models.Model):
