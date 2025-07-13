@@ -24,11 +24,13 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-2gn4^%g*(+3(gvog^0l&#^oso#^(ibg5gqdq2is35*5ssyg3+o")
 
-# OpenAI API configuration
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
 # Media files configuration
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if os.getenv("LITEFS_DIR"):
+    # Production: store media files in LiteFS volume
+    MEDIA_ROOT = os.path.join(os.getenv("LITEFS_DIR"), 'media')
+else:
+    # Development: store in project directory
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -38,17 +40,27 @@ DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    ".fly.dev",
     "dnd-companion.fly.dev",
+    ".internal",  # Internal Fly.io hostnames
 ]
+
+CSRF_TRUSTED_ORIGINS = ["https://dnd-companion.fly.dev"]
 
 # Add fly.io internal network
 if os.getenv("FLY_APP_NAME"):
     ALLOWED_HOSTS.append(f"{os.getenv('FLY_APP_NAME')}.fly.dev")
+    # Add internal IP ranges for health checks
+    ALLOWED_HOSTS.extend([
+        "172.19.12.250",  # Internal health check IP
+        "172.19.6.106",   # New internal health check IP
+        "172.19.0.0/16",  # Fly.io internal network range
+        ".dnd-companion.fly.dev"
+    ])
     
 # Security settings for production
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Temporarily disable HTTPS redirect to fix health checks
+    # SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -105,7 +117,6 @@ WSGI_APPLICATION = "dnd_companion.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 # Use LiteFS in production, SQLite for development
 if os.getenv("LITEFS_DIR"):
     # Production with LiteFS

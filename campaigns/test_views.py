@@ -575,50 +575,6 @@ class SessionNoteViewTest(BaseViewTestCase):
         self.assertEqual(new_note.content, 'Test session note content')
 
 
-class GenerateSessionSummaryViewTest(BaseViewTestCase):
-    """Test session summary generation view"""
-    
-    def setUp(self):
-        super().setUp()
-        self.session_note = SessionNote.objects.create(
-            encounter=self.encounter,
-            content='Test session notes content',
-            owner=self.user1
-        )
-    
-    @patch('campaigns.views.api.generate_session_summary')
-    def test_generate_session_summary_view(self, mock_generate):
-        """Test session summary generation view"""
-        mock_generate.return_value = "Generated summary content"
-        
-        self.client.login(username='testuser1', password='testpass123')
-        response = self.client.post(reverse('campaigns:generate_session_summary', args=[self.session_note.id]))
-        self.assertEqual(response.status_code, 200)
-        
-        # Check summary was generated and saved
-        self.session_note.refresh_from_db()
-        self.assertEqual(self.session_note.summary, "Generated summary content")
-        
-        # Check the LLM function was called with correct parameters
-        mock_generate.assert_called_once_with(
-            self.session_note.content,
-            self.chapter.title
-        )
-    
-    @patch('campaigns.views.api.generate_session_summary')
-    def test_generate_session_summary_view_error(self, mock_generate):
-        """Test session summary generation view with error"""
-        mock_generate.side_effect = Exception("API Error")
-        
-        self.client.login(username='testuser1', password='testpass123')
-        response = self.client.post(reverse('campaigns:generate_session_summary', args=[self.session_note.id]))
-        self.assertEqual(response.status_code, 500)
-        
-        # Check error response
-        response_data = json.loads(response.content)
-        self.assertIn('error', response_data)
-
-
 class ExportViewTest(BaseViewTestCase):
     """Test export functionality"""
     

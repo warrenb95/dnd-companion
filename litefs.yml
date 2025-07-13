@@ -10,47 +10,21 @@ data:
   dir: "/var/lib/litefs"
 
 # This flag ensure that LiteFS continues to run if there is an issue on startup.
-# It makes it easier to debug any issues you might be having rather than 
+# It makes it easier to debug any issues you might be having rather than
 # continuously restarting on initialization failure.
 exit-on-error: false
 
-# This section defines settings for the option HTTP proxy.
-# This proxy can handle primary forwarding & replica consistency
-# for applications that use a single SQLite database.
 proxy:
+  # Bind address for the proxy to listen on.
   addr: ":8080"
+
+  # Hostport of your application - replace 8000 with whatever port
+  # your application is listening on!
   target: "localhost:8000"
-  db: "db.sqlite3"
 
-# Define the lease configuration
+  # Filename of the SQLite database you want to use for TXID tracking.
+  db: "tx_tracking.db"
+
 lease:
-  type: "consul"
-  advertise-url: "http://${HOSTNAME}.vm.${FLY_APP_NAME}.internal:20202"
-  candidate: ${FLY_REGION == PRIMARY_REGION}
-  
-  consul:
-    url: "${FLY_CONSUL_URL}"
-    key: "litefs/${FLY_APP_NAME}"
+  type: "static"
 
-# The backup section handles backing up your database to another system.
-backup:
-  # Backup to S3-compatible storage
-  type: "s3"
-  
-  # S3 configuration
-  s3:
-    bucket: "${BACKUP_BUCKET}"
-    path: "dnd-companion"
-    region: "${BACKUP_REGION}"
-    
-  # Retention policy
-  retention: "24h"
-  retention-monitor-interval: "1h"
-
-# Prometheus metrics
-prometheus:
-  addr: ":9090"
-
-# Tracing
-tracing:
-  level: "info"

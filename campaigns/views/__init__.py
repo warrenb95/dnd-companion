@@ -35,7 +35,7 @@ from .characters import (
     UpdateCharacterView
 )
 from .auth import LoginView
-from .api import GenerateSessionSummaryView, empty_fragment
+from .api import empty_fragment
 
 # Make all views available when importing from campaigns.views
 __all__ = [
@@ -78,6 +78,5 @@ __all__ = [
     'LoginView',
     
     # API views
-    'GenerateSessionSummaryView',
     'empty_fragment',
 ]
