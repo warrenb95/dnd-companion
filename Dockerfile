@@ -5,47 +5,36 @@ FROM python:${PYTHON_VERSION}
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Install system dependencies
+# Install LiteFS
 RUN apt-get update && apt-get install -y \
     ca-certificates \
+    curl \
     fuse3 \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install LiteFS
-COPY --from=flyio/litefs:0.5 /usr/local/bin/litefs /usr/local/bin/litefs
+ADD https://github.com/superfly/litefs/releases/download/v0.5.11/litefs-v0.5.11-linux-amd64.tar.gz /tmp/litefs.tar.gz
+RUN tar -C /usr/local/bin -xzf /tmp/litefs.tar.gz && rm /tmp/litefs.tar.gz
 
-# Create application directory
-RUN mkdir -p /code
+RUN mkdir -p /code /litefs /var/lib/litefs /litefs/media && \
+    chmod 755 /litefs/media
 
 WORKDIR /code
 
-# Install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
 RUN set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     rm -rf /root/.cache/
 
-# Copy application code
 COPY . /code
-
-# Copy LiteFS configuration
 COPY litefs.yml /etc/litefs.yml
-
-# Create entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create directories for LiteFS
-RUN mkdir -p /var/lib/litefs /litefs
+ENV SECRET_KEY "BosFk8bX3pVT6b767AtE5IHnu30WVNdmDBgA2PMiUlP78gStTw"
+RUN python manage.py collectstatic --noinput
 
-# Set environment variables for LiteFS
-ENV LITEFS_DIR="/litefs"
+EXPOSE 8080
 
-# Expose ports
-EXPOSE 8000 8080
-
-# Use entrypoint script
-ENTRYPOINT ["/entrypoint.sh"]
-CMD ["litefs", "mount"]
+CMD ["/entrypoint.sh", "litefs", "mount"]

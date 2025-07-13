@@ -18,15 +18,24 @@ Including another URLconf
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import never_cache
 
 from dnd_companion import settings
 
+@csrf_exempt
+@never_cache
+def health_check(request):
+    return HttpResponse("OK", content_type="text/plain")
+
 urlpatterns = [
+    path("health", health_check, name="health"),  # Remove trailing slash
+    path("health/", health_check, name="health_slash"),  # Keep both versions
     path("admin/", admin.site.urls),
     path("", include("campaigns.urls", namespace="campaigns")),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in development and production
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

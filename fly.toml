@@ -1,70 +1,58 @@
-# fly.toml app configuration file for D&D Campaign Builder with LiteFS
+# fly.toml app configuration file generated for dnd-companion on 2025-07-10T20:33:03+01:00
+#
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = 'dnd-companion'
 primary_region = 'lhr'
-console_command = '/entrypoint.sh manage.py shell'
+console_command = '/code/manage.py shell'
+
+[experimental]
+  enable_consul = true
 
 [build]
 
-[env]
-# Django configuration
-DJANGO_DEBUG = "false"
-DJANGO_SETTINGS_MODULE = "dnd_companion.settings"
-PRIMARY_REGION = "lhr"
-
-# LiteFS configuration
-LITEFS_DIR = "/litefs"
-
-# Application settings
-PORT = "8000"
-
-[experimental]
-enable_consul = true
-
-# Main HTTP service (proxied through LiteFS)
-[http_service]
-internal_port = 8080
-force_https = true
-auto_stop_machines = 'suspend'
-auto_start_machines = true
-min_machines_running = 0
-processes = ['app']
-
-# Health check configuration
-[[http_service.checks]]
-grace_period = "30s"
-interval = "15s"
-method = "GET"
-path = "/"
-timeout = "10s"
-tls_skip_verify = false
-
-# VM configuration
-[[vm]]
-memory = '1gb'
-cpu_kind = 'shared'
-cpus = 1
-
-# LiteFS volume configuration
-[mounts]
-source = "litefs_data"
-destination = "/var/lib/litefs"
-
-# Static files configuration
-[[statics]]
-guest_path = '/code/staticfiles'
-url_prefix = '/static/'
-
-# Process groups
-[processes]
-app = "litefs mount"
-
-# Machine restart policy
-[[restart]]
-policy = "on-failure"
-
-# Deploy configuration
 [deploy]
-release_command = "/entrypoint.sh manage.py migrate"
-strategy = "rolling"
+  strategy = 'rolling'
+
+[env]
+  DJANGO_DEBUG = 'false'
+  DJANGO_SETTINGS_MODULE = 'dnd_companion.settings'
+  LITEFS_DIR = '/litefs'
+  PORT = '8000'
+  PRIMARY_REGION = 'lhr'
+
+[processes]
+  app = '/entrypoint.sh litefs mount'
+
+[[mounts]]
+  source = 'litefs_data'
+  destination = '/var/lib/litefs'
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'suspend'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    interval = '15s'
+    timeout = '10s'
+    grace_period = '30s'
+    method = 'GET'
+    path = '/health'
+    tls_skip_verify = false
+
+[[restart]]
+  policy = 'on-failure'
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 2
+
+[[statics]]
+  guest_path = '/code/static'
+  url_prefix = '/static/'

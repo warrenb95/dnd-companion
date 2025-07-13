@@ -345,23 +345,6 @@ class NPCUpdateView(LoginRequiredMixin, UpdateView):
         return self.object.campaign.get_absolute_url()
 
 
-class GenerateSessionSummaryView(View):
-
-    def post(self, request, pk):
-        session = SessionNote.objects.get(pk=pk)
-        if not session.notes:
-            return HttpResponseRedirect(reverse("campaigns:campaign_list"))
-
-        summary = generate_session_summary(
-            session.notes, chapter_title=session.chapter.title
-        )
-        session.summary = summary
-        session.save()
-
-        return HttpResponseRedirect(session.chapter.campaign.get_absolute_url())
-
-
-
 class EncounterNoteFormView(View):
     def get(self, request, encounter_id):
         encounter = get_object_or_404(Encounter, pk=encounter_id)
