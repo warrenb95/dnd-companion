@@ -4,7 +4,7 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -84,6 +84,12 @@ urlpatterns = [
     ),
     path("character/<int:pk>/edit/", UpdateCharacterView.as_view(), name="update_character"),
     path("character/<int:pk>/view/", CharacterDetailView.as_view(), name="view_character"),
+    path("settings/", UserSettingsView.as_view(), name="user_settings"),
+    path("settings/profile/", UpdateProfileView.as_view(), name="update_profile"),
+    path("settings/account/", UpdateAccountView.as_view(), name="update_account"),
+    path("settings/password/", ChangePasswordView.as_view(), name="change_password"),
+    path("profile/", user_profile_view, name="user_profile"),
+    path("profile/<str:username>/", user_profile_view, name="user_profile_detail"),
     path("empty/", empty_fragment, name="empty_fragment"),
 ]
 
