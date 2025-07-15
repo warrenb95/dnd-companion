@@ -39,6 +39,7 @@ from .characters import (
 )
 from .auth import LoginView
 from .api import empty_fragment
+from .users import UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view
 
 # Make all views available when importing from campaigns.views
 __all__ = [
@@ -82,6 +83,13 @@ __all__ = [
     
     # Auth views
     'LoginView',
+    
+    # User views
+    'UserSettingsView',
+    'UpdateProfileView',
+    'UpdateAccountView',
+    'ChangePasswordView',
+    'user_profile_view',
     
     # API views
     'empty_fragment',
