@@ -32,7 +32,8 @@ COPY litefs.yml /etc/litefs.yml
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENV SECRET_KEY "BosFk8bX3pVT6b767AtE5IHnu30WVNdmDBgA2PMiUlP78gStTw"
+# Set a temporary secret key for collectstatic only
+ENV DJANGO_SECRET_KEY "build-time-secret-key-for-collectstatic-only"
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8080

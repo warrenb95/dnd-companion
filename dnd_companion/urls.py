@@ -36,6 +36,7 @@ urlpatterns = [
     path("", include("campaigns.urls", namespace="campaigns")),
 ]
 
-# Serve media files in development and production
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in development only (production uses S3)
+if settings.DEBUG or not hasattr(settings, 'DEFAULT_FILE_STORAGE'):
+    urlpatterns += static(settings.MEDIA_URL, document_root=getattr(settings, 'MEDIA_ROOT', None))
 

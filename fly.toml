@@ -8,51 +8,51 @@ primary_region = 'lhr'
 console_command = '/code/manage.py shell'
 
 [experimental]
-  enable_consul = true
+enable_consul = true
 
 [build]
 
 [deploy]
-  strategy = 'rolling'
+strategy = 'rolling'
 
 [env]
-  DJANGO_DEBUG = 'false'
-  DJANGO_SETTINGS_MODULE = 'dnd_companion.settings'
-  LITEFS_DIR = '/litefs'
-  PORT = '8000'
-  PRIMARY_REGION = 'lhr'
+DJANGO_DEBUG = 'false'
+DJANGO_SETTINGS_MODULE = 'dnd_companion.settings'
+LITEFS_DIR = '/litefs'
+PORT = '8000'
+PRIMARY_REGION = 'lhr'
 
 [processes]
-  app = '/entrypoint.sh litefs mount'
+app = '/entrypoint.sh litefs mount'
 
 [[mounts]]
-  source = 'litefs_data'
-  destination = '/var/lib/litefs'
+source = 'litefs_data'
+destination = '/var/lib/litefs'
 
 [http_service]
-  internal_port = 8080
-  force_https = true
-  auto_stop_machines = 'suspend'
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+internal_port = 8080
+force_https = true
+auto_stop_machines = 'suspend'
+auto_start_machines = true
+min_machines_running = 0
+processes = ['app']
 
-  [[http_service.checks]]
-    interval = '15s'
-    timeout = '10s'
-    grace_period = '30s'
-    method = 'GET'
-    path = '/health'
-    tls_skip_verify = false
+[[http_service.checks]]
+interval = '15s'
+timeout = '10s'
+grace_period = '30s'
+method = 'GET'
+path = '/health'
+tls_skip_verify = false
 
 [[restart]]
-  policy = 'on-failure'
+policy = 'on-failure'
 
 [[vm]]
-  memory = '2gb'
-  cpu_kind = 'shared'
-  cpus = 2
+memory = '2gb'
+cpu_kind = 'shared'
+cpus = 2
 
 [[statics]]
-  guest_path = '/code/static'
-  url_prefix = '/static/'
+guest_path = '/code/staticfiles'
+url_prefix = '/static/'
