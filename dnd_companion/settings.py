@@ -24,14 +24,38 @@ load_dotenv()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-2gn4^%g*(+3(gvog^0l&#^oso#^(ibg5gqdq2is35*5ssyg3+o")
 
+# AWS S3 Configuration
+# Use IAM role authentication via OIDC (preferred) or fallback to access keys
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'eu-west-2')  # London region
+AWS_DEFAULT_ACL = None  # Disable ACL to avoid AccessControlListNotSupported error
+
+# Only set custom domain if bucket name exists
+if AWS_STORAGE_BUCKET_NAME:
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',  # 1 day cache
+}
+
 # Media files configuration
-if os.getenv("LITEFS_DIR"):
-    # Production: store media files in LiteFS volume
-    MEDIA_ROOT = os.path.join(os.getenv("LITEFS_DIR"), 'media')
+if os.getenv("LITEFS_DIR") and AWS_STORAGE_BUCKET_NAME:
+    # Production: use S3 for media files (Django 4.2+ style)
+    STORAGES = {
+        "default": {
+            "BACKEND": "campaigns.storage.CampaignMediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 else:
     # Development: store in project directory
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+    MEDIA_URL = '/media/'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
@@ -81,6 +105,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "widget_tweaks",
+    "storages",
     "campaigns",
 ]
 
@@ -190,25 +215,45 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Logging configuration for production
-if not DEBUG:
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
         },
-        'root': {
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': 'INFO',
-                'propagate': False,
-            },
+        'campaigns.storage': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
         },
-    }
+        'campaigns.views.encounters': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

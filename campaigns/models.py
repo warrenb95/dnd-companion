@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
+from .storage import get_encounter_image_path
+from .validators import validate_encounter_image
 
 class Campaign(models.Model):
     title = models.CharField(max_length=200)
@@ -105,7 +107,12 @@ class Encounter(models.Model):
     )
 
     map_reference = models.CharField(max_length=100, blank=True)
-    map_image = models.ImageField(upload_to="images/", blank=True)
+    map_image = models.ImageField(
+        upload_to=get_encounter_image_path,
+        blank=True,
+        validators=[validate_encounter_image],
+        help_text="Upload an image file (JPG, PNG, WEBP). Max size: 5MB, Max dimensions: 6000x6000px"
+    )
 
     tags = models.CharField(
         max_length=200,

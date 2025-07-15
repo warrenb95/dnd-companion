@@ -58,8 +58,39 @@ class EncounterUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, f"Encounter '{form.instance.title}' updated successfully.")
-        return super().form_valid(form)
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Log form submission details
+        logger.info(f"Processing encounter form submission - User: {self.request.user.id}, "
+                   f"Encounter: {form.instance.id}, Title: {form.instance.title}")
+        
+        # Check if map_image was uploaded
+        if 'map_image' in form.changed_data:
+            map_image = form.cleaned_data.get('map_image')
+            if map_image:
+                logger.info(f"New map image uploaded - Name: {map_image.name}, "
+                           f"Size: {map_image.size} bytes, Content type: {map_image.content_type}")
+            else:
+                logger.info("Map image field was changed but no file provided")
+        else:
+            logger.info("No map image changes detected")
+        
+        try:
+            result = super().form_valid(form)
+            logger.info(f"Encounter saved successfully - ID: {form.instance.id}")
+            
+            # Log final map_image details if it exists
+            if form.instance.map_image:
+                logger.info(f"Final map image details - Name: {form.instance.map_image.name}, "
+                           f"URL: {form.instance.map_image.url}")
+            
+            messages.success(self.request, f"Encounter '{form.instance.title}' updated successfully.")
+            return result
+        except Exception as e:
+            logger.error(f"Error saving encounter - ID: {form.instance.id}, Error: {str(e)}")
+            messages.error(self.request, f"Error saving encounter: {str(e)}")
+            raise
 
     def get_success_url(self):
         # Redirect back to chapter detail view after success

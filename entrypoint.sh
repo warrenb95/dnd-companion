@@ -94,10 +94,7 @@ if [ "$1" = "litefs" ] && [ "$2" = "mount" ]; then
     exit 1
   fi
 
-  # Create media directory with proper permissions after LiteFS is mounted
-  echo "Setting up media directory..."
-  mkdir -p "$LITEFS_DIR/media"
-  chmod 755 "$LITEFS_DIR/media"
+  # Media files now handled by S3 - no local directory needed
 
   # Run Django commands only on the primary node
   if [ "${FLY_REGION}" = "${PRIMARY_REGION}" ]; then
