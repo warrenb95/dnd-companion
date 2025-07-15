@@ -21,7 +21,10 @@ from .encounters import (
     EncounterUpdateView,
     EncounterDeleteView,
     EncounterNoteFormView,
-    EncounterNoteCreateView
+    EncounterNoteCreateView,
+    EncounterNoteEditView,
+    EncounterNoteUpdateView,
+    EncounterNoteDeleteView
 )
 from .world import (
     LocationCreateView,
@@ -62,6 +65,9 @@ __all__ = [
     'EncounterDeleteView',
     'EncounterNoteFormView',
     'EncounterNoteCreateView',
+    'EncounterNoteEditView',
+    'EncounterNoteUpdateView',
+    'EncounterNoteDeleteView',
     
     # World views
     'LocationCreateView',

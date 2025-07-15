@@ -132,3 +132,50 @@ class EncounterNoteCreateView(View):
 
         # Re-render the updated notes list as HTML
         return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
+
+
+class EncounterNoteEditView(LoginRequiredMixin, View):
+    def get(self, request, note_id):
+        note = get_object_or_404(
+            SessionNote.objects.select_related('encounter__chapter__campaign'),
+            pk=note_id,
+            owner=request.user
+        )
+        return render(request, "encounters/components/_note_edit_form.html", {"note": note})
+
+
+class EncounterNoteUpdateView(LoginRequiredMixin, View):
+    def post(self, request, note_id):
+        note = get_object_or_404(
+            SessionNote.objects.select_related('encounter__chapter__campaign'),
+            pk=note_id,
+            owner=request.user
+        )
+        
+        content = request.POST.get("content")
+        date = request.POST.get("date")
+        
+        if content and date:
+            note.content = content
+            note.date = date
+            note.save()
+            messages.success(request, "Note updated successfully.")
+        
+        # Re-render the updated notes list as HTML
+        return render(request, "encounters/components/_notes_list.html", {"enc": note.encounter})
+
+
+class EncounterNoteDeleteView(LoginRequiredMixin, View):
+    def delete(self, request, note_id):
+        note = get_object_or_404(
+            SessionNote.objects.select_related('encounter__chapter__campaign'),
+            pk=note_id,
+            owner=request.user
+        )
+        
+        encounter = note.encounter
+        note.delete()
+        messages.success(request, "Note deleted successfully.")
+        
+        # Re-render the updated notes list as HTML
+        return render(request, "encounters/components/_notes_list.html", {"enc": encounter})

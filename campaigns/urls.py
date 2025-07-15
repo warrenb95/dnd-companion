@@ -4,7 +4,7 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -70,6 +70,9 @@ urlpatterns = [
     path("npcs/<int:pk>/edit/", NPCUpdateView.as_view(), name="npc_edit"),
     path("<int:encounter_id>/note-form/", EncounterNoteFormView.as_view(), name="encounter_note_form"),
     path("create-encounter-note/", EncounterNoteCreateView.as_view(), name="encounter_note_create"),
+    path("notes/<int:note_id>/edit/", EncounterNoteEditView.as_view(), name="encounter_note_edit"),
+    path("notes/<int:note_id>/update/", EncounterNoteUpdateView.as_view(), name="encounter_note_update"),
+    path("notes/<int:note_id>/delete/", EncounterNoteDeleteView.as_view(), name="encounter_note_delete"),
     path("<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
     path(
         "<int:campaign_id>/save-campaign-summary/",
