@@ -19,10 +19,13 @@
     <form method="post" class="space-y-6">
       {% csrf_token %}
 
-      <!-- Username -->
+      <!-- Username or Email -->
       <div>
-        <label for="id_username" class="block text-sm font-medium text-gray-300 mb-1">Username</label>
+        <label for="id_username" class="block text-sm font-medium text-gray-300 mb-1">{{ form.username.label }}</label>
         {{ form.username|add_class:"w-full px-3 py-2 rounded-md bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500" }}
+        {% if form.username.help_text %}
+        <p class="text-gray-400 text-xs mt-1">{{ form.username.help_text }}</p>
+        {% endif %}
         {% if form.username.errors %}
         <p class="text-red-400 text-xs mt-1">{{ form.username.errors.0 }}</p>
         {% endif %}

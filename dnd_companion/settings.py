@@ -109,6 +109,12 @@ INSTALLED_APPS = [
     "campaigns",
 ]
 
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'campaigns.authentication.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
