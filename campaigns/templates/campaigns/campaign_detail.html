@@ -5,12 +5,79 @@
   <h1 class="text-4xl font-bold mb-6 text-white">{{ campaign.title }}</h1>
 
   {% include "campaigns/components/_campaign_description.html" %}
+  
+  <!-- Co-DM Management Section -->
+  {% if is_owner or co_dms %}
+  <div class="bg-gray-800 rounded-lg p-6 mb-6">
+    <h3 class="text-xl font-semibold text-white mb-4">Campaign DMs</h3>
+    
+    <div class="space-y-4">
+      <!-- Owner -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+            <span class="text-white font-medium">👑</span>
+          </div>
+          <div>
+            <span class="text-white font-medium">{{ campaign.owner.username }}</span>
+            <span class="text-gray-400 text-sm ml-2">(Owner)</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Co-DMs -->
+      {% for co_dm in co_dms %}
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+            <span class="text-white font-medium">{{ co_dm.username|first|upper }}</span>
+          </div>
+          <div>
+            <span class="text-white font-medium">{{ co_dm.username }}</span>
+            <span class="text-gray-400 text-sm ml-2">(Co-DM)</span>
+          </div>
+        </div>
+        
+        {% if is_owner %}
+        <form method="post" action="{% url 'campaigns:remove_codm' campaign.id %}" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="user_id" value="{{ co_dm.id }}">
+          <button type="submit" class="text-red-400 hover:text-red-300 text-sm" onclick="return confirm('Are you sure you want to remove this co-DM?')">
+            Remove
+          </button>
+        </form>
+        {% endif %}
+      </div>
+      {% empty %}
+      {% if not is_owner %}
+      <p class="text-gray-400 text-sm">No co-DMs assigned to this campaign.</p>
+      {% endif %}
+      {% endfor %}
+      
+      <!-- Add Co-DM Button (Only for Owner) -->
+      {% if is_owner %}
+      <div class="border-t border-gray-700 pt-4">
+        <button id="add-codm-btn" 
+                hx-get="{% url 'campaigns:add_codm' campaign.id %}"
+                hx-target="#modal-content"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+          Add Co-DM
+        </button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  
   {% include "campaigns/components/_chapter_list.html" %}
 
   <div class="text-right mt-8">
     <a href="{% url 'campaigns:campaign_list' %}" class="inline-block px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Back to Campaigns</a>
   </div>
 </div>
+
+<!-- Include the Co-DM Modal -->
+{% include "campaigns/components/_codm_modal.html" %}
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -130,6 +197,41 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error:', error));
     }
+});
+
+// Co-DM Modal Management
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('codm-modal');
+    const addCoDMBtn = document.getElementById('add-codm-btn');
+    const closeModalBtn = document.getElementById('close-modal');
+    
+    // Show modal when Add Co-DM button is clicked
+    if (addCoDMBtn) {
+        addCoDMBtn.addEventListener('click', function() {
+            modal.classList.remove('hidden');
+        });
+    }
+    
+    // Close modal when X button is clicked
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+        });
+    }
+    
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+    
+    // Handle cancel button in form
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'cancel-btn') {
+            modal.classList.add('hidden');
+        }
+    });
 });
 </script>
 

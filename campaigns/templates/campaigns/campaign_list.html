@@ -11,7 +11,16 @@
       <li class="border-b bg-gray-900 border-gray-700 last:border-b-0">
         <a href="{% url 'campaigns:campaign_detail' campaign.id %}"
            class="block px-6 py-4 text-indigo-400 hover:text-white hover:bg-gray-700 transition-colors duration-150">
-          {{ campaign.title }}
+          <div class="flex items-center justify-between">
+            <span>{{ campaign.title }}</span>
+            <div class="flex items-center space-x-2">
+              {% if campaign.owner == request.user %}
+              <span class="text-yellow-400 text-sm">👑 Owner</span>
+              {% else %}
+              <span class="text-blue-400 text-sm">Co-DM</span>
+              {% endif %}
+            </div>
+          </div>
         </a>
       </li>
       {% empty %}

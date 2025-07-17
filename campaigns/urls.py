@@ -14,6 +14,7 @@ from .views import (
     export_campaign_markdown,
     save_campaign_summary,
 )
+from .views.campaigns import AddCoDMView, RemoveCoDMView
 
 app_name = "campaigns"
 
@@ -78,6 +79,16 @@ urlpatterns = [
         "<int:campaign_id>/save-campaign-summary/",
         save_campaign_summary,
         name="save_campaign_summary",
+    ),
+    path(
+        "<int:campaign_id>/add-codm/",
+        AddCoDMView.as_view(),
+        name="add_codm",
+    ),
+    path(
+        "<int:campaign_id>/remove-codm/",
+        RemoveCoDMView.as_view(),
+        name="remove_codm",
     ),
     path(
         "campaign/<int:campaign_id>/add_character/", CreateCharacterView.as_view(), name="add_character"

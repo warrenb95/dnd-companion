@@ -5,8 +5,10 @@ from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
+from django.db.models import Q
 
 from ..models import Campaign
+from ..forms.campaigns import AddCoDMForm, RemoveCoDMForm
 
 
 class HomeView(View):
@@ -22,7 +24,11 @@ class CampaignListView(ListView):
     context_object_name = "campaigns"
 
     def get_queryset(self):
-        return Campaign.objects.filter(owner=self.request.user)
+        # Return campaigns where user is owner or co-DM
+        return Campaign.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(collaborators__user=self.request.user, collaborators__permission_level='co_dm')
+        ).distinct()
 
 
 class CampaignDetailView(LoginRequiredMixin, DetailView):
@@ -31,7 +37,27 @@ class CampaignDetailView(LoginRequiredMixin, DetailView):
     context_object_name = "campaign"
 
     def get_queryset(self):
-        return Campaign.objects.filter(owner=self.request.user)
+        # Return campaigns where user is owner or co-DM
+        return Campaign.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(collaborators__user=self.request.user, collaborators__permission_level='co_dm')
+        ).distinct()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        campaign = self.get_object()
+        
+        # Add co-DM management forms if user is the owner
+        if campaign.owner == self.request.user:
+            context['add_codm_form'] = AddCoDMForm(campaign=campaign)
+            context['remove_codm_form'] = RemoveCoDMForm(campaign=campaign)
+        
+        # Add co-DM information
+        context['co_dms'] = campaign.get_co_dms()
+        context['is_owner'] = campaign.owner == self.request.user
+        context['can_edit'] = campaign.can_edit(self.request.user)
+        
+        return context
 
 
 class CampaignCreateView(LoginRequiredMixin, CreateView):
@@ -144,4 +170,75 @@ def save_campaign_summary(request, campaign_id):
 
         campaign.generated_summary = content
         campaign.save()
+        return redirect(campaign.get_absolute_url())
+
+
+class AddCoDMView(LoginRequiredMixin, View):
+    def get(self, request, campaign_id):
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        
+        # Only the owner can add co-DMs
+        if campaign.owner != request.user:
+            return HttpResponse("Unauthorized", status=403)
+        
+        form = AddCoDMForm(campaign=campaign)
+        return render(request, 'campaigns/components/_codm_form.html', {
+            'form': form,
+            'campaign': campaign
+        })
+    
+    def post(self, request, campaign_id):
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        
+        # Only the owner can add co-DMs
+        if campaign.owner != request.user:
+            return HttpResponse("Unauthorized", status=403)
+        
+        form = AddCoDMForm(request.POST, campaign=campaign)
+        if form.is_valid():
+            user = form.cleaned_data['username_or_email']
+            success, message = campaign.add_co_dm(user)
+            
+            if success:
+                return render(request, 'campaigns/components/_codm_success.html', {
+                    'message': f"Successfully added {user.username} as a co-DM.",
+                    'campaign': campaign
+                })
+            else:
+                # Return form with error message
+                return render(request, 'campaigns/components/_codm_form.html', {
+                    'form': form,
+                    'campaign': campaign,
+                    'error_message': message
+                })
+        else:
+            # Return form with validation errors
+            return render(request, 'campaigns/components/_codm_form.html', {
+                'form': form,
+                'campaign': campaign
+            })
+
+
+class RemoveCoDMView(LoginRequiredMixin, View):
+    def post(self, request, campaign_id):
+        campaign = get_object_or_404(Campaign, pk=campaign_id)
+        
+        # Only the owner can remove co-DMs
+        if campaign.owner != request.user:
+            messages.error(request, "Only the campaign owner can remove co-DMs.")
+            return redirect(campaign.get_absolute_url())
+        
+        form = RemoveCoDMForm(request.POST, campaign=campaign)
+        if form.is_valid():
+            user = form.cleaned_data['user_id']
+            success, message = campaign.remove_co_dm(user)
+            
+            if success:
+                messages.success(request, f"Successfully removed {user.username} as a co-DM.")
+            else:
+                messages.error(request, message)
+        else:
+            for error in form.errors.values():
+                messages.error(request, error[0])
+        
         return redirect(campaign.get_absolute_url())
