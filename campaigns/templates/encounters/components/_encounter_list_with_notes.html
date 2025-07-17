@@ -1,3 +1,5 @@
+{% load markdown_extras %}
+
 <div class="bg-gray-800 rounded-lg shadow">
   <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
     <h2 class="text-2xl font-semibold text-white">Encounters & Notes</h2>
@@ -45,10 +47,22 @@
           </div>
           {% endif %}
           
-          <p><strong>Summary:</strong> {{ enc.summary }}</p>
-          {% if enc.setup %}<p><strong>Setup:</strong> {{ enc.setup }}</p>{% endif %}
-          {% if enc.read_aloud %}<p><strong>Read-Aloud:</strong> {{ enc.read_aloud }}</p>{% endif %}
-          {% if enc.dm_notes %}<p><strong>DM Notes:</strong> {{ enc.dm_notes }}</p>{% endif %}
+          <div class="prose prose-invert prose-sm max-w-none">
+            <div><strong>Summary:</strong></div>
+            <div class="ml-4 mb-3">{{ enc.summary|markdown }}</div>
+            {% if enc.setup %}
+            <div><strong>Setup:</strong></div>
+            <div class="ml-4 mb-3">{{ enc.setup|markdown }}</div>
+            {% endif %}
+            {% if enc.read_aloud %}
+            <div><strong>Read-Aloud:</strong></div>
+            <div class="ml-4 mb-3 p-3 bg-gray-600 rounded border-l-4 border-indigo-500">{{ enc.read_aloud|markdown }}</div>
+            {% endif %}
+            {% if enc.dm_notes %}
+            <div><strong>DM Notes:</strong></div>
+            <div class="ml-4 mb-3">{{ enc.dm_notes|markdown }}</div>
+            {% endif %}
+          </div>
           {% if enc.map_reference %}<p><strong>Map Ref:</strong> {{ enc.map_reference }}</p>{% endif %}
           
           {% if enc.tags %}

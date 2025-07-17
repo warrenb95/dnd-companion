@@ -1,3 +1,5 @@
+{% load markdown_extras %}
+
 <div class="bg-gray-800 p-6 rounded-lg shadow">
   <div class="flex items-center justify-between mb-4">
     <div class="flex items-center gap-4">
@@ -30,29 +32,29 @@
   <div class="space-y-4 text-gray-300">
     {% if chapter.summary %}
     <div>
-      <h2 class="text-xl font-semibold text-white">Summary</h2>
-      <p>{{ chapter.summary }}</p>
+      <h2 class="text-xl font-semibold text-white mb-2">Summary</h2>
+      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.summary|markdown }}</div>
     </div>
     {% endif %}
     
     {% if chapter.intro %}
     <div>
-      <h2 class="text-xl font-semibold text-white">Introduction</h2>
-      <p>{{ chapter.intro }}</p>
+      <h2 class="text-xl font-semibold text-white mb-2">Introduction</h2>
+      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.intro|markdown }}</div>
     </div>
     {% endif %}
     
     {% if chapter.dm_notes %}
     <div>
-      <h2 class="text-xl font-semibold text-white">DM Notes</h2>
-      <p>{{ chapter.dm_notes }}</p>
+      <h2 class="text-xl font-semibold text-white mb-2">DM Notes</h2>
+      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.dm_notes|markdown }}</div>
     </div>
     {% endif %}
     
     {% if chapter.conclusion %}
     <div>
-      <h2 class="text-xl font-semibold text-white">Conclusion</h2>
-      <p>{{ chapter.conclusion }}</p>
+      <h2 class="text-xl font-semibold text-white mb-2">Conclusion</h2>
+      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.conclusion|markdown }}</div>
     </div>
     {% endif %}
   </div>
