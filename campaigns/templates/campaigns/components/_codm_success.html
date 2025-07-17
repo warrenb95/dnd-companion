@@ -1,0 +1,21 @@
+<!-- Co-DM Success Message -->
+<div class="text-center py-4">
+  <div class="w-16 h-16 mx-auto mb-4 bg-green-600 rounded-full flex items-center justify-center">
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+    </svg>
+  </div>
+  <h4 class="text-lg font-semibold text-white mb-2">Success!</h4>
+  <p class="text-gray-300 mb-4">{{ message }}</p>
+  <button id="close-success" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+    Close
+  </button>
+</div>
+
+<script>
+document.getElementById('close-success').addEventListener('click', function() {
+  document.getElementById('codm-modal').classList.add('hidden');
+  // Refresh the page to show the new co-DM
+  window.location.reload();
+});
+</script>
