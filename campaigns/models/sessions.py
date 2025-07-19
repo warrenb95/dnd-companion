@@ -1,6 +1,8 @@
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth.models import User
+import uuid
 
 from .base import Campaign
 from .content import Encounter
@@ -49,3 +51,110 @@ class ChapterChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.role}: {self.content[:40]}"
+
+
+class SessionSchedule(models.Model):
+    STATUS_CHOICES = [
+        ("collecting", "Collecting Responses"),
+        ("ready", "Ready to Schedule"),
+        ("scheduled", "Session Scheduled"),
+        ("completed", "Session Completed"),
+        ("cancelled", "Cancelled"),
+    ]
+
+    campaign = models.ForeignKey(
+        Campaign, on_delete=models.CASCADE, related_name="session_schedules"
+    )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='session_schedules')
+    
+    title = models.CharField(max_length=200, default="Session Availability")
+    date_range_start = models.DateField(help_text="Start of the date range for potential sessions")
+    date_range_end = models.DateField(help_text="End of the date range for potential sessions")
+    session_duration = models.PositiveIntegerField(default=4, help_text="Expected session duration in hours")
+    
+    shareable_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="collecting")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    notes = models.TextField(blank=True, help_text="Additional notes for players")
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.campaign.title}"
+
+    def get_absolute_url(self):
+        return reverse("campaigns:session_schedule_detail", args=[str(self.id)])
+
+    def get_player_url(self):
+        return reverse("campaigns:player_availability", args=[str(self.shareable_token)])
+
+    @property
+    def total_responses(self):
+        return self.player_availabilities.count()
+
+    @property
+    def can_schedule(self):
+        return self.status == "collecting" and self.total_responses > 0
+
+
+class PlayerAvailability(models.Model):
+    session_schedule = models.ForeignKey(
+        SessionSchedule, on_delete=models.CASCADE, related_name="player_availabilities"
+    )
+    player_name = models.CharField(max_length=100)
+    character_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField()
+    
+    # Store availability as JSON: {date: [time_slots]}
+    availability_data = models.JSONField(default=dict)
+    
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['submitted_at']
+        unique_together = ['session_schedule', 'email']
+
+    def __str__(self):
+        return f"{self.player_name} - {self.session_schedule.title}"
+
+    def get_availability_for_date(self, date_str):
+        return self.availability_data.get(date_str, [])
+
+    def set_availability_for_date(self, date_str, time_slots):
+        self.availability_data[date_str] = time_slots
+
+
+class ScheduledSession(models.Model):
+    STATUS_CHOICES = [
+        ("confirmed", "Confirmed"),
+        ("tentative", "Tentative"),
+        ("cancelled", "Cancelled"),
+        ("completed", "Completed"),
+    ]
+
+    session_schedule = models.OneToOneField(
+        SessionSchedule, on_delete=models.CASCADE, related_name="scheduled_session"
+    )
+    scheduled_datetime = models.DateTimeField()
+    duration_hours = models.PositiveIntegerField(default=4)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="confirmed")
+    
+    participants = models.ManyToManyField(PlayerAvailability, blank=True)
+    
+    session_notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['scheduled_datetime']
+
+    def __str__(self):
+        return f"Session: {self.session_schedule.campaign.title} - {self.scheduled_datetime.strftime('%Y-%m-%d %H:%M')}"
+
+    @property
+    def end_datetime(self):
+        return self.scheduled_datetime + timezone.timedelta(hours=self.duration_hours)

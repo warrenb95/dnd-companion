@@ -3,7 +3,7 @@ from .base import Campaign, CampaignCollaborator
 from .content import Chapter, Encounter
 from .world import Location, NPC
 from .characters import CharacterSummary
-from .sessions import SessionNote, ChatMessage, ChapterChatMessage
+from .sessions import SessionNote, ChatMessage, ChapterChatMessage, SessionSchedule, PlayerAvailability, ScheduledSession
 from .users import UserProfile
 
 # Make all models available when importing from campaigns.models
@@ -18,5 +18,8 @@ __all__ = [
     'SessionNote',
     'ChatMessage',
     'ChapterChatMessage',
+    'SessionSchedule',
+    'PlayerAvailability',
+    'ScheduledSession',
     'UserProfile',
 ]

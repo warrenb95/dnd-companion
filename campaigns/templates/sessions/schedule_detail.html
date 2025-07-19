@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}{{ schedule.title }} - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-8 max-w-6xl mx-auto px-4">
+  <!-- Header -->
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h2 class="text-3xl font-bold text-white">{{ schedule.title }}</h2>
+      <p class="text-gray-400 text-lg">{{ campaign.title }}</p>
+    </div>
+    <span class="px-3 py-1 rounded-full text-sm font-medium {% if schedule.status == 'collecting' %}bg-yellow-900 text-yellow-200{% elif schedule.status == 'scheduled' %}bg-green-900 text-green-200{% else %}bg-gray-700 text-gray-300{% endif %}">
+      {{ schedule.get_status_display }}
+    </span>
+  </div>
+  
+  <!-- Schedule Info -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div class="lg:col-span-2">
+      <div class="bg-gray-800 rounded-lg shadow-lg">
+        <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+          <h5 class="text-xl font-semibold text-white">Schedule Information</h5>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div>
+              <p class="text-gray-300"><strong class="text-white">Date Range:</strong><br>{{ schedule.date_range_start|date:"F j" }} - {{ schedule.date_range_end|date:"F j, Y" }}</p>
+            </div>
+            <div>
+              <p class="text-gray-300"><strong class="text-white">Session Duration:</strong><br>{{ schedule.session_duration }} hours</p>
+            </div>
+          </div>
+          {% if schedule.notes %}
+            <p class="text-gray-300 mb-6"><strong class="text-white">Notes:</strong><br>{{ schedule.notes }}</p>
+          {% endif %}
+          
+          <!-- Shareable Link -->
+          <div class="mt-3 p-4 bg-gray-750 rounded-lg border border-gray-600">
+            <strong class="text-white">Share this link with your players:</strong>
+            <div class="flex mt-3">
+              <input type="text" class="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-l-md text-white font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" value="{{ player_url }}" readonly id="shareLink">
+              <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-r-md border border-indigo-600 hover:border-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors" type="button" onclick="copyToClipboard()">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div>
+      <div class="bg-gray-800 rounded-lg shadow-lg">
+        <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+          <h6 class="text-lg font-semibold text-white">Quick Stats</h6>
+        </div>
+        <div class="p-6 space-y-3">
+          <p class="text-gray-300"><strong class="text-white">Total Responses:</strong> {{ responses|length }}</p>
+          <p class="text-gray-300"><strong class="text-white">Status:</strong> {{ schedule.get_status_display }}</p>
+          <p class="text-gray-300"><strong class="text-white">Created:</strong> {{ schedule.created_at|date:"M j, Y" }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Player Responses -->
+  {% if responses %}
+    <div class="bg-gray-800 rounded-lg shadow-lg mb-6">
+      <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+        <h5 class="text-xl font-semibold text-white">Player Responses ({{ responses|length }})</h5>
+      </div>
+      <div class="p-6">
+        <!-- Simple list view -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {% for response in responses %}
+            <div class="bg-gray-750 border border-gray-600 rounded-lg p-4">
+              <h6 class="text-lg font-semibold text-white mb-2">{{ response.player_name }}</h6>
+              {% if response.character_name %}
+                <p class="text-gray-400 text-sm mb-3">Playing: {{ response.character_name }}</p>
+              {% endif %}
+              <p class="text-gray-300 text-sm mb-2"><strong class="text-white">Email:</strong> {{ response.email }}</p>
+              <p class="text-gray-300 text-sm mb-3"><strong class="text-white">Submitted:</strong> {{ response.submitted_at|date:"M j, Y g:i A" }}</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Availability Grid -->
+    {% if availability_grid %}
+      <div class="bg-gray-800 rounded-lg shadow-lg mb-6">
+        <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+          <h5 class="text-xl font-semibold text-white">Availability Overview</h5>
+        </div>
+        <div class="p-6">
+          <!-- Detailed Availability Grid -->
+          <h6 class="text-lg font-semibold text-white mb-4">Player Availability by Time Slot</h6>
+          <div class="overflow-x-auto">
+            <table class="w-full border border-gray-600 rounded-lg overflow-hidden text-sm">
+              <thead class="bg-gray-700">
+                <tr>
+                  <th class="text-left py-2 px-3 text-white font-semibold border-b border-gray-600">Date</th>
+                  {% for response in responses %}
+                    <th class="text-center py-2 px-2 text-white font-semibold border-b border-gray-600 min-w-24">{{ response.player_name }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody class="bg-gray-800">
+                {% for date_str, data in availability_grid.items %}
+                  {% for time_slot, time_label in time_slots %}
+                    <tr class="border-b border-gray-600">
+                      {% if forloop.first %}
+                        <td rowspan="4" class="py-2 px-3 text-white font-medium border-r border-gray-600 align-top">
+                          {{ data.date|date:"M j" }}
+                        </td>
+                      {% endif %}
+                      {% for player in data.players %}
+                        <td class="text-center py-1 px-2">
+                          {% if time_slot in player.available_times %}
+                            <div class="bg-green-600 text-white rounded px-2 py-1 text-xs font-medium">
+                              {{ time_slot|capfirst }}
+                            </div>
+                          {% else %}
+                            <span class="text-gray-500">-</span>
+                          {% endif %}
+                        </td>
+                      {% endfor %}
+                    </tr>
+                  {% endfor %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <p class="text-gray-400 text-xs mt-2">Green boxes indicate when each player is available</p>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Most Popular Times (only show if there are responses and can schedule) -->
+    {% if schedule.can_schedule and popular_slots %}
+      <div class="bg-gray-800 rounded-lg shadow-lg mb-6">
+        <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+          <h5 class="text-xl font-semibold text-white">Best Scheduling Options</h5>
+          <p class="text-gray-400 text-sm mt-1">Most popular date-time combinations based on player availability</p>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for slot_info in popular_slots %}
+              <div class="bg-gray-750 rounded-lg p-4 border border-gray-600 hover:border-blue-500 transition-colors">
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-white font-medium">{{ slot_info.date|date:"M j" }}</span>
+                  <span class="px-2 py-1 bg-blue-600 text-white rounded-full text-xs font-medium">
+                    {{ slot_info.count }} player{{ slot_info.count|pluralize }}
+                  </span>
+                </div>
+                <div class="text-sm text-gray-300 mb-2">{{ slot_info.time_display }}</div>
+                {% if slot_info.players %}
+                  <div class="text-xs text-gray-400">
+                    Available: {{ slot_info.players|join:", " }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Schedule Session -->
+    {% if schedule.can_schedule %}
+      <div class="bg-gray-800 rounded-lg shadow-lg">
+        <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+          <h5 class="text-xl font-semibold text-white">Schedule Session</h5>
+        </div>
+        <div class="p-6">
+          <form method="post" action="{% url 'campaigns:schedule_session' campaign.pk schedule.pk %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label for="selected_date" class="block text-sm font-medium text-white mb-2">Select Date</label>
+                <select name="selected_date" id="selected_date" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                  <option value="">Choose a date...</option>
+                  {% for date_str, data in availability_grid.items %}
+                    <option value="{{ date_str }}">{{ data.date|date:"F j, Y" }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label for="selected_time" class="block text-sm font-medium text-white mb-2">Select Time Slot</label>
+                <select name="selected_time" id="selected_time" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                  <option value="">Choose a time...</option>
+                  <option value="morning">Morning (9:00 AM - 12:00 PM)</option>
+                  <option value="afternoon">Afternoon (1:00 PM - 5:00 PM)</option>
+                  <option value="evening">Evening (6:00 PM - 10:00 PM)</option>
+                  <option value="late">Late Night (8:00 PM - 12:00 AM)</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+              <i class="fas fa-check mr-2"></i>Confirm Session
+            </button>
+          </form>
+        </div>
+      </div>
+    {% endif %}
+    
+  {% else %}
+    <div class="bg-gray-800 rounded-lg shadow-lg">
+      <div class="p-12 text-center">
+        <i class="fas fa-users text-6xl text-gray-500 mb-6"></i>
+        <h5 class="text-2xl font-bold text-white mb-3">No responses yet</h5>
+        <p class="text-gray-400">Share the link above with your players to collect their availability.</p>
+      </div>
+    </div>
+  {% endif %}
+  
+  <!-- Back Button -->
+  <div class="mt-4">
+    <a href="{% url 'campaigns:session_schedule_list' campaign.pk %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors">
+      <i class="fas fa-arrow-left mr-2"></i> Back to Schedules
+    </a>
+  </div>
+</div>
+
+<script>
+function copyToClipboard() {
+  const copyText = document.getElementById("shareLink");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(copyText.value);
+  
+  const button = event.target.closest('button');
+  const originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+  button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
+  button.classList.add('bg-green-600', 'hover:bg-green-700', 'border-green-600', 'hover:border-green-700');
+  
+  setTimeout(() => {
+    button.innerHTML = originalText;
+    button.classList.remove('bg-green-600', 'hover:bg-green-700', 'border-green-600', 'hover:border-green-700');
+    button.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
+  }, 2000);
+}
+</script>
+{% endblock %}

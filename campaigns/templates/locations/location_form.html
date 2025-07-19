@@ -1,21 +1,97 @@
 {% extends "base.html" %}
 {% block title %}{{ view.object.name|default:"New Location" }}{% endblock %}
 {% block content %}
-<div class="container my-5">
-  <div class="card shadow-sm">
-    <div class="card-header bg-light">
-      <h2>{{ view.object.name|default:"Add Location" }}</h2>
+<div class="my-10 max-w-4xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+      <h2 class="text-2xl font-semibold text-white">
+        {{ view.object.name|default:"Add Location" }} for {{ campaign.title }}
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Create interesting locations for your campaign</p>
     </div>
-    <div class="card-body">
-      <form method="post">
+
+    <div class="p-6">
+      <form method="post" class="space-y-6">
         {% csrf_token %}
-        {{form.as_p}}
-        <div class="d-flex">
-          <button type="submit" class="btn btn-success me-2">Save</button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn btn-secondary">Cancel</a>
+        
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6">Location Details</h3>
+          
+          <div class="space-y-6">
+            <!-- Name -->
+            <div>
+              <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Location Name *
+              </label>
+              {{ form.name }}
+              {% if form.name.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.name.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Description -->
+            <div>
+              <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Description
+              </label>
+              {{ form.description }}
+              {% if form.description.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.description.help_text }}</p>
+              {% endif %}
+              {% if form.description.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.description.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Region -->
+            <div>
+              <label for="{{ form.region.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Region
+              </label>
+              {{ form.region }}
+              {% if form.region.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.region.help_text }}</p>
+              {% endif %}
+              {% if form.region.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.region.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Tags -->
+            <div>
+              <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Tags
+              </label>
+              {{ form.tags }}
+              {% if form.tags.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.tags.help_text }}</p>
+              {% endif %}
+              {% if form.tags.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.tags.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+        {% if form.non_field_errors %}
+          <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-4 border-t border-gray-700">
+          <button type="submit" class="btn-dark-success">
+            {{ view.object.pk|yesno:"Update,Save" }} Location
+          </button>
+          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn-dark-secondary">
+            Cancel
+          </a>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+{% include "components/_dark_form_styles.html" %}
 {% endblock %}

@@ -57,6 +57,15 @@ class CampaignDetailView(LoginRequiredMixin, DetailView):
         context['is_owner'] = campaign.owner == self.request.user
         context['can_edit'] = campaign.can_edit(self.request.user)
         
+        # Add scheduled sessions information
+        if campaign.owner == self.request.user or context['can_edit']:
+            # Get recent and upcoming scheduled sessions
+            scheduled_sessions = []
+            for schedule in campaign.session_schedules.filter(status='scheduled').order_by('-updated_at')[:5]:
+                if hasattr(schedule, 'scheduled_session'):
+                    scheduled_sessions.append(schedule.scheduled_session)
+            context['scheduled_sessions'] = scheduled_sessions
+        
         return context
 
 

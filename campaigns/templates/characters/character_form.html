@@ -1,23 +1,204 @@
 {% extends "base.html" %} 
-{% block title %}Character form{% endblock %} 
+{% block title %}{{ form.instance.pk|yesno:"Edit,Add" }} Character{% endblock %} 
 {% block content %}
-<h2>{{ campaign.name }} - {{ form.instance.pk|yesno:"Edit,Add" }} Character</h2>
-
-<div class="container my-5">
-  <div class="card shadow-sm">
-    <div class="card-header bg-light">
-      <h2>{{ view.object.character_name|default:"Add Character" }}</h2>
+<div class="my-10 max-w-4xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+      <h2 class="text-2xl font-semibold text-white">
+        {{ form.instance.pk|yesno:"Edit,Add" }} Character for {{ campaign.title }}
+      </h2>
+      <p class="text-gray-400 text-sm mt-1">Manage player character details</p>
     </div>
-    <div class="card-body">
-      <form method="post">
+
+    <div class="p-6">
+      <form method="post" class="space-y-6">
         {% csrf_token %}
-        {{form.as_p}}
-        <div class="d-flex">
-          <button type="submit" class="btn btn-success me-2">Save</button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn btn-secondary">Cancel</a>
+        
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6">Character Details</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Player Name -->
+            <div>
+              <label for="{{ form.player_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Player Name *
+              </label>
+              {{ form.player_name }}
+              {% if form.player_name.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.player_name.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Character Name -->
+            <div>
+              <label for="{{ form.character_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Character Name *
+              </label>
+              {{ form.character_name }}
+              {% if form.character_name.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.character_name.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Race -->
+            <div>
+              <label for="{{ form.race.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Race *
+              </label>
+              {{ form.race }}
+              {% if form.race.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.race.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Class -->
+            <div>
+              <label for="{{ form.character_class.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Class
+              </label>
+              {{ form.character_class }}
+              {% if form.character_class.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.character_class.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Subclass -->
+            <div>
+              <label for="{{ form.character_sub_class.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Subclass
+              </label>
+              {{ form.character_sub_class }}
+              {% if form.character_sub_class.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.character_sub_class.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Level -->
+            <div>
+              <label for="{{ form.level.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Level *
+              </label>
+              {{ form.level }}
+              {% if form.level.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.level.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Alignment -->
+            <div>
+              <label for="{{ form.alignment.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Alignment
+              </label>
+              {{ form.alignment }}
+              {% if form.alignment.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.alignment.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Passive Perception -->
+            <div>
+              <label for="{{ form.passive_perception.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Passive Perception
+              </label>
+              {{ form.passive_perception }}
+              {% if form.passive_perception.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.passive_perception.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Armor Class -->
+            <div>
+              <label for="{{ form.armor_class.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Armor Class
+              </label>
+              {{ form.armor_class }}
+              {% if form.armor_class.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.armor_class.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Initiative Modifier -->
+            <div>
+              <label for="{{ form.initiative_modifier.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Initiative Modifier
+              </label>
+              {{ form.initiative_modifier }}
+              {% if form.initiative_modifier.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.initiative_modifier.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Current Hit Points -->
+            <div>
+              <label for="{{ form.current_hit_points.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Current Hit Points
+              </label>
+              {{ form.current_hit_points }}
+              {% if form.current_hit_points.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.current_hit_points.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Background -->
+            <div class="md:col-span-2">
+              <label for="{{ form.background.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Background
+              </label>
+              {{ form.background }}
+              {% if form.background.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.background.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Notable Traits -->
+            <div class="md:col-span-2">
+              <label for="{{ form.notable_traits.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Notable Traits
+              </label>
+              {{ form.notable_traits }}
+              {% if form.notable_traits.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.notable_traits.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Status Checkboxes -->
+            <div class="md:col-span-2 space-y-3">
+              <div class="flex items-center">
+                {{ form.heroic_inspiration }}
+                <label for="{{ form.heroic_inspiration.id_for_label }}" class="ml-2 text-white">
+                  Has Heroic Inspiration
+                </label>
+              </div>
+              
+              <div class="flex items-center">
+                {{ form.alive }}
+                <label for="{{ form.alive.id_for_label }}" class="ml-2 text-white">
+                  Character is Alive
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {% if form.non_field_errors %}
+          <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-4 border-t border-gray-700">
+          <button type="submit" class="btn-dark-success">
+            {{ form.instance.pk|yesno:"Update,Save" }} Character
+          </button>
+          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn-dark-secondary">
+            Cancel
+          </a>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+{% include "components/_dark_form_styles.html" %}
 {% endblock %}

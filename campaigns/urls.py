@@ -4,7 +4,7 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -102,5 +102,14 @@ urlpatterns = [
     path("profile/", user_profile_view, name="user_profile"),
     path("profile/<str:username>/", user_profile_view, name="user_profile_detail"),
     path("empty/", empty_fragment, name="empty_fragment"),
+    
+    # Session scheduling URLs
+    path("<int:campaign_id>/schedule/", SessionScheduleListView.as_view(), name="session_schedule_list"),
+    path("<int:campaign_id>/schedule/create/", SessionScheduleCreateView.as_view(), name="session_schedule_create"),
+    path("<int:campaign_id>/schedule/<int:pk>/", SessionScheduleDetailView.as_view(), name="session_schedule_detail"),
+    path("<int:campaign_id>/schedule/<int:pk>/confirm/", ScheduleSessionView.as_view(), name="schedule_session"),
+    
+    # Public player availability URL (no login required)
+    path("schedule/<uuid:token>/", PlayerAvailabilityView.as_view(), name="player_availability"),
 ]
 

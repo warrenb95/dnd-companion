@@ -40,6 +40,13 @@ from .characters import (
 from .auth import LoginView
 from .api import empty_fragment
 from .users import UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view
+from .sessions import (
+    SessionScheduleListView,
+    SessionScheduleCreateView, 
+    SessionScheduleDetailView,
+    PlayerAvailabilityView,
+    ScheduleSessionView
+)
 
 # Make all views available when importing from campaigns.views
 __all__ = [
@@ -93,4 +100,11 @@ __all__ = [
     
     # API views
     'empty_fragment',
+    
+    # Session scheduling views
+    'SessionScheduleListView',
+    'SessionScheduleCreateView', 
+    'SessionScheduleDetailView',
+    'PlayerAvailabilityView',
+    'ScheduleSessionView',
 ]

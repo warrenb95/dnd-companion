@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Availability Submitted - {{ schedule.campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-10 max-w-2xl mx-auto px-4">
+  <div class="text-center">
+    <div class="mb-6">
+      <i class="fas fa-check-circle text-6xl text-green-500"></i>
+    </div>
+    <h2 class="text-3xl font-bold text-white mb-3">Thank You!</h2>
+    <p class="text-xl text-gray-300 mb-8">Your availability has been submitted successfully.</p>
+    
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
+      <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+        <h3 class="text-xl font-semibold text-white">Submission Details</h3>
+      </div>
+      <div class="p-6 space-y-3">
+        <p class="text-gray-300"><strong class="text-white">Player:</strong> {{ availability.player_name }}</p>
+        {% if availability.character_name %}
+          <p class="text-gray-300"><strong class="text-white">Character:</strong> {{ availability.character_name }}</p>
+        {% endif %}
+        <p class="text-gray-300"><strong class="text-white">Email:</strong> {{ availability.email }}</p>
+        <p class="text-gray-300"><strong class="text-white">Submitted:</strong> {{ availability.submitted_at|date:"F j, Y g:i A" }}</p>
+      </div>
+    </div>
+    
+    <div class="bg-blue-900 border border-blue-700 text-blue-200 px-6 py-4 rounded-lg mb-8">
+      <p>
+        The DM will review everyone's availability and schedule the session. 
+        You'll receive an email confirmation once the session is scheduled.
+      </p>
+    </div>
+    
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+        <h3 class="text-xl font-semibold text-white">Campaign Details</h3>
+      </div>
+      <div class="p-6 space-y-2">
+        <p class="text-gray-300">
+          <strong class="text-white">Campaign:</strong> {{ schedule.campaign.title }}
+        </p>
+        <p class="text-gray-300">
+          <strong class="text-white">Schedule:</strong> {{ schedule.title }}
+        </p>
+        <p class="text-gray-300">
+          <strong class="text-white">Session Duration:</strong> {{ schedule.session_duration }} hours
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
