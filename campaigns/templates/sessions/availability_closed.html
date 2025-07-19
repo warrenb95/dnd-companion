@@ -3,32 +3,32 @@
 {% block title %}Scheduling Closed - {{ schedule.campaign.title }}{% endblock %}
 
 {% block content %}
-<div class="my-10 max-w-2xl mx-auto px-4">
+<div class="my-4 sm:my-10 max-w-2xl mx-auto px-4">
   <div class="text-center">
-    <div class="mb-6">
-      <i class="fas fa-calendar-times text-6xl text-yellow-500"></i>
+    <div class="mb-4 sm:mb-6">
+      <i class="fas fa-calendar-times text-4xl sm:text-6xl text-yellow-500"></i>
     </div>
-    <h2 class="text-3xl font-bold text-white mb-3">Scheduling Poll Closed</h2>
-    <p class="text-xl text-gray-300 mb-8">This scheduling poll is no longer accepting responses.</p>
+    <h2 class="text-2xl sm:text-3xl font-bold text-white mb-3">Scheduling Poll Closed</h2>
+    <p class="text-lg sm:text-xl text-gray-300 mb-6 sm:mb-8">This scheduling poll is no longer accepting responses.</p>
     
-    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-8">
-      <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-        <h3 class="text-xl font-semibold text-white">{{ schedule.title }}</h3>
+    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-6 sm:mb-8">
+      <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+        <h3 class="text-lg sm:text-xl font-semibold text-white">{{ schedule.title }}</h3>
       </div>
-      <div class="p-6 space-y-3">
-        <p class="text-gray-300"><strong class="text-white">Campaign:</strong> {{ schedule.campaign.title }}</p>
-        <p class="text-gray-300"><strong class="text-white">Status:</strong> {{ schedule.get_status_display }}</p>
+      <div class="p-4 sm:p-6 space-y-2 sm:space-y-3">
+        <p class="text-gray-300 text-sm sm:text-base"><strong class="text-white">Campaign:</strong> {{ schedule.campaign.title }}</p>
+        <p class="text-gray-300 text-sm sm:text-base"><strong class="text-white">Status:</strong> {{ schedule.get_status_display }}</p>
         {% if schedule.scheduled_session %}
           <div class="bg-green-900 border border-green-700 text-green-200 px-4 py-3 rounded-lg mt-4">
-            <strong>Session Scheduled!</strong><br>
-            {{ schedule.scheduled_session.scheduled_datetime|date:"F j, Y g:i A" }}
+            <strong class="text-sm sm:text-base">Session Scheduled!</strong><br>
+            <span class="text-sm sm:text-base">{{ schedule.scheduled_session.scheduled_datetime|date:"F j, Y g:i A" }}</span>
           </div>
         {% endif %}
       </div>
     </div>
     
-    <div class="bg-gray-750 rounded-lg p-6">
-      <p class="text-gray-300">
+    <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+      <p class="text-gray-300 text-sm sm:text-base">
         {% if schedule.status == 'scheduled' %}
           The session has been scheduled. Check your email for confirmation details.
         {% elif schedule.status == 'completed' %}
