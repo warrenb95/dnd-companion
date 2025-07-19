@@ -69,6 +69,82 @@
   </div>
   {% endif %}
   
+  <!-- Session Scheduling Section -->
+  {% if is_owner %}
+  <div class="bg-gray-800 rounded-lg shadow mb-8">
+    <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+      <h2 class="text-2xl font-semibold text-white">Session Scheduling</h2>
+      <div class="flex gap-2">
+        <a href="{% url 'campaigns:session_schedule_list' campaign.id %}"
+           class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+          View Schedules
+        </a>
+        <a href="{% url 'campaigns:session_schedule_create' campaign.id %}"
+           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+          Create Schedule
+        </a>
+      </div>
+    </div>
+    <div class="px-6 py-4">
+      <!-- Scheduled Sessions List -->
+      {% if scheduled_sessions %}
+        <div class="pt-4">
+          <h3 class="text-lg font-semibold text-white mb-3">Confirmed Sessions</h3>
+          <div class="space-y-3">
+            {% for session in scheduled_sessions %}
+              <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h4 class="text-white font-medium">{{ session.session_schedule.title }}</h4>
+                    <div class="flex items-center space-x-4 mt-2 text-sm">
+                      <span class="text-green-400">
+                        <i class="fas fa-calendar mr-1"></i>
+                        {{ session.scheduled_datetime|date:"M j, Y" }}
+                      </span>
+                      <span class="text-blue-400">
+                        <i class="fas fa-clock mr-1"></i>
+                        {{ session.scheduled_datetime|date:"g:i A" }}
+                      </span>
+                      <span class="text-purple-400">
+                        <i class="fas fa-hourglass-half mr-1"></i>
+                        {{ session.duration_hours }}h
+                      </span>
+                    </div>
+                    {% if session.participants.count > 0 %}
+                      <div class="mt-2 text-xs text-gray-400">
+                        <i class="fas fa-users mr-1"></i>
+                        {{ session.participants.count }} player{{ session.participants.count|pluralize }} confirmed
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2 py-1 bg-green-900 text-green-200 rounded-full text-xs font-medium">
+                      {{ session.get_status_display }}
+                    </span>
+                    <a href="{% url 'campaigns:session_schedule_detail' campaign.id session.session_schedule.pk %}" 
+                       class="text-indigo-400 hover:text-indigo-300 text-sm">
+                      <i class="fas fa-external-link-alt"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          {% if campaign.session_schedules.filter|length > 5 %}
+            <div class="mt-3 text-center">
+              <a href="{% url 'campaigns:session_schedule_list' campaign.id %}" 
+                 class="text-indigo-400 hover:text-indigo-300 text-sm">
+                View all schedules →
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
   {% include "campaigns/components/_chapter_list.html" %}
 
   <div class="text-right mt-8">

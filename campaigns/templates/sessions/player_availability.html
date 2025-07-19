@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Session Availability - {{ schedule.campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-10 max-w-4xl mx-auto px-4">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h2 class="text-3xl font-bold text-white">{{ schedule.title }}</h2>
+    <p class="text-xl text-gray-300 mt-2">{{ schedule.campaign.title }}</p>
+    {% if schedule.notes %}
+      <div class="bg-blue-900 border border-blue-700 text-blue-200 px-4 py-3 rounded mt-4">
+        {{ schedule.notes }}
+      </div>
+    {% endif %}
+  </div>
+  
+  <!-- Form -->
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+      <h3 class="text-xl font-semibold text-white">Submit Your Availability</h3>
+    </div>
+    <div class="p-6">
+      {% if existing_response %}
+        <div class="bg-yellow-900 border border-yellow-700 text-yellow-200 px-4 py-3 rounded mb-6">
+          You've already submitted availability for this session. Submitting again will update your previous response.
+        </div>
+      {% endif %}
+      
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Player Info -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h4 class="text-lg font-semibold text-white mb-4">Your Information</h4>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="{{ form.player_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Your Name *
+              </label>
+              {{ form.player_name }}
+              {% if form.player_name.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.player_name.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.character_name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Character Name
+              </label>
+              {{ form.character_name }}
+              {% if form.character_name.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.character_name.errors }}</div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+              Email Address *
+            </label>
+            {{ form.email }}
+            <p class="text-gray-400 text-sm mt-1">We'll use this to send you session confirmations</p>
+            {% if form.email.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.email.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Availability Grid -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h4 class="text-lg font-semibold text-white mb-4">Select when you're available:</h4>
+          <p class="text-gray-400 text-sm mb-4">Check all weekend time slots when you could play during the {{ schedule.session_duration }}-hour session (Friday-Sunday only).</p>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full border border-gray-600 rounded-lg overflow-hidden">
+              <thead class="bg-gray-700">
+                <tr>
+                  <th class="text-left py-3 px-4 text-white font-semibold border-b border-gray-600">Date</th>
+                  <th class="text-center py-3 px-4 text-white font-semibold border-b border-gray-600">
+                    Morning<br><small class="text-gray-300 font-normal">9:00 AM - 12:00 PM</small>
+                  </th>
+                  <th class="text-center py-3 px-4 text-white font-semibold border-b border-gray-600">
+                    Afternoon<br><small class="text-gray-300 font-normal">1:00 PM - 5:00 PM</small>
+                  </th>
+                  <th class="text-center py-3 px-4 text-white font-semibold border-b border-gray-600">
+                    Evening<br><small class="text-gray-300 font-normal">6:00 PM - 10:00 PM</small>
+                  </th>
+                  <th class="text-center py-3 px-4 text-white font-semibold border-b border-gray-600">
+                    Late Night<br><small class="text-gray-300 font-normal">8:00 PM - 12:00 AM</small>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-gray-800">
+                {% for date in date_range %}
+                  {% with date_str=date|date:"Y-m-d" %}
+                    <tr class="border-b border-gray-600">
+                      <td class="py-3 px-4 text-white font-medium">
+                        {{ date|date:"l, F j" }}
+                      </td>
+                      <td class="text-center py-3 px-4">
+                        <input type="checkbox" name="times_{{ date_str }}" value="morning" class="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500">
+                      </td>
+                      <td class="text-center py-3 px-4">
+                        <input type="checkbox" name="times_{{ date_str }}" value="afternoon" class="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500">
+                      </td>
+                      <td class="text-center py-3 px-4">
+                        <input type="checkbox" name="times_{{ date_str }}" value="evening" class="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500">
+                      </td>
+                      <td class="text-center py-3 px-4">
+                        <input type="checkbox" name="times_{{ date_str }}" value="late" class="w-4 h-4 text-indigo-600 bg-gray-700 border-gray-600 rounded focus:ring-indigo-500">
+                      </td>
+                    </tr>
+                  {% endwith %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        {% if form.non_field_errors %}
+          <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+            {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+        
+        <!-- Submit Button -->
+        <div class="text-center">
+          <button type="submit" class="btn-dark-success text-lg px-8 py-3">Submit Availability</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Info -->
+  <div class="text-center mt-6 text-gray-400">
+    <p class="text-sm">
+      Session Duration: {{ schedule.session_duration }} hours | 
+      Date Range: {{ schedule.date_range_start|date:"M j" }} - {{ schedule.date_range_end|date:"M j, Y" }}
+    </p>
+  </div>
+</div>
+
+<script>
+// Pre-fill form if there's existing response
+{% if existing_response %}
+  document.addEventListener('DOMContentLoaded', function() {
+    // Fill in player info
+    document.getElementById('{{ form.player_name.id_for_label }}').value = '{{ existing_response.player_name|escapejs }}';
+    document.getElementById('{{ form.character_name.id_for_label }}').value = '{{ existing_response.character_name|escapejs }}';
+    document.getElementById('{{ form.email.id_for_label }}').value = '{{ existing_response.email|escapejs }}';
+    
+    // Check availability boxes
+    const availability = {{ existing_response.availability_data|safe }};
+    for (const [date, times] of Object.entries(availability)) {
+      times.forEach(time => {
+        const checkbox = document.querySelector(`input[name="times_${date}"][value="${time}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+    }
+  });
+{% endif %}
+</script>
+
+{% include "components/_dark_form_styles.html" %}
+{% endblock %}

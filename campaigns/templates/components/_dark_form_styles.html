@@ -1,0 +1,188 @@
+<style>
+/* Dark Theme Form Styling - Shared across all forms */
+form input[type="text"], 
+form input[type="email"],
+form input[type="password"],
+form input[type="date"],
+form input[type="number"],
+form textarea, 
+form select {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+form input[type="text"]:focus, 
+form input[type="email"]:focus,
+form input[type="password"]:focus,
+form input[type="date"]:focus,
+form input[type="number"]:focus,
+form textarea:focus, 
+form select:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+form input[type="text"]::placeholder,
+form input[type="email"]::placeholder,
+form input[type="password"]::placeholder,
+form input[type="number"]::placeholder,
+form textarea::placeholder {
+  color: #9CA3AF;
+}
+
+form input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.25rem;
+  accent-color: #6366F1;
+}
+
+form textarea {
+  min-height: 4rem;
+  resize: vertical;
+}
+
+form input[type="file"] {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #374151;
+  border: 1px solid #4B5563;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.875rem;
+}
+
+/* Date input styling for dark theme */
+form input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+form input[type="date"]::-webkit-datetime-edit {
+  color: white;
+}
+
+form input[type="date"]::-webkit-datetime-edit-text {
+  color: white;
+}
+
+form input[type="date"]::-webkit-datetime-edit-month-field {
+  color: white;
+}
+
+form input[type="date"]::-webkit-datetime-edit-day-field {
+  color: white;
+}
+
+form input[type="date"]::-webkit-datetime-edit-year-field {
+  color: white;
+}
+
+/* Custom bg color for section backgrounds */
+.bg-gray-750 {
+  background-color: #2D3748;
+}
+
+/* Error states */
+form input.error,
+form textarea.error,
+form select.error {
+  border-color: #EF4444;
+}
+
+/* Disabled states */
+form input:disabled,
+form textarea:disabled,
+form select:disabled {
+  background-color: #1F2937;
+  color: #6B7280;
+  cursor: not-allowed;
+}
+
+/* Select dropdown styling */
+form select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Button styling for consistency */
+.btn-dark-primary {
+  background-color: #6366F1;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-dark-primary:hover {
+  background-color: #4F46E5;
+}
+
+.btn-dark-secondary {
+  background-color: #6B7280;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-dark-secondary:hover {
+  background-color: #4B5563;
+  color: white;
+  text-decoration: none;
+}
+
+.btn-dark-success {
+  background-color: #10B981;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-dark-success:hover {
+  background-color: #059669;
+}
+
+.btn-dark-danger {
+  background-color: #EF4444;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-dark-danger:hover {
+  background-color: #DC2626;
+  color: white;
+  text-decoration: none;
+}
+</style>
