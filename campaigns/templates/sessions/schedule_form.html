@@ -3,26 +3,26 @@
 {% block title %}Create Session Schedule - {{ campaign.title }}{% endblock %}
 
 {% block content %}
-<div class="my-10 max-w-4xl mx-auto px-4">
+<div class="my-4 sm:my-10 max-w-7xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold text-white">
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
         Create Session Schedule for {{ campaign.title }}
       </h2>
-      <p class="text-gray-400 text-sm mt-1">
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">
         Create a weekend scheduling poll to collect player availability (Friday-Sunday). 
         Players will be able to submit their availability using a shareable link.
       </p>
     </div>
 
-    <div class="p-6">
-      <form method="post" class="space-y-6">
+    <div class="p-4 sm:p-6">
+      <form method="post" class="space-y-4 sm:space-y-6">
         {% csrf_token %}
         
-        <div class="bg-gray-750 rounded-lg p-6">
-          <h3 class="text-xl font-semibold text-white mb-6">Schedule Details</h3>
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Schedule Details</h3>
           
-          <div class="space-y-6">
+          <div class="space-y-4 sm:space-y-6">
             <!-- Poll Title -->
             <div>
               <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-white mb-2">
@@ -35,7 +35,7 @@
             </div>
             
             <!-- Date Range -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label for="{{ form.date_range_start.id_for_label }}" class="block text-sm font-medium text-white mb-2">
                   Start Date
@@ -62,7 +62,7 @@
                 Session Duration (hours)
               </label>
               {{ form.session_duration }}
-              <p class="text-gray-400 text-sm mt-1">How long do you expect the session to last?</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">How long do you expect the session to last?</p>
               {% if form.session_duration.errors %}
                 <div class="text-red-400 text-sm mt-1">{{ form.session_duration.errors }}</div>
               {% endif %}
@@ -74,7 +74,7 @@
                 Notes for Players
               </label>
               {{ form.notes }}
-              <p class="text-gray-400 text-sm mt-1">Optional additional information for your players</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">Optional additional information for your players</p>
               {% if form.notes.errors %}
                 <div class="text-red-400 text-sm mt-1">{{ form.notes.errors }}</div>
               {% endif %}
@@ -83,17 +83,17 @@
         </div>
         
         {% if form.non_field_errors %}
-          <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
+          <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded text-sm sm:text-base">
             {{ form.non_field_errors }}
           </div>
         {% endif %}
         
         <!-- Action Buttons -->
-        <div class="flex gap-4 pt-4 border-t border-gray-700">
-          <button type="submit" class="btn-dark-success">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-700">
+          <button type="submit" class="w-full sm:w-auto btn-dark-success text-sm sm:text-base py-3 sm:py-2">
             Create Schedule
           </button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.pk %}" class="btn-dark-secondary">
+          <a href="{% url 'campaigns:campaign_detail' campaign.pk %}" class="w-full sm:w-auto btn-dark-secondary text-center text-sm sm:text-base py-3 sm:py-2">
             Cancel
           </a>
         </div>

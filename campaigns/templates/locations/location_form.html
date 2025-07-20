@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 {% block title %}{{ view.object.name|default:"New Location" }}{% endblock %}
 {% block content %}
-<div class="my-10 max-w-4xl mx-auto px-4">
+<div class="my-4 sm:my-10 max-w-7xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold text-white">
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
         {{ view.object.name|default:"Add Location" }} for {{ campaign.title }}
       </h2>
-      <p class="text-gray-400 text-sm mt-1">Create interesting locations for your campaign</p>
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">Create interesting locations for your campaign</p>
     </div>
 
-    <div class="p-6">
-      <form method="post" class="space-y-6">
+    <div class="p-4 sm:p-6">
+      <form method="post" class="space-y-4 sm:space-y-6">
         {% csrf_token %}
         
-        <div class="bg-gray-750 rounded-lg p-6">
-          <h3 class="text-xl font-semibold text-white mb-6">Location Details</h3>
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Location Details</h3>
           
           <div class="space-y-6">
             <!-- Name -->

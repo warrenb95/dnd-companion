@@ -1,40 +1,40 @@
 {% extends "base.html" %}
 {% block title %}{{ campaign.title }}{% endblock %}
 {% block content %}
-<div class="my-8">
-  <h1 class="text-4xl font-bold mb-6 text-white">{{ campaign.title }}</h1>
+<div class="my-4 sm:my-8 px-4">
+  <h1 class="text-2xl sm:text-4xl font-bold mb-6 text-white">{{ campaign.title }}</h1>
 
   {% include "campaigns/components/_campaign_description.html" %}
   
   <!-- Co-DM Management Section -->
   {% if is_owner or co_dms %}
-  <div class="bg-gray-800 rounded-lg p-6 mb-6">
-    <h3 class="text-xl font-semibold text-white mb-4">Campaign DMs</h3>
+  <div class="bg-gray-800 rounded-lg p-4 sm:p-6 mb-6">
+    <h3 class="text-lg sm:text-xl font-semibold text-white mb-4">Campaign DMs</h3>
     
-    <div class="space-y-4">
+    <div class="space-y-3 sm:space-y-4">
       <!-- Owner -->
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-            <span class="text-white font-medium">👑</span>
+            <span class="text-white font-medium text-sm">👑</span>
           </div>
           <div>
-            <span class="text-white font-medium">{{ campaign.owner.username }}</span>
-            <span class="text-gray-400 text-sm ml-2">(Owner)</span>
+            <span class="text-white font-medium text-sm sm:text-base">{{ campaign.owner.username }}</span>
+            <span class="text-gray-400 text-xs sm:text-sm ml-2">(Owner)</span>
           </div>
         </div>
       </div>
       
       <!-- Co-DMs -->
       {% for co_dm in co_dms %}
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-            <span class="text-white font-medium">{{ co_dm.username|first|upper }}</span>
+            <span class="text-white font-medium text-sm">{{ co_dm.username|first|upper }}</span>
           </div>
           <div>
-            <span class="text-white font-medium">{{ co_dm.username }}</span>
-            <span class="text-gray-400 text-sm ml-2">(Co-DM)</span>
+            <span class="text-white font-medium text-sm sm:text-base">{{ co_dm.username }}</span>
+            <span class="text-gray-400 text-xs sm:text-sm ml-2">(Co-DM)</span>
           </div>
         </div>
         
@@ -42,7 +42,7 @@
         <form method="post" action="{% url 'campaigns:remove_codm' campaign.id %}" class="inline">
           {% csrf_token %}
           <input type="hidden" name="user_id" value="{{ co_dm.id }}">
-          <button type="submit" class="text-red-400 hover:text-red-300 text-sm" onclick="return confirm('Are you sure you want to remove this co-DM?')">
+          <button type="submit" class="text-red-400 hover:text-red-300 text-xs sm:text-sm" onclick="return confirm('Are you sure you want to remove this co-DM?')">
             Remove
           </button>
         </form>
@@ -50,17 +50,17 @@
       </div>
       {% empty %}
       {% if not is_owner %}
-      <p class="text-gray-400 text-sm">No co-DMs assigned to this campaign.</p>
+      <p class="text-gray-400 text-xs sm:text-sm">No co-DMs assigned to this campaign.</p>
       {% endif %}
       {% endfor %}
       
       <!-- Add Co-DM Button (Only for Owner) -->
       {% if is_owner %}
-      <div class="border-t border-gray-700 pt-4">
+      <div class="border-t border-gray-700 pt-3 sm:pt-4">
         <button id="add-codm-btn" 
                 hx-get="{% url 'campaigns:add_codm' campaign.id %}"
                 hx-target="#modal-content"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">
+                class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm sm:text-base">
           Add Co-DM
         </button>
       </div>
@@ -72,40 +72,40 @@
   <!-- Session Scheduling Section -->
   {% if is_owner %}
   <div class="bg-gray-800 rounded-lg shadow mb-8">
-    <div class="border-b border-gray-700 px-6 py-4 flex justify-between items-center">
-      <h2 class="text-2xl font-semibold text-white">Session Scheduling</h2>
-      <div class="flex gap-2">
+    <div class="border-b border-gray-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">Session Scheduling</h2>
+      <div class="flex flex-col sm:flex-row gap-2">
         <a href="{% url 'campaigns:session_schedule_list' campaign.id %}"
-           class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+           class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
           View Schedules
         </a>
         <a href="{% url 'campaigns:session_schedule_create' campaign.id %}"
-           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
           Create Schedule
         </a>
       </div>
     </div>
-    <div class="px-6 py-4">
+    <div class="px-4 sm:px-6 py-4">
       <!-- Scheduled Sessions List -->
       {% if scheduled_sessions %}
         <div class="pt-4">
-          <h3 class="text-lg font-semibold text-white mb-3">Confirmed Sessions</h3>
+          <h3 class="text-base sm:text-lg font-semibold text-white mb-3">Confirmed Sessions</h3>
           <div class="space-y-3">
             {% for session in scheduled_sessions %}
-              <div class="bg-gray-750 rounded-lg p-4 border border-gray-600">
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h4 class="text-white font-medium">{{ session.session_schedule.title }}</h4>
-                    <div class="flex items-center space-x-4 mt-2 text-sm">
-                      <span class="text-green-400">
+              <div class="bg-gray-750 rounded-lg p-3 sm:p-4 border border-gray-600">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-2 sm:space-y-0">
+                  <div class="flex-1">
+                    <h4 class="text-white font-medium text-sm sm:text-base">{{ session.session_schedule.title }}</h4>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-2 space-y-1 sm:space-y-0">
+                      <span class="text-green-400 text-xs sm:text-sm">
                         <i class="fas fa-calendar mr-1"></i>
                         {{ session.scheduled_datetime|date:"M j, Y" }}
                       </span>
-                      <span class="text-blue-400">
+                      <span class="text-blue-400 text-xs sm:text-sm">
                         <i class="fas fa-clock mr-1"></i>
                         {{ session.scheduled_datetime|date:"g:i A" }}
                       </span>
-                      <span class="text-purple-400">
+                      <span class="text-purple-400 text-xs sm:text-sm">
                         <i class="fas fa-hourglass-half mr-1"></i>
                         {{ session.duration_hours }}h
                       </span>
@@ -117,7 +117,7 @@
                       </div>
                     {% endif %}
                   </div>
-                  <div class="flex items-center space-x-2">
+                  <div class="flex items-center justify-between sm:justify-end space-x-2 sm:flex-col sm:items-end sm:space-x-0 sm:space-y-2">
                     <span class="px-2 py-1 bg-green-900 text-green-200 rounded-full text-xs font-medium">
                       {{ session.get_status_display }}
                     </span>
@@ -134,7 +134,7 @@
           {% if campaign.session_schedules.filter|length > 5 %}
             <div class="mt-3 text-center">
               <a href="{% url 'campaigns:session_schedule_list' campaign.id %}" 
-                 class="text-indigo-400 hover:text-indigo-300 text-sm">
+                 class="text-indigo-400 hover:text-indigo-300 text-xs sm:text-sm">
                 View all schedules →
               </a>
             </div>
@@ -147,8 +147,10 @@
 
   {% include "campaigns/components/_chapter_list.html" %}
 
-  <div class="text-right mt-8">
-    <a href="{% url 'campaigns:campaign_list' %}" class="inline-block px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Back to Campaigns</a>
+  <div class="mt-6 sm:mt-8">
+    <a href="{% url 'campaigns:campaign_list' %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
+      <i class="fas fa-arrow-left mr-2"></i>Back to Campaigns
+    </a>
   </div>
 </div>
 

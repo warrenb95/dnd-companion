@@ -1,76 +1,76 @@
 {% extends "base.html" %}
 {% block title %}{{ view.object.title|default:"New Chapter" }}{% endblock %}
 {% block content %}
-<div class="my-10 max-w-6xl mx-auto px-4">
+<div class="my-4 sm:my-10 max-w-7xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold text-white">
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
         Create Chapter for {{ campaign.title }}
       </h2>
-      <p class="text-gray-400 text-sm mt-1">Build a complete chapter with encounters</p>
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">Build a complete chapter with encounters</p>
     </div>
 
-    <div class="p-6">
-      <form method="post" class="space-y-8">
+    <div class="p-4 sm:p-6">
+      <form method="post" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
 
         <!-- Chapter Details Section -->
-        <div class="bg-gray-750 rounded-lg p-6">
-          <h3 class="text-xl font-semibold text-white mb-6">Chapter Details</h3>
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Chapter Details</h3>
           
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <!-- Title -->
             <div class="lg:col-span-2">
-              <label for="id_title" class="block text-sm font-medium text-white mb-2">Chapter Title *</label>
+              <label for="id_title" class="block text-xs sm:text-sm font-medium text-white mb-2">Chapter Title *</label>
               {{ form.title }}
             </div>
 
             <!-- Summary -->
             <div class="lg:col-span-2">
-              <label for="id_summary" class="block text-sm font-medium text-white mb-2">Summary</label>
+              <label for="id_summary" class="block text-xs sm:text-sm font-medium text-white mb-2">Summary</label>
               {{ form.summary }}
               {% if form.summary.help_text %}
-              <p class="text-gray-400 text-sm mt-1">{{ form.summary.help_text }}</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.summary.help_text }}</p>
               {% endif %}
             </div>
 
             <!-- Intro -->
             <div class="lg:col-span-2">
-              <label for="id_intro" class="block text-sm font-medium text-white mb-2">Introduction/Hook</label>
+              <label for="id_intro" class="block text-xs sm:text-sm font-medium text-white mb-2">Introduction/Hook</label>
               {{ form.intro }}
               {% if form.intro.help_text %}
-              <p class="text-gray-400 text-sm mt-1">{{ form.intro.help_text }}</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.intro.help_text }}</p>
               {% endif %}
             </div>
 
             <!-- Level Range and Status -->
             <div>
-              <label for="id_level_range" class="block text-sm font-medium text-white mb-2">Level Range</label>
+              <label for="id_level_range" class="block text-xs sm:text-sm font-medium text-white mb-2">Level Range</label>
               {{ form.level_range }}
               {% if form.level_range.help_text %}
-              <p class="text-gray-400 text-sm mt-1">{{ form.level_range.help_text }}</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.level_range.help_text }}</p>
               {% endif %}
             </div>
             <div>
-              <label for="id_status" class="block text-sm font-medium text-white mb-2">Status</label>
+              <label for="id_status" class="block text-xs sm:text-sm font-medium text-white mb-2">Status</label>
               {{ form.status }}
             </div>
 
             <!-- DM Notes -->
             <div class="lg:col-span-2">
-              <label for="id_dm_notes" class="block text-sm font-medium text-white mb-2">DM Notes</label>
+              <label for="id_dm_notes" class="block text-xs sm:text-sm font-medium text-white mb-2">DM Notes</label>
               {{ form.dm_notes }}
               {% if form.dm_notes.help_text %}
-              <p class="text-gray-400 text-sm mt-1">{{ form.dm_notes.help_text }}</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.dm_notes.help_text }}</p>
               {% endif %}
             </div>
 
             <!-- Conclusion -->
             <div class="lg:col-span-2">
-              <label for="id_conclusion" class="block text-sm font-medium text-white mb-2">Conclusion</label>
+              <label for="id_conclusion" class="block text-xs sm:text-sm font-medium text-white mb-2">Conclusion</label>
               {{ form.conclusion }}
               {% if form.conclusion.help_text %}
-              <p class="text-gray-400 text-sm mt-1">{{ form.conclusion.help_text }}</p>
+              <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.conclusion.help_text }}</p>
               {% endif %}
             </div>
 
@@ -78,10 +78,10 @@
             <div class="lg:col-span-2">
               <div class="flex items-center">
                 {{ form.is_optional }}
-                <label for="id_is_optional" class="ml-2 text-white">
+                <label for="id_is_optional" class="ml-2 text-white text-sm sm:text-base">
                   Optional Chapter
                   {% if form.is_optional.help_text %}
-                  <span class="block text-gray-400 text-sm">{{ form.is_optional.help_text }}</span>
+                  <span class="block text-gray-400 text-xs sm:text-sm">{{ form.is_optional.help_text }}</span>
                   {% endif %}
                 </label>
               </div>
@@ -90,87 +90,87 @@
         </div>
 
         <!-- Encounters Section -->
-        <div class="bg-gray-750 rounded-lg p-6">
-          <div class="flex items-center justify-between mb-6">
-            <h3 class="text-xl font-semibold text-white">Encounters</h3>
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-4 sm:mb-6">
+            <h3 class="text-lg sm:text-xl font-semibold text-white">Encounters</h3>
           </div>
           
           {{ formset.management_form }}
-          <div id="encounter-forms" class="space-y-6">
+          <div id="encounter-forms" class="space-y-4 sm:space-y-6">
             {% for enc_form in formset %}
-            <div class="encounter-form bg-gray-700 rounded-lg p-4 border border-gray-600">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="text-lg font-medium text-white encounter-title">
+            <div class="encounter-form bg-gray-700 rounded-lg p-3 sm:p-4 border border-gray-600">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
+                <h4 class="text-base sm:text-lg font-medium text-white encounter-title">
                   Encounter {{ forloop.counter }}
                   {% if enc_form.DELETE %}
-                  <span class="text-sm text-gray-400">(Optional)</span>
+                  <span class="text-xs sm:text-sm text-gray-400">(Optional)</span>
                   {% endif %}
                 </h4>
                 {% if forloop.counter > 1 %}
-                <button type="button" class="remove-encounter text-red-400 hover:text-red-300 text-sm">
+                <button type="button" class="remove-encounter text-red-400 hover:text-red-300 text-xs sm:text-sm">
                   Remove
                 </button>
                 {% endif %}
               </div>
               
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
                 <!-- Title and Type -->
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Title</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Title</label>
                   {{ enc_form.title }}
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Type</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Type</label>
                   {{ enc_form.type }}
                 </div>
 
                 <!-- Summary -->
                 <div class="lg:col-span-2">
-                  <label class="block text-sm font-medium text-white mb-2">Summary</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Summary</label>
                   {{ enc_form.summary }}
                 </div>
 
                 <!-- Setup and Read Aloud -->
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Setup</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Setup</label>
                   {{ enc_form.setup }}
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Read Aloud</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Read Aloud</label>
                   {{ enc_form.read_aloud }}
                 </div>
 
                 <!-- DM Notes -->
                 <div class="lg:col-span-2">
-                  <label class="block text-sm font-medium text-white mb-2">DM Notes</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">DM Notes</label>
                   {{ enc_form.dm_notes }}
                 </div>
 
                 <!-- Additional Fields Row -->
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Tags</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Tags</label>
                   {{ enc_form.tags }}
                   <p class="text-gray-400 text-xs mt-1">Comma-separated (e.g., boss, undead, trap)</p>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Danger Level</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Danger Level</label>
                   {{ enc_form.danger_level }}
                 </div>
 
                 <!-- Optional and Map Reference -->
                 <div>
-                  <label class="block text-sm font-medium text-white mb-2">Map Reference</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Map Reference</label>
                   {{ enc_form.map_reference }}
                 </div>
                 <div class="flex items-center">
                   {{ enc_form.is_optional }}
-                  <label class="ml-2 text-white text-sm">Optional Encounter</label>
+                  <label class="ml-2 text-white text-xs sm:text-sm">Optional Encounter</label>
                 </div>
 
                 <!-- Map Image -->
                 {% if enc_form.map_image %}
                 <div class="lg:col-span-2">
-                  <label class="block text-sm font-medium text-white mb-2">Map Image</label>
+                  <label class="block text-xs sm:text-sm font-medium text-white mb-2">Map Image</label>
                   {{ enc_form.map_image }}
                 </div>
                 {% endif %}
@@ -193,25 +193,25 @@
 
         </div>
 
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4 sm:mb-6">
           <button type="button" id="add-encounter" 
-                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
             + Add Another Encounter
           </button>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4 pt-4 border-t border-gray-700">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-700">
           <button type="submit"
-                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg transition">
+                  class="bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-2 rounded-lg transition text-sm sm:text-base">
             Create Chapter
           </button>
           <a href="{% url 'campaigns:campaign_detail' campaign.id %}"
-             class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded-lg transition">
+             class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-6 py-2 rounded-lg transition text-center text-sm sm:text-base">
             Cancel
           </a>
           <a href="{% url 'campaigns:chapter_quick_create' campaign.id %}"
-             class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition">
+             class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition text-center text-sm sm:text-base">
             Quick Create Instead
           </a>
         </div>

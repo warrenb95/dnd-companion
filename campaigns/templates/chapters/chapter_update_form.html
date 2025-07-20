@@ -2,17 +2,17 @@
 {% block title %}Edit {{ chapter.title }}{% endblock %}
 
 {% block content %}
-<div class="my-8 max-w-6xl mx-auto px-4">
+<div class="my-4 sm:my-8 max-w-7xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold text-white">
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
         Edit Chapter: {{ chapter.title }}
       </h2>
-      <p class="text-gray-400 text-sm mt-1">Campaign: {{ campaign.title }}</p>
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">Campaign: {{ campaign.title }}</p>
     </div>
 
-    <div class="p-6">
-      <form method="post" enctype="multipart/form-data" class="space-y-8">
+    <div class="p-4 sm:p-6">
+      <form method="post" enctype="multipart/form-data" class="space-y-6 sm:space-y-8">
         {% csrf_token %}
 
         <!-- Chapter Details Section -->
@@ -214,14 +214,14 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-4 pt-4 border-t border-gray-700">
-          <button type="submit" class="btn-dark-success">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-700">
+          <button type="submit" class="btn-dark-success text-sm sm:text-base">
             Update Chapter
           </button>
-          <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn-dark-secondary">
+          <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn-dark-secondary text-center text-sm sm:text-base">
             Cancel
           </a>
-          <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}" class="btn-dark-primary">
+          <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}" class="btn-dark-primary text-center text-sm sm:text-base">
             Back to Campaign
           </a>
         </div>

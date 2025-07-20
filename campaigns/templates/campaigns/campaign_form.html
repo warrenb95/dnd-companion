@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Create Campaign{% endblock %}
 {% block content %}
-<div class="my-10 max-w-4xl mx-auto px-4">
+<div class="my-4 sm:my-10 max-w-7xl mx-auto px-4">
   <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-2xl font-semibold text-white">
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
         Create New Campaign
       </h2>
-      <p class="text-gray-400 text-sm mt-1">Start building your D&D adventure</p>
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">Start building your D&D adventure</p>
     </div>
 
-    <div class="p-6">
-      <form method="post" class="space-y-6">
+    <div class="p-4 sm:p-6">
+      <form method="post" class="space-y-4 sm:space-y-6">
         {% csrf_token %}
         
-        <div class="bg-gray-750 rounded-lg p-6">
-          <h3 class="text-xl font-semibold text-white mb-6">Campaign Details</h3>
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Campaign Details</h3>
           
-          <div class="space-y-6">
+          <div class="space-y-4 sm:space-y-6">
             <!-- Title -->
             <div>
-              <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+              <label for="{{ form.title.id_for_label }}" class="block text-xs sm:text-sm font-medium text-white mb-2">
                 Campaign Title *
               </label>
               {{ form.title }}
               {% if form.title.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.title.errors }}</div>
+                <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.title.errors }}</div>
               {% endif %}
             </div>
             
             <!-- Description -->
             <div>
-              <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+              <label for="{{ form.description.id_for_label }}" class="block text-xs sm:text-sm font-medium text-white mb-2">
                 Description
               </label>
               {{ form.description }}
               {% if form.description.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.description.help_text }}</p>
+                <p class="text-gray-400 text-xs sm:text-sm mt-1">{{ form.description.help_text }}</p>
               {% endif %}
               {% if form.description.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.description.errors }}</div>
+                <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.description.errors }}</div>
               {% endif %}
             </div>
           </div>
@@ -52,11 +52,11 @@
         {% endif %}
         
         <!-- Action Buttons -->
-        <div class="flex gap-4 pt-4 border-t border-gray-700">
-          <button type="submit" class="btn-dark-success">
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 border-t border-gray-700">
+          <button type="submit" class="btn-dark-success text-sm sm:text-base">
             Create Campaign
           </button>
-          <a href="{% url 'campaigns:campaign_list' %}" class="btn-dark-secondary">
+          <a href="{% url 'campaigns:campaign_list' %}" class="btn-dark-secondary text-center text-sm sm:text-base">
             Cancel
           </a>
         </div>

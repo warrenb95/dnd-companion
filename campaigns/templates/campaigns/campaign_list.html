@@ -1,36 +1,44 @@
 {% extends "base.html" %}
 {% block title %}Your Campaigns{% endblock %}
 {% block content %}
-<div class="my-10 max-w-4xl mx-auto">
+<div class="my-4 sm:my-10 max-w-4xl mx-auto px-4">
   <div class="bg-gray-800 shadow rounded-lg overflow-hidden">
-    <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
-      <h2 class="text-xl font-semibold text-white mb-0">All Campaigns</h2>
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white mb-0">All Campaigns</h2>
     </div>
-    <ul>
-      {% for campaign in campaigns %}
-      <li class="border-b bg-gray-900 border-gray-700 last:border-b-0">
-        <a href="{% url 'campaigns:campaign_detail' campaign.id %}"
-           class="block px-6 py-4 text-indigo-400 hover:text-white hover:bg-gray-700 transition-colors duration-150">
-          <div class="flex items-center justify-between">
-            <span>{{ campaign.title }}</span>
-            <div class="flex items-center space-x-2">
-              {% if campaign.owner == request.user %}
-              <span class="text-yellow-400 text-sm">👑 Owner</span>
-              {% else %}
-              <span class="text-blue-400 text-sm">Co-DM</span>
-              {% endif %}
+    {% if campaigns %}
+      <ul>
+        {% for campaign in campaigns %}
+        <li class="border-b bg-gray-900 border-gray-700 last:border-b-0">
+          <a href="{% url 'campaigns:campaign_detail' campaign.id %}"
+             class="block px-4 sm:px-6 py-4 text-indigo-400 hover:text-white hover:bg-gray-700 transition-colors duration-150">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <span class="text-base sm:text-lg font-medium">{{ campaign.title }}</span>
+              <div class="flex items-center space-x-2">
+                {% if campaign.owner == request.user %}
+                <span class="text-yellow-400 text-xs sm:text-sm px-2 py-1 bg-yellow-900 rounded-full">👑 Owner</span>
+                {% else %}
+                <span class="text-blue-400 text-xs sm:text-sm px-2 py-1 bg-blue-900 rounded-full">Co-DM</span>
+                {% endif %}
+              </div>
             </div>
-          </div>
-        </a>
-      </li>
-      {% empty %}
-      <li class="px-6 py-4 text-gray-400">No campaigns yet.</li>
-      {% endfor %}
-    </ul>
-    <div class="bg-gray-900 px-6 py-4 border-t border-gray-700 text-right">
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="text-center py-8 sm:py-12">
+        <div class="mb-4 sm:mb-6">
+          <i class="fas fa-dragon text-4xl sm:text-6xl text-gray-500"></i>
+        </div>
+        <h4 class="text-xl sm:text-2xl font-bold text-white mb-3">No campaigns yet</h4>
+        <p class="text-gray-400 mb-6 text-sm sm:text-base">Create your first campaign to start building your D&D adventures</p>
+      </div>
+    {% endif %}
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-t border-gray-700 text-center sm:text-right">
       <a href="{% url 'campaigns:campaign_create' %}"
-         class="inline-block px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600 transition">
-        Create New Campaign
+         class="inline-flex items-center justify-center sm:justify-start px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
+        <i class="fas fa-plus mr-2"></i>Create New Campaign
       </a>
     </div>
   </div>

@@ -3,64 +3,66 @@
 {% block title %}Session Schedules - {{ campaign.title }}{% endblock %}
 
 {% block content %}
-<div class="my-8 max-w-6xl mx-auto px-4">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-3xl font-bold text-white">Session Schedules for {{ campaign.title }}</h2>
-    <a href="{% url 'campaigns:session_schedule_create' campaign.pk %}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+<div class="my-4 sm:my-8 max-w-6xl mx-auto px-4">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
+    <h2 class="text-2xl sm:text-3xl font-bold text-white">Session Schedules for {{ campaign.title }}</h2>
+    <a href="{% url 'campaigns:session_schedule_create' campaign.pk %}" class="inline-flex items-center justify-center sm:justify-start px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
       <i class="fas fa-plus mr-2"></i> Create New Schedule
     </a>
   </div>
   
   {% if schedules %}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       {% for schedule in schedules %}
         <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <div class="bg-gray-900 px-6 py-4 border-b border-gray-700 flex justify-between items-center">
-            <h5 class="text-xl font-semibold text-white">{{ schedule.title }}</h5>
-            <span class="px-3 py-1 rounded-full text-sm font-medium {% if schedule.status == 'collecting' %}bg-yellow-900 text-yellow-200{% elif schedule.status == 'scheduled' %}bg-green-900 text-green-200{% else %}bg-gray-700 text-gray-300{% endif %}">
+          <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+            <h5 class="text-lg sm:text-xl font-semibold text-white">{{ schedule.title }}</h5>
+            <span class="px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium {% if schedule.status == 'collecting' %}bg-yellow-900 text-yellow-200{% elif schedule.status == 'scheduled' %}bg-green-900 text-green-200{% else %}bg-gray-700 text-gray-300{% endif %}">
               {{ schedule.get_status_display }}
             </span>
           </div>
-          <div class="p-6">
-            <p class="text-gray-300 mb-2">
-              <strong class="text-white">Date Range:</strong> {{ schedule.date_range_start|date:"M j" }} - {{ schedule.date_range_end|date:"M j, Y" }}
-            </p>
-            <p class="text-gray-300 mb-2">
-              <strong class="text-white">Duration:</strong> {{ schedule.session_duration }} hours
-            </p>
-            <p class="text-gray-300 mb-3">
-              <strong class="text-white">Responses:</strong> {{ schedule.total_responses }}
-            </p>
+          <div class="p-4 sm:p-6">
+            <div class="space-y-2 sm:space-y-3 mb-4">
+              <p class="text-gray-300 text-sm sm:text-base">
+                <strong class="text-white">Date Range:</strong> {{ schedule.date_range_start|date:"M j" }} - {{ schedule.date_range_end|date:"M j, Y" }}
+              </p>
+              <p class="text-gray-300 text-sm sm:text-base">
+                <strong class="text-white">Duration:</strong> {{ schedule.session_duration }} hours
+              </p>
+              <p class="text-gray-300 text-sm sm:text-base">
+                <strong class="text-white">Responses:</strong> {{ schedule.total_responses }}
+              </p>
+            </div>
             
             {% if schedule.notes %}
-              <p class="text-sm text-gray-400 mb-4">{{ schedule.notes|truncatewords:20 }}</p>
+              <p class="text-sm text-gray-400 mb-4 line-clamp-2">{{ schedule.notes|truncatewords:20 }}</p>
             {% endif %}
             
-            <div class="flex justify-between items-center">
-              <a href="{% url 'campaigns:session_schedule_detail' campaign.pk schedule.pk %}" class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+              <a href="{% url 'campaigns:session_schedule_detail' campaign.pk schedule.pk %}" class="inline-flex items-center justify-center sm:justify-start px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors text-sm">
                 <i class="fas fa-eye mr-2"></i>View Details
               </a>
-              <small class="text-gray-400">{{ schedule.created_at|date:"M j, Y" }}</small>
+              <small class="text-gray-400 text-xs sm:text-sm text-center sm:text-right">{{ schedule.created_at|date:"M j, Y" }}</small>
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
   {% else %}
-    <div class="text-center py-12">
-      <div class="mb-6">
-        <i class="fas fa-calendar-alt text-6xl text-gray-500"></i>
+    <div class="text-center py-8 sm:py-12">
+      <div class="mb-4 sm:mb-6">
+        <i class="fas fa-calendar-alt text-4xl sm:text-6xl text-gray-500"></i>
       </div>
-      <h4 class="text-2xl font-bold text-white mb-3">No session schedules yet</h4>
-      <p class="text-gray-400 mb-6">Create your first scheduling poll to coordinate with your players</p>
-      <a href="{% url 'campaigns:session_schedule_create' campaign.pk %}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+      <h4 class="text-xl sm:text-2xl font-bold text-white mb-3">No session schedules yet</h4>
+      <p class="text-gray-400 mb-6 text-sm sm:text-base">Create your first scheduling poll to coordinate with your players</p>
+      <a href="{% url 'campaigns:session_schedule_create' campaign.pk %}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
         <i class="fas fa-plus mr-2"></i>Create Session Schedule
       </a>
     </div>
   {% endif %}
   
-  <div class="mt-8">
-    <a href="{% url 'campaigns:campaign_detail' campaign.pk %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors">
+  <div class="mt-6 sm:mt-8">
+    <a href="{% url 'campaigns:campaign_detail' campaign.pk %}" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
       <i class="fas fa-arrow-left mr-2"></i> Back to Campaign
     </a>
   </div>
