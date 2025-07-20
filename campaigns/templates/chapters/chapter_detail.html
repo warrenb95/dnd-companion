@@ -2,14 +2,14 @@
 {% block title %}Chapter Details{% endblock %}
 
 {% block content %}
-<div class="my-8 max-w-screen-xl mx-auto px-4 relative">
+<div class="my-4 sm:my-8 max-w-screen-xl mx-auto px-4 relative">
   <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}"
-     class="inline-block mb-6 text-indigo-400 hover:underline">
-    ← Back to Campaign
+     class="inline-flex items-center mb-6 text-indigo-400 hover:text-indigo-300 text-sm sm:text-base">
+    <i class="fas fa-arrow-left mr-2"></i>Back to Campaign
   </a>
 
   <!-- Main Content: Full Width -->
-  <div class="space-y-10">
+  <div class="space-y-6 sm:space-y-10">
     {% include "chapters/components/_chapter_overview.html" %}
 
     <!-- Encounters + Notes -->
