@@ -117,9 +117,15 @@
       <!-- Topbar -->
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
-          <a href="{% url 'campaigns:campaign_list' %}" class="text-indigo-400 hover:underline">
-            D&D Campaign Companion
-          </a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'campaigns:campaign_list' %}" class="text-indigo-400 hover:underline">
+              D&D Campaign Companion
+            </a>
+          {% else %}
+            <a href="{% url 'campaigns:home' %}" class="text-indigo-400 hover:underline">
+              D&D Campaign Companion
+            </a>
+          {% endif %}
         </h1>
 
         {% if user.is_authenticated %}
