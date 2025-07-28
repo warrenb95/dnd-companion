@@ -1,0 +1,115 @@
+<!-- Single Encounter Form Component -->
+<div class="encounter-form bg-gray-700 rounded-lg p-4 mb-4" id="encounter-form-{{ form_index }}">
+  <div class="flex items-center justify-between mb-4">
+    <h4 class="encounter-title text-lg font-medium text-white">
+      Encounter {{ encounter_number }}
+    </h4>
+    {% if can_remove %}
+    <button type="button" 
+            hx-delete="{% url 'campaigns:remove_encounter_form' form_index %}"
+            hx-target="#encounter-form-{{ form_index }}"
+            hx-swap="outerHTML"
+            hx-confirm="Are you sure you want to remove this encounter?"
+            class="remove-encounter text-red-400 hover:text-red-300 text-sm">
+      Remove
+    </button>
+    {% endif %}
+  </div>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Title Field -->
+    <div class="md:col-span-2">
+      <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.title.label }}
+      </label>
+      {{ form.title }}
+      {% if form.title.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.title.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Type Field -->
+    <div>
+      <label for="{{ form.encounter_type.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.encounter_type.label }}
+      </label>
+      {{ form.encounter_type }}
+      {% if form.encounter_type.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.encounter_type.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Order Field -->
+    <div>
+      <label for="{{ form.order.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.order.label }}
+      </label>
+      {{ form.order }}
+      {% if form.order.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.order.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Description Field -->
+    <div class="md:col-span-2">
+      <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.description.label }}
+      </label>
+      {{ form.description }}
+      {% if form.description.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.description.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Notes Field -->
+    <div class="md:col-span-2">
+      <label for="{{ form.notes.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.notes.label }}
+      </label>
+      {{ form.notes }}
+      {% if form.notes.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.notes.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Image Upload Field -->
+    {% if form.image %}
+    <div class="md:col-span-2">
+      <label for="{{ form.image.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+        {{ form.image.label }}
+      </label>
+      {{ form.image }}
+      {% if form.image.help_text %}
+        <p class="text-xs text-gray-400 mt-1">{{ form.image.help_text }}</p>
+      {% endif %}
+      {% if form.image.errors %}
+        <div class="text-red-400 text-sm mt-1">
+          {% for error in form.image.errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>

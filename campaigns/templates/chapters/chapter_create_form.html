@@ -194,7 +194,11 @@
         </div>
 
         <div class="flex items-center justify-between mb-4 sm:mb-6">
-          <button type="button" id="add-encounter" 
+          <button type="button"
+                  hx-post="{% url 'campaigns:add_encounter_form' campaign.id %}"
+                  hx-target="#encounter-forms"
+                  hx-swap="beforeend"
+                  hx-vals='{"form_count": "{{ formset.total_form_count }}"}'
                   class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base">
             + Add Another Encounter
           </button>
@@ -223,92 +227,11 @@
 {% include "components/_dark_form_styles.html" %}
 
 <style>
-/* Hide empty forms initially */
-.encounter-form.empty-form {
-  display: none;
+/* HTMX form management styles */
+.encounter-form {
+  transition: opacity 0.3s ease;
 }
 </style>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const addButton = document.getElementById('add-encounter');
-    const formsContainer = document.getElementById('encounter-forms');
-    const totalForms = document.getElementById('id_encounters-TOTAL_FORMS');
-    let formCount = parseInt(totalForms.value);
-
-    // Store the empty form template
-    const emptyForm = document.querySelector('.encounter-form:last-child').cloneNode(true);
-    
-    addButton.addEventListener('click', function() {
-        // Create a new form from the template
-        const newForm = emptyForm.cloneNode(true);
-        
-        // Update form index in all field names and IDs
-        const formRegex = new RegExp('encounters-(\\d+)', 'g');
-        newForm.innerHTML = newForm.innerHTML.replace(formRegex, `encounters-${formCount}`);
-        
-        // Update the encounter title
-        const titleElement = newForm.querySelector('.encounter-title');
-        titleElement.textContent = `Encounter ${formCount + 1}`;
-        
-        // Clear all field values
-        const inputs = newForm.querySelectorAll('input, textarea, select');
-        inputs.forEach(input => {
-            if (input.type === 'checkbox') {
-                input.checked = false;
-            } else {
-                input.value = '';
-            }
-        });
-        
-        // Add remove button
-        const headerDiv = newForm.querySelector('.flex.items-center.justify-between');
-        const removeButton = document.createElement('button');
-        removeButton.type = 'button';
-        removeButton.className = 'remove-encounter text-red-400 hover:text-red-300 text-sm';
-        removeButton.textContent = 'Remove';
-        headerDiv.appendChild(removeButton);
-        
-        // Add remove functionality
-        removeButton.addEventListener('click', function() {
-            newForm.remove();
-            updateFormNumbers();
-            updateTotalForms();
-        });
-        
-        // Append the new form
-        formsContainer.appendChild(newForm);
-        
-        // Update form count
-        formCount++;
-        totalForms.value = formCount;
-        
-        // Update form numbers
-        updateFormNumbers();
-    });
-    
-    // Add remove functionality to existing remove buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.classList.contains('remove-encounter')) {
-            e.target.closest('.encounter-form').remove();
-            updateFormNumbers();
-            updateTotalForms();
-        }
-    });
-    
-    function updateFormNumbers() {
-        const forms = document.querySelectorAll('.encounter-form');
-        forms.forEach((form, index) => {
-            const titleElement = form.querySelector('.encounter-title');
-            titleElement.textContent = `Encounter ${index + 1}`;
-        });
-    }
-    
-    function updateTotalForms() {
-        const forms = document.querySelectorAll('.encounter-form');
-        totalForms.value = forms.length;
-        formCount = forms.length;
-    }
-});
-</script>
+<!-- JavaScript replaced with HTMX for dynamic form management -->
 {% endblock %}

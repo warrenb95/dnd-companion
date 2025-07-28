@@ -29,7 +29,9 @@
   </div>
   
   <div class="flex justify-end space-x-3">
-    <button type="button" id="cancel-btn" class="px-4 py-2 text-gray-400 hover:text-white">
+    <button type="button" 
+            hx-on:click="document.getElementById('codm-modal').classList.add('hidden')"
+            class="px-4 py-2 text-gray-400 hover:text-white">
       Cancel
     </button>
     <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">

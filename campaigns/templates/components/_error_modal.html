@@ -1,0 +1,39 @@
+<!-- Error Modal Component -->
+<div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4 border-l-4" id="error-modal-content">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-semibold text-white flex items-center" id="error-modal-title">
+        <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20" id="error-modal-icon">
+          <!-- Icon will be set by JavaScript -->
+        </svg>
+        <span id="error-modal-title-text">Error</span>
+      </h3>
+      <button id="close-error-modal" class="text-gray-400 hover:text-white">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="mb-6">
+      <p class="text-gray-300" id="error-modal-message">
+        <!-- Error message will be set by JavaScript -->
+      </p>
+      
+      <!-- Optional detailed error info -->
+      <div id="error-modal-details" class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-400 hidden">
+        <div class="font-medium text-gray-300 mb-2">Technical Details:</div>
+        <div id="error-modal-details-content"></div>
+      </div>
+    </div>
+    
+    <div class="flex justify-end space-x-3">
+      <button id="error-modal-retry" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200 hidden">
+        Try Again
+      </button>
+      <button id="error-modal-close" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

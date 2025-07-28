@@ -14,6 +14,7 @@ from .views import (
     export_campaign_markdown,
     save_campaign_summary,
 )
+from . import htmx_views
 from .views.campaigns import AddCoDMView, RemoveCoDMView
 
 app_name = "campaigns"
@@ -111,5 +112,12 @@ urlpatterns = [
     
     # Public player availability URL (no login required)
     path("schedule/<uuid:token>/", PlayerAvailabilityView.as_view(), name="player_availability"),
+    
+    # HTMX endpoints
+    path("<int:campaign_id>/encounter-form/add/", htmx_views.add_encounter_form, name="add_encounter_form"),
+    path("encounter-form/<int:form_index>/remove/", htmx_views.remove_encounter_form, name="remove_encounter_form"),
+    path("<int:campaign_id>/encounter-form/empty/", htmx_views.get_empty_encounter_form, name="get_empty_encounter_form"),
+    path("notification/<int:notification_id>/dismiss/", htmx_views.dismiss_notification, name="dismiss_notification"),
+    path("<int:campaign_id>/refresh/", htmx_views.refresh_campaign_detail, name="refresh_campaign_detail"),
 ]
 

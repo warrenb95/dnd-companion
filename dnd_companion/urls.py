@@ -40,3 +40,9 @@ urlpatterns = [
 if settings.DEBUG or not hasattr(settings, 'DEFAULT_FILE_STORAGE'):
     urlpatterns += static(settings.MEDIA_URL, document_root=getattr(settings, 'MEDIA_ROOT', None))
 
+# Custom error handlers
+handler404 = 'campaigns.error_views.custom_404_view'
+handler500 = 'campaigns.error_views.custom_500_view'
+handler403 = 'campaigns.error_views.custom_403_view'
+handler400 = 'campaigns.error_views.custom_400_view'
+
