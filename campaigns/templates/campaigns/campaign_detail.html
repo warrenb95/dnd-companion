@@ -42,7 +42,9 @@
         <form method="post" action="{% url 'campaigns:remove_codm' campaign.id %}" class="inline">
           {% csrf_token %}
           <input type="hidden" name="user_id" value="{{ co_dm.id }}">
-          <button type="submit" class="text-red-400 hover:text-red-300 text-xs sm:text-sm" onclick="return confirm('Are you sure you want to remove this co-DM?')">
+          <button type="submit" 
+                  class="text-red-400 hover:text-red-300 text-xs sm:text-sm" 
+                  hx-confirm="Are you sure you want to remove this co-DM?">
             Remove
           </button>
         </form>
@@ -57,9 +59,9 @@
       <!-- Add Co-DM Button (Only for Owner) -->
       {% if is_owner %}
       <div class="border-t border-gray-700 pt-3 sm:pt-4">
-        <button id="add-codm-btn" 
-                hx-get="{% url 'campaigns:add_codm' campaign.id %}"
+        <button hx-get="{% url 'campaigns:add_codm' campaign.id %}"
                 hx-target="#modal-content"
+                hx-on:click="document.getElementById('codm-modal').classList.remove('hidden')"
                 class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm sm:text-base">
           Add Co-DM
         </button>
@@ -277,40 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Co-DM Modal Management
-document.addEventListener('DOMContentLoaded', function() {
-    const modal = document.getElementById('codm-modal');
-    const addCoDMBtn = document.getElementById('add-codm-btn');
-    const closeModalBtn = document.getElementById('close-modal');
-    
-    // Show modal when Add Co-DM button is clicked
-    if (addCoDMBtn) {
-        addCoDMBtn.addEventListener('click', function() {
-            modal.classList.remove('hidden');
-        });
-    }
-    
-    // Close modal when X button is clicked
-    if (closeModalBtn) {
-        closeModalBtn.addEventListener('click', function() {
-            modal.classList.add('hidden');
-        });
-    }
-    
-    // Close modal when clicking outside
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            modal.classList.add('hidden');
-        }
-    });
-    
-    // Handle cancel button in form
-    document.addEventListener('click', function(e) {
-        if (e.target.id === 'cancel-btn') {
-            modal.classList.add('hidden');
-        }
-    });
-});
+// Co-DM Modal Management replaced with HTMX
 </script>
 
 {% csrf_token %}

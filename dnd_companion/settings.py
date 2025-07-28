@@ -123,6 +123,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "campaigns.middleware.ErrorHandlingMiddleware",
+    "campaigns.middleware.UserFriendlyErrorMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -259,6 +261,16 @@ LOGGING = {
         'campaigns.views.encounters': {
             'handlers': ['console'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'campaigns.error_views': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'campaigns.middleware': {
+            'handlers': ['console'],
+            'level': 'WARNING',
             'propagate': False,
         },
     },
