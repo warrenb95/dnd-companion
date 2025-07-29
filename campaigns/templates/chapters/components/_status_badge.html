@@ -1,5 +1,5 @@
 <button 
-  hx-post="{% url 'campaigns:chapter_status_toggle' chapter.id %}"
+  hx-post="{% url 'campaigns:chapter_status_toggle' campaign_id=chapter.campaign.id chapter_id=chapter.id %}"
   hx-target="#status-{{ chapter.id }}"
   hx-swap="outerHTML"
   id="status-{{ chapter.id }}"

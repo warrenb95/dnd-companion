@@ -35,6 +35,7 @@ class CampaignDetailView(LoginRequiredMixin, DetailView):
     model = Campaign
     template_name = "campaigns/campaign_detail.html"
     context_object_name = "campaign"
+    pk_url_kwarg = 'campaign_id'
 
     def get_queryset(self):
         # Return campaigns where user is owner or co-DM

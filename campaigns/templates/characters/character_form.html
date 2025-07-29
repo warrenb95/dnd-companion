@@ -191,7 +191,7 @@
           <button type="submit" class="btn-dark-success">
             {{ form.instance.pk|yesno:"Update,Save" }} Character
           </button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn-dark-secondary">
+          <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" class="btn-dark-secondary">
             Cancel
           </a>
         </div>

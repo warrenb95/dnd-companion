@@ -10,7 +10,7 @@
 
   <form
     method="post"
-    hx-post="{% url 'campaigns:encounter_note_create' %}"
+    hx-post="{% url 'campaigns:encounter_note_create' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}"
     hx-target="#notes-list-{{ encounter.id }}"
     hx-swap="outerHTML"
     class="p-6 space-y-6"

@@ -76,7 +76,7 @@
           <button type="submit" class="btn-dark-success text-sm sm:text-base">
             Create Chapter
           </button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn-dark-secondary text-center text-sm sm:text-base">
+          <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" class="btn-dark-secondary text-center text-sm sm:text-base">
             Cancel
           </a>
           <a href="{% url 'campaigns:chapter_create' campaign.id %}" class="btn-dark-primary text-center text-sm sm:text-base">
