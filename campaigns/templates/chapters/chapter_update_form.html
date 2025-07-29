@@ -95,7 +95,7 @@
           <div class="flex items-center justify-between mb-6">
             <h3 class="text-xl font-semibold text-white">Encounters</h3>
             <div class="text-sm text-gray-400">
-              <a href="{% url 'campaigns:encounter_create' chapter.id %}" 
+              <a href="{% url 'campaigns:encounter_create' campaign_id=chapter.id.campaign.id chapter_id=chapter.id %}" 
                  class="text-indigo-400 hover:text-indigo-300">+ Add New Encounter</a>
             </div>
           </div>
@@ -207,7 +207,7 @@
           {% else %}
           <div class="text-center py-8 text-gray-400">
             <p>No encounters yet.</p>
-            <a href="{% url 'campaigns:encounter_create' chapter.id %}" 
+            <a href="{% url 'campaigns:encounter_create' campaign_id=chapter.id.campaign.id chapter_id=chapter.id %}" 
                class="text-indigo-400 hover:text-indigo-300">Add your first encounter</a>
           </div>
           {% endif %}
@@ -218,7 +218,7 @@
           <button type="submit" class="btn-dark-success text-sm sm:text-base">
             Update Chapter
           </button>
-          <a href="{% url 'campaigns:chapter_detail' chapter.id %}" class="btn-dark-secondary text-center text-sm sm:text-base">
+          <a href="{% url 'campaigns:chapter_detail' campaign_id=chapter.id.campaign.id chapter_id=chapter.id %}" class="btn-dark-secondary text-center text-sm sm:text-base">
             Cancel
           </a>
           <a href="{% url 'campaigns:campaign_detail' chapter.campaign.id %}" class="btn-dark-primary text-center text-sm sm:text-base">

@@ -112,7 +112,7 @@
           <button type="submit" class="btn-dark-success">
             {{ view.object.pk|yesno:"Update,Save" }} NPC
           </button>
-          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="btn-dark-secondary">
+          <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" class="btn-dark-secondary">
             Cancel
           </a>
         </div>

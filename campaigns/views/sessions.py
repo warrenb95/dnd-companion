@@ -51,7 +51,7 @@ class SessionScheduleCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('campaigns:session_schedule_detail', kwargs={
             'campaign_id': self.kwargs['campaign_id'],
-            'pk': self.object.pk
+            'schedule_id': self.object.pk
         })
 
 
@@ -59,6 +59,7 @@ class SessionScheduleDetailView(LoginRequiredMixin, DetailView):
     model = SessionSchedule
     template_name = "sessions/schedule_detail.html"
     context_object_name = "schedule"
+    pk_url_kwarg = 'schedule_id'
 
     def get_queryset(self):
         campaign = get_object_or_404(Campaign, pk=self.kwargs['campaign_id'], owner=self.request.user)
@@ -271,13 +272,13 @@ class PlayerAvailabilityView(View):
 class ScheduleSessionView(LoginRequiredMixin, View):
     """DM confirms a session time"""
     
-    def post(self, request, campaign_id, pk):
+    def post(self, request, campaign_id, schedule_id):
         campaign = get_object_or_404(Campaign, pk=campaign_id, owner=request.user)
-        schedule = get_object_or_404(SessionSchedule, pk=pk, campaign=campaign)
+        schedule = get_object_or_404(SessionSchedule, pk=schedule_id, campaign=campaign)
         
         if not schedule.can_schedule:
             messages.error(request, "Cannot schedule session at this time.")
-            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, pk=pk)
+            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, schedule_id=schedule_id)
         
         # Get the selected datetime from form
         selected_date = request.POST.get('selected_date')
@@ -285,7 +286,7 @@ class ScheduleSessionView(LoginRequiredMixin, View):
         
         if not selected_date or not selected_time:
             messages.error(request, "Please select a date and time.")
-            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, pk=pk)
+            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, schedule_id=schedule_id)
         
         # Convert to datetime
         try:
@@ -303,7 +304,7 @@ class ScheduleSessionView(LoginRequiredMixin, View):
             
         except ValueError:
             messages.error(request, "Invalid date or time selected.")
-            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, pk=pk)
+            return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, schedule_id=schedule_id)
         
         # Create scheduled session
         scheduled_session = ScheduledSession.objects.create(
@@ -326,7 +327,7 @@ class ScheduleSessionView(LoginRequiredMixin, View):
         self.send_confirmation_emails(scheduled_session)
         
         messages.success(request, f"Session scheduled for {scheduled_datetime.strftime('%B %d, %Y at %I:%M %p')}")
-        return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, pk=pk)
+        return redirect('campaigns:session_schedule_detail', campaign_id=campaign_id, schedule_id=schedule_id)
     
     def send_confirmation_emails(self, scheduled_session):
         """Send email notifications to participants"""

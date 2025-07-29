@@ -105,10 +105,15 @@ class ChapterQuickCreateView(LoginRequiredMixin, CreateView):
 class ChapterDeleteView(LoginRequiredMixin, DeleteView):
     model = Chapter
     template_name = "chapters/chapter_delete_confirmation.html"
+    pk_url_kwarg = 'chapter_id'
 
     def get_queryset(self):
-        # Ensure only the chapter owner can delete
-        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+        # Ensure only the chapter owner can delete from the correct campaign
+        campaign_id = self.kwargs['campaign_id']
+        return Chapter.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -123,10 +128,15 @@ class ChapterUpdateView(LoginRequiredMixin, UpdateView):
     model = Chapter
     form_class = ChapterForm
     template_name = "chapters/chapter_update_form.html"
+    pk_url_kwarg = 'chapter_id'
 
     def get_queryset(self):
         # Only allow editing chapters if the user owns the parent campaign
-        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        return Chapter.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -170,10 +180,15 @@ class ChapterDetailView(LoginRequiredMixin, DetailView):
     model = Chapter
     template_name = "chapters/chapter_detail.html"
     context_object_name = "chapter"
+    pk_url_kwarg = 'chapter_id'
 
     def get_queryset(self):
         # Restrict chapters to ones owned by the current user via their campaign
-        return Chapter.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        return Chapter.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -182,10 +197,13 @@ class ChapterDetailView(LoginRequiredMixin, DetailView):
 
 
 class ChapterStatusToggleView(LoginRequiredMixin, View):
-    def post(self, request, pk):
+    def post(self, request, campaign_id, chapter_id):
         chapter = get_object_or_404(
-            Chapter.objects.select_related('campaign').filter(campaign__owner=request.user),
-            pk=pk
+            Chapter.objects.select_related('campaign').filter(
+                campaign__owner=request.user,
+                campaign_id=campaign_id
+            ),
+            pk=chapter_id
         )
         
         # Cycle through status options

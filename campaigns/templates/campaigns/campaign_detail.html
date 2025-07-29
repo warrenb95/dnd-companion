@@ -39,7 +39,7 @@
         </div>
         
         {% if is_owner %}
-        <form method="post" action="{% url 'campaigns:remove_codm' campaign.id %}" class="inline">
+        <form method="post" action="{% url 'campaigns:remove_codm' campaign_id=campaign.id %}" class="inline">
           {% csrf_token %}
           <input type="hidden" name="user_id" value="{{ co_dm.id }}">
           <button type="submit" 
@@ -59,7 +59,7 @@
       <!-- Add Co-DM Button (Only for Owner) -->
       {% if is_owner %}
       <div class="border-t border-gray-700 pt-3 sm:pt-4">
-        <button hx-get="{% url 'campaigns:add_codm' campaign.id %}"
+        <button hx-get="{% url 'campaigns:add_codm' campaign_id=campaign.id %}"
                 hx-target="#modal-content"
                 hx-on:click="document.getElementById('codm-modal').classList.remove('hidden')"
                 class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm sm:text-base">
@@ -123,7 +123,7 @@
                     <span class="px-2 py-1 bg-green-900 text-green-200 rounded-full text-xs font-medium">
                       {{ session.get_status_display }}
                     </span>
-                    <a href="{% url 'campaigns:session_schedule_detail' campaign.id session.session_schedule.pk %}" 
+                    <a href="{% url 'campaigns:session_schedule_detail' campaign_id=campaign.id schedule_id=session.session_schedule.pk %}" 
                        class="text-indigo-400 hover:text-indigo-300 text-sm">
                       <i class="fas fa-external-link-alt"></i>
                     </a>
@@ -135,7 +135,7 @@
           
           {% if campaign.session_schedules.filter|length > 5 %}
             <div class="mt-3 text-center">
-              <a href="{% url 'campaigns:session_schedule_list' campaign.id %}" 
+              <a href="{% url 'campaigns:session_schedule_list' campaign_id=campaign.id %}" 
                  class="text-indigo-400 hover:text-indigo-300 text-xs sm:text-sm">
                 View all schedules →
               </a>
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData();
         chapterIds.forEach(id => formData.append('chapter_order', id));
         
-        fetch(`{% url 'campaigns:chapter_reorder' campaign.id %}`, {
+        fetch(`{% url 'campaigns:chapter_reorder' campaign_id=campaign.id %}`, {
             method: 'POST',
             body: formData,
             headers: {

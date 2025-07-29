@@ -14,10 +14,15 @@ class EncounterCreateView(LoginRequiredMixin, CreateView):
     template_name = "encounters/encounter_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        # Fetch and cache the chapter object, ensuring user ownership
+        # Fetch and cache the chapter object, ensuring user ownership and correct campaign
+        campaign_id = self.kwargs["campaign_id"]
+        chapter_id = self.kwargs["chapter_id"]
         self.chapter = get_object_or_404(
-            Chapter.objects.select_related('campaign').filter(campaign__owner=request.user),
-            pk=self.kwargs["chapter_id"]
+            Chapter.objects.select_related('campaign').filter(
+                campaign__owner=request.user,
+                campaign_id=campaign_id
+            ),
+            pk=chapter_id
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -47,10 +52,17 @@ class EncounterUpdateView(LoginRequiredMixin, UpdateView):
     model = Encounter
     form_class = EncounterForm
     template_name = "encounters/encounter_form.html"
+    pk_url_kwarg = 'encounter_id'
 
     def get_queryset(self):
         # Only allow editing encounters if the user owns the parent campaign
-        return Encounter.objects.select_related('chapter__campaign').filter(chapter__campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        chapter_id = self.kwargs['chapter_id']
+        return Encounter.objects.select_related('chapter__campaign').filter(
+            chapter__campaign__owner=self.request.user,
+            chapter__campaign_id=campaign_id,
+            chapter_id=chapter_id
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -100,10 +112,17 @@ class EncounterUpdateView(LoginRequiredMixin, UpdateView):
 class EncounterDeleteView(LoginRequiredMixin, DeleteView):
     model = Encounter
     template_name = "encounters/encounter_delete_confirmation.html"
+    pk_url_kwarg = 'encounter_id'
 
     def get_queryset(self):
         # Ensure only the encounter owner can delete (via campaign ownership)
-        return Encounter.objects.select_related('chapter__campaign').filter(chapter__campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        chapter_id = self.kwargs['chapter_id']
+        return Encounter.objects.select_related('chapter__campaign').filter(
+            chapter__campaign__owner=self.request.user,
+            chapter__campaign_id=campaign_id,
+            chapter_id=chapter_id
+        )
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -115,19 +134,32 @@ class EncounterDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class EncounterNoteFormView(View):
-    def get(self, request, encounter_id):
-        encounter = get_object_or_404(Encounter, pk=encounter_id)
+    def get(self, request, campaign_id, chapter_id, encounter_id):
+        encounter = get_object_or_404(
+            Encounter.objects.select_related('chapter__campaign').filter(
+                chapter__campaign__owner=request.user,
+                chapter__campaign_id=campaign_id,
+                chapter_id=chapter_id
+            ),
+            pk=encounter_id
+        )
         return render(request, "encounters/components/_note_form.html", {"encounter": encounter})
 
 
 class EncounterNoteCreateView(View):
-    def post(self, request):
+    def post(self, request, campaign_id, chapter_id, encounter_id):
         content = request.POST.get("content")
-        encounter_id = request.POST.get("encounter")
         encounter = None
 
-        if content and encounter_id:
-            encounter = get_object_or_404(Encounter, pk=encounter_id)
+        if content:
+            encounter = get_object_or_404(
+                Encounter.objects.select_related('chapter__campaign').filter(
+                    chapter__campaign__owner=request.user,
+                    chapter__campaign_id=campaign_id,
+                    chapter_id=chapter_id
+                ),
+                pk=encounter_id
+            )
             SessionNote.objects.create(encounter=encounter, content=content, owner=request.user)
 
         # Re-render the updated notes list as HTML
@@ -135,21 +167,29 @@ class EncounterNoteCreateView(View):
 
 
 class EncounterNoteEditView(LoginRequiredMixin, View):
-    def get(self, request, note_id):
+    def get(self, request, campaign_id, chapter_id, encounter_id, note_id):
         note = get_object_or_404(
-            SessionNote.objects.select_related('encounter__chapter__campaign'),
-            pk=note_id,
-            owner=request.user
+            SessionNote.objects.select_related('encounter__chapter__campaign').filter(
+                encounter__chapter__campaign__owner=request.user,
+                encounter__chapter__campaign_id=campaign_id,
+                encounter__chapter_id=chapter_id,
+                encounter_id=encounter_id
+            ),
+            pk=note_id
         )
         return render(request, "encounters/components/_note_edit_form.html", {"note": note})
 
 
 class EncounterNoteUpdateView(LoginRequiredMixin, View):
-    def post(self, request, note_id):
+    def post(self, request, campaign_id, chapter_id, encounter_id, note_id):
         note = get_object_or_404(
-            SessionNote.objects.select_related('encounter__chapter__campaign'),
-            pk=note_id,
-            owner=request.user
+            SessionNote.objects.select_related('encounter__chapter__campaign').filter(
+                encounter__chapter__campaign__owner=request.user,
+                encounter__chapter__campaign_id=campaign_id,
+                encounter__chapter_id=chapter_id,
+                encounter_id=encounter_id
+            ),
+            pk=note_id
         )
         
         content = request.POST.get("content")
@@ -166,11 +206,15 @@ class EncounterNoteUpdateView(LoginRequiredMixin, View):
 
 
 class EncounterNoteDeleteView(LoginRequiredMixin, View):
-    def delete(self, request, note_id):
+    def delete(self, request, campaign_id, chapter_id, encounter_id, note_id):
         note = get_object_or_404(
-            SessionNote.objects.select_related('encounter__chapter__campaign'),
-            pk=note_id,
-            owner=request.user
+            SessionNote.objects.select_related('encounter__chapter__campaign').filter(
+                encounter__chapter__campaign__owner=request.user,
+                encounter__chapter__campaign_id=campaign_id,
+                encounter__chapter_id=chapter_id,
+                encounter_id=encounter_id
+            ),
+            pk=note_id
         )
         
         encounter = note.encounter

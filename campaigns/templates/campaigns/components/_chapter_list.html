@@ -2,11 +2,11 @@
   <div class="border-b border-gray-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
     <h2 class="text-xl sm:text-2xl font-semibold text-white">Chapters</h2>
     <div class="flex flex-col sm:flex-row gap-2 sm:gap-2">
-      <a href="{% url 'campaigns:chapter_quick_create' campaign.id %}"
+      <a href="{% url 'campaigns:chapter_quick_create' campaign_id=campaign.id %}"
          class="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
         <i class="fas fa-plus mr-1 sm:mr-2"></i><span class="hidden xs:inline">Quick </span>Add
       </a>
-      <a href="{% url 'campaigns:chapter_create' campaign.id %}"
+      <a href="{% url 'campaigns:chapter_create' campaign_id=campaign.id %}"
          class="px-3 sm:px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
         <i class="fas fa-list mr-1 sm:mr-2"></i><span class="hidden xs:inline">Add with </span>Encounters
       </a>
@@ -18,7 +18,7 @@
       {% include "campaigns/components/_chapter_item.html" %}
     {% empty %}
       <li class="px-6 py-8 text-center text-gray-500">
-        No chapters yet. <a href="{% url 'campaigns:chapter_create' campaign.id %}" class="text-indigo-400 hover:underline">Create your first chapter</a>
+        No chapters yet. <a href="{% url 'campaigns:chapter_create' campaign_id=campaign.id %}" class="text-indigo-400 hover:underline">Create your first chapter</a>
       </li>
     {% endfor %}
   </ul>

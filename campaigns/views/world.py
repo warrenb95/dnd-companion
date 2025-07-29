@@ -39,10 +39,15 @@ class LocationUpdateView(LoginRequiredMixin, UpdateView):
     model = Location
     form_class = LocationForm
     template_name = "locations/location_form.html"
+    pk_url_kwarg = 'location_id'
 
     def get_queryset(self):
         # Only allow access to locations owned via campaign
-        return Location.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        return Location.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -89,10 +94,15 @@ class NPCUpdateView(LoginRequiredMixin, UpdateView):
     model = NPC
     form_class = NPCForm
     template_name = "npcs/npc_form.html"
+    pk_url_kwarg = 'npc_id'
 
     def get_queryset(self):
         # Enforce ownership by checking related campaign
-        return NPC.objects.select_related('campaign').filter(campaign__owner=self.request.user)
+        campaign_id = self.kwargs['campaign_id']
+        return NPC.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

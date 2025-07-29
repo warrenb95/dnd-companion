@@ -15,7 +15,7 @@
       </div>
       <div class="flex space-x-2 mb-3">
         <a
-          href="{% url 'campaigns:chapter_detail' chapter.id %}"
+          href="{% url 'campaigns:chapter_detail' campaign_id=chapter.campaign.id chapter_id=chapter.id %}"
           class="px-3 py-1 text-sm bg-indigo-500 text-white rounded hover:bg-indigo-600"
           >View</a
         >
