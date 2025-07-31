@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 from django.http import HttpResponse
@@ -90,6 +90,52 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
                 'class': 'w-full px-4 py-2 rounded-md border border-gray-300 text-black'
             })
         return form
+
+
+class CampaignUpdateView(LoginRequiredMixin, UpdateView):
+    model = Campaign
+    fields = ["title", "description"]
+    template_name = "campaigns/campaign_form.html"
+    pk_url_kwarg = 'campaign_id'
+
+    def get_queryset(self):
+        # Only allow editing campaigns where user is owner or co-DM
+        return Campaign.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(collaborators__user=self.request.user, collaborators__permission_level='co_dm')
+        ).distinct()
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Campaign '{form.instance.title}' updated successfully.")
+        return super().form_valid(form)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Add Tailwind CSS classes to form fields
+        for field in form.fields.values():
+            field.widget.attrs.update({
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-300 text-black'
+            })
+        return form
+
+    def get_success_url(self):
+        return reverse_lazy("campaigns:campaign_detail", kwargs={'campaign_id': self.object.pk})
+
+
+class CampaignDeleteView(LoginRequiredMixin, DeleteView):
+    model = Campaign
+    template_name = "campaigns/campaign_delete_confirmation.html"
+    success_url = reverse_lazy("campaigns:campaign_list")
+    pk_url_kwarg = 'campaign_id'
+
+    def get_queryset(self):
+        # Only allow deleting campaigns where user is the owner (not co-DMs)
+        return Campaign.objects.filter(owner=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(request, f"Campaign '{self.object.title}' deleted successfully.")
+        return super().delete(request, *args, **kwargs)
 
 
 def export_campaign_markdown(request, campaign_id):

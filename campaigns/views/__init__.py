@@ -4,6 +4,8 @@ from .campaigns import (
     CampaignListView, 
     CampaignDetailView, 
     CampaignCreateView,
+    CampaignUpdateView,
+    CampaignDeleteView,
     export_campaign_markdown,
     save_campaign_summary
 )
@@ -55,6 +57,8 @@ __all__ = [
     'CampaignListView', 
     'CampaignDetailView', 
     'CampaignCreateView',
+    'CampaignUpdateView',
+    'CampaignDeleteView',
     'export_campaign_markdown',
     'save_campaign_summary',
     

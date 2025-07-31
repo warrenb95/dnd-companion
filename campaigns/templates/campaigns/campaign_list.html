@@ -10,19 +10,47 @@
       <ul>
         {% for campaign in campaigns %}
         <li class="border-b bg-gray-900 border-gray-700 last:border-b-0">
-          <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}"
-             class="block px-4 sm:px-6 py-4 text-indigo-400 hover:text-white hover:bg-gray-700 transition-colors duration-150">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
-              <span class="text-base sm:text-lg font-medium">{{ campaign.title }}</span>
-              <div class="flex items-center space-x-2">
-                {% if campaign.owner == request.user %}
-                <span class="text-yellow-400 text-xs sm:text-sm px-2 py-1 bg-yellow-900 rounded-full">👑 Owner</span>
-                {% else %}
-                <span class="text-blue-400 text-xs sm:text-sm px-2 py-1 bg-blue-900 rounded-full">Co-DM</span>
+          <div class="px-4 sm:px-6 py-4 hover:bg-gray-700 transition-colors duration-150">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
+              <div class="flex-1">
+                <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}"
+                   class="text-base sm:text-lg font-medium text-indigo-400 hover:text-white transition-colors">
+                  {{ campaign.title }}
+                </a>
+                {% if campaign.description %}
+                <p class="text-gray-400 text-xs sm:text-sm mt-1 line-clamp-2">{{ campaign.description|truncatewords:15 }}</p>
+                {% endif %}
+              </div>
+              
+              <div class="flex items-center justify-between sm:justify-end space-x-3">
+                <div class="flex items-center space-x-2">
+                  {% if campaign.owner == request.user %}
+                  <span class="text-yellow-400 text-xs sm:text-sm px-2 py-1 bg-yellow-900 rounded-full">👑 Owner</span>
+                  {% else %}
+                  <span class="text-blue-400 text-xs sm:text-sm px-2 py-1 bg-blue-900 rounded-full">Co-DM</span>
+                  {% endif %}
+                </div>
+                
+                <!-- Action buttons for owners and co-DMs -->
+                {% if campaign.can_edit %}
+                <div class="flex items-center space-x-1">
+                  <a href="{% url 'campaigns:campaign_edit' campaign_id=campaign.id %}" 
+                     class="p-2 text-gray-400 hover:text-indigo-400 transition-colors" 
+                     title="Edit Campaign">
+                    <i class="fas fa-edit text-sm"></i>
+                  </a>
+                  {% if campaign.owner == request.user %}
+                  <a href="{% url 'campaigns:campaign_delete' campaign_id=campaign.id %}" 
+                     class="p-2 text-gray-400 hover:text-red-400 transition-colors" 
+                     title="Delete Campaign">
+                    <i class="fas fa-trash text-sm"></i>
+                  </a>
+                  {% endif %}
+                </div>
                 {% endif %}
               </div>
             </div>
-          </a>
+          </div>
         </li>
         {% endfor %}
       </ul>
