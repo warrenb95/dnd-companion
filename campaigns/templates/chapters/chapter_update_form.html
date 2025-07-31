@@ -115,7 +115,7 @@
                 </h4>
                 {% if enc_form.instance.pk %}
                 <div class="flex gap-2">
-                  <a href="{% url 'campaigns:encounter_edit' enc_form.instance.pk %}" 
+                  <a href="{% url 'campaigns:encounter_edit' campaign_id=chapter.campaign.id chapter_id=chapter.id encounter_id=enc_form.instance.pk %}" 
                      class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded">
                     Edit Details
                   </a>
