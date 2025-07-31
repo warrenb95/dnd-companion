@@ -4,7 +4,7 @@ from django.contrib.auth.views import LogoutView
 
 from dnd_companion import settings
 
-from .views import CampaignListView, CampaignDetailView, CampaignCreateView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
+from .views import CampaignListView, CampaignDetailView, CampaignCreateView, CampaignUpdateView, CampaignDeleteView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView
@@ -37,6 +37,8 @@ urlpatterns = [
     path("campaigns/", CampaignListView.as_view(), name="campaign_list"),
     path("campaigns/create/", CampaignCreateView.as_view(), name="campaign_create"),
     path("campaigns/<int:campaign_id>/", CampaignDetailView.as_view(), name="campaign_detail"),
+    path("campaigns/<int:campaign_id>/edit/", CampaignUpdateView.as_view(), name="campaign_edit"),
+    path("campaigns/<int:campaign_id>/delete/", CampaignDeleteView.as_view(), name="campaign_delete"),
     path("campaigns/<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
     path("campaigns/<int:campaign_id>/save-summary/", save_campaign_summary, name="save_campaign_summary"),
     

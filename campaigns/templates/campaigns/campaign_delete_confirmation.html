@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Delete Campaign - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-4 sm:my-8 max-w-2xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-xl border border-red-600/20">
+    <div class="border-b border-gray-700 px-4 sm:px-6 py-4">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center mr-4">
+          <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-semibold text-white">Delete Campaign</h2>
+          <p class="text-gray-400 mt-1 text-sm sm:text-base">This action cannot be undone</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-4 sm:p-6">
+      <div class="bg-red-900/20 border border-red-600/30 rounded-lg p-4 mb-6">
+        <h3 class="text-lg font-medium text-red-300 mb-2">⚠️ Warning</h3>
+        <p class="text-red-200 text-sm leading-relaxed">
+          You are about to permanently delete the campaign "<strong>{{ campaign.title }}</strong>". 
+          This will also delete:
+        </p>
+        <ul class="text-red-200 text-sm mt-3 space-y-1 ml-4">
+          <li>• All {{ campaign.chapters.count }} chapter{{ campaign.chapters.count|pluralize }}</li>
+          <li>• All encounters within those chapters</li>
+          <li>• All session notes and summaries</li>
+          <li>• All campaign locations and NPCs</li>
+          <li>• All character summaries</li>
+          <li>• All session schedules and availability data</li>
+          <li>• All chat messages and AI conversations</li>
+        </ul>
+      </div>
+
+      <div class="bg-gray-700 rounded-lg p-4 mb-6">
+        <h4 class="text-white font-medium mb-2">Campaign Details:</h4>
+        <div class="text-gray-300 text-sm space-y-1">
+          <p><strong>Title:</strong> {{ campaign.title }}</p>
+          <p><strong>Created:</strong> {{ campaign.created_at|date:"M d, Y" }}</p>
+          <p><strong>Chapters:</strong> {{ campaign.chapters.count }}</p>
+          {% if campaign.description %}
+          <p><strong>Description:</strong></p>
+          <div class="text-gray-400 text-xs mt-1 bg-gray-800 p-2 rounded">
+            {{ campaign.description|truncatewords:20 }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+          <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" 
+             class="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
+            <i class="fas fa-arrow-left mr-2"></i>Cancel
+          </a>
+          
+          <button type="submit" 
+                  class="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  onclick="return confirm('Are you absolutely sure? This cannot be undone!');">
+            <i class="fas fa-trash mr-2"></i>Delete Campaign
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
