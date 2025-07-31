@@ -84,10 +84,10 @@ class CampaignCreateView(LoginRequiredMixin, CreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        # Optionally: add Tailwind CSS classes to form fields
+        # Add Tailwind CSS classes to form fields for dark theme
         for field in form.fields.values():
             field.widget.attrs.update({
-                'class': 'w-full px-4 py-2 rounded-md border border-gray-300 text-black'
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500'
             })
         return form
 
@@ -111,10 +111,10 @@ class CampaignUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        # Add Tailwind CSS classes to form fields
+        # Add Tailwind CSS classes to form fields for dark theme
         for field in form.fields.values():
             field.widget.attrs.update({
-                'class': 'w-full px-4 py-2 rounded-md border border-gray-300 text-black'
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500'
             })
         return form
 
