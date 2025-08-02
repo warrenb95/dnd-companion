@@ -101,6 +101,12 @@ class Encounter(models.Model):
         blank=True,
         help_text="The location where this encounter takes place"
     )
+    npcs = models.ManyToManyField(
+        'NPC',
+        blank=True,
+        related_name='encounters',
+        help_text="NPCs that appear in this specific encounter"
+    )
     map_reference = models.CharField(max_length=100, blank=True)
 
     tags = models.CharField(

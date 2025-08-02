@@ -14,6 +14,10 @@
               class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-user-plus mr-2"></i>Add NPC
       </button>
+      <a href="{% url 'campaigns:enemy_create' campaign_id=chapter.campaign.id %}" 
+         class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+        <i class="fas fa-user-ninja mr-2"></i>Add Enemy
+      </a>
       <button onclick="openLocationModal()" 
               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-map-marker-alt mr-2"></i>Add Location

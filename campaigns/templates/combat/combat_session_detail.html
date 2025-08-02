@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}{{ combat_session.name }} - Combat Session{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 text-white">
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <nav class="text-sm text-gray-400">
+          <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="hover:text-white transition-colors">{{ campaign.title }}</a>
+          <span class="mx-2">→</span>
+          <a href="{% url 'campaigns:chapter_detail' campaign.id chapter.id %}" class="hover:text-white transition-colors">{{ chapter.title }}</a>
+          <span class="mx-2">→</span>
+          <span class="text-white">{{ encounter.title }} - Combat</span>
+        </nav>
+        
+        <a href="{% url 'campaigns:chapter_detail' campaign.id chapter.id %}" 
+           class="inline-flex items-center px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i>Back to Encounter
+        </a>
+      </div>
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-white flex items-center">
+            <i class="fas fa-sword mr-3 text-red-500"></i>
+            {{ combat_session.name }}
+          </h1>
+          <p class="text-gray-400 mt-2">{{ encounter.title }} - Round {{ combat_session.current_round }}</p>
+        </div>
+        
+        <!-- Combat Status -->
+        <div class="flex items-center gap-4">
+          <div class="text-center">
+            <div class="text-2xl font-bold text-white">{{ combat_session.current_round }}</div>
+            <div class="text-xs text-gray-400">ROUND</div>
+          </div>
+          
+          <div class="px-4 py-2 rounded-lg
+            {% if combat_session.status == 'setup' %}bg-yellow-800 text-yellow-300
+            {% elif combat_session.status == 'active' %}bg-red-800 text-red-300
+            {% elif combat_session.status == 'paused' %}bg-blue-800 text-blue-300
+            {% elif combat_session.status == 'completed' %}bg-green-800 text-green-300
+            {% endif %}">
+            <i class="fas fa-circle mr-2"></i>{{ combat_session.get_status_display }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Combat Controls -->
+      <div class="lg:col-span-1">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6 mb-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fas fa-gamepad mr-2 text-blue-400"></i>Combat Controls
+          </h3>
+          
+          {% if combat_session.status == 'setup' %}
+          <div class="space-y-3">
+            <button onclick="rollInitiative()" 
+                    class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+              <i class="fas fa-dice-d20 mr-2"></i>Roll Initiative
+            </button>
+            <button onclick="startCombat()" 
+                    class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-colors">
+              <i class="fas fa-play mr-2"></i>Start Combat
+            </button>
+          </div>
+          {% elif combat_session.status == 'active' %}
+          <div class="space-y-3">
+            <button onclick="nextTurn()" 
+                    class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors">
+              <i class="fas fa-forward mr-2"></i>Next Turn
+            </button>
+            <button onclick="endCombat()" 
+                    class="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors">
+              <i class="fas fa-stop mr-2"></i>End Combat
+            </button>
+          </div>
+          {% elif combat_session.status == 'completed' %}
+          <div class="text-center text-gray-400">
+            <i class="fas fa-check-circle text-green-400 text-2xl mb-2"></i>
+            <p>Combat Completed</p>
+            <p class="text-sm">Lasted {{ combat_session.total_rounds }} rounds</p>
+          </div>
+          {% endif %}
+          
+          <!-- Current Turn Indicator -->
+          {% if current_participant and combat_session.status == 'active' %}
+          <div class="mt-6 p-4 bg-yellow-800 bg-opacity-50 border border-yellow-600 rounded-lg">
+            <h4 class="text-yellow-300 font-medium mb-2">Current Turn</h4>
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-yellow-400 rounded-full animate-pulse mr-3"></div>
+              <span class="text-white font-medium">{{ current_participant.name }}</span>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Round Summary -->
+        {% if current_round_actions %}
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fas fa-history mr-2 text-purple-400"></i>Round {{ combat_session.current_round }} Actions
+          </h3>
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            {% for action in current_round_actions %}
+            <div class="text-sm bg-gray-700 rounded p-2">
+              <div class="font-medium text-white">{{ action.participant.name }}</div>
+              <div class="text-gray-300">{{ action.description }}</div>
+              {% if action.target %}
+              <div class="text-gray-400 text-xs">vs {{ action.target.name }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Initiative Order & Participants -->
+      <div class="lg:col-span-2">
+        <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+          <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fas fa-list-ol mr-2 text-green-400"></i>Initiative Order
+          </h3>
+          
+          {% if participants %}
+          <div class="space-y-3">
+            {% for participant in participants %}
+            <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg
+              {% if participant == current_participant %}border-2 border-yellow-400 bg-yellow-900 bg-opacity-20{% endif %}
+              {% if not participant.is_active %}opacity-50{% endif %}">
+              
+              <div class="flex items-center flex-1">
+                <!-- Initiative Order -->
+                <div class="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center text-sm font-bold text-white mr-4">
+                  {{ participant.initiative_order|add:1 }}
+                </div>
+                
+                <!-- Participant Info -->
+                <div class="flex-1">
+                  <div class="flex items-center gap-2">
+                    <h4 class="font-medium text-white">{{ participant.name }}</h4>
+                    
+                    {% if participant.participant_type == 'enemy' %}
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        Enemy
+                      </span>
+                    {% elif participant.participant_type == 'player' %}
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Player
+                      </span>
+                    {% elif participant.participant_type == 'ally' %}
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Ally
+                      </span>
+                    {% endif %}
+                    
+                    {% if not participant.is_active %}
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        Down
+                      </span>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- HP and Stats -->
+                  <div class="flex items-center gap-3 mt-2">
+                    <!-- HP Bar -->
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm text-gray-400">HP:</span>
+                      <div class="w-24 bg-gray-600 rounded-full h-2">
+                        {% widthratio participant.current_hp participant.max_hp 100 as hp_percent %}
+                        <div class="h-2 rounded-full transition-all duration-300
+                          {% if hp_percent > 50 %}bg-green-500
+                          {% elif hp_percent > 25 %}bg-yellow-500
+                          {% else %}bg-red-500{% endif %}" 
+                             style="width: {{ hp_percent }}%"></div>
+                      </div>
+                      <span class="text-sm text-white">{{ participant.current_hp }}/{{ participant.max_hp }}</span>
+                    </div>
+                    
+                    {% if participant.temp_hp > 0 %}
+                    <span class="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                      +{{ participant.temp_hp }} temp
+                    </span>
+                    {% endif %}
+                    
+                    {% if participant.initiative_roll %}
+                    <span class="text-xs text-gray-400">
+                      Init: {{ participant.initiative_roll }}
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 ml-4">
+                <button onclick="damageParticipant({{ participant.id }})" 
+                        class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm rounded transition-colors"
+                        title="Deal damage">
+                  <i class="fas fa-heart-broken"></i>
+                </button>
+                <button onclick="healParticipant({{ participant.id }})" 
+                        class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors"
+                        title="Heal">
+                  <i class="fas fa-heart"></i>
+                </button>
+                <button onclick="editParticipant({{ participant.id }})" 
+                        class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
+                        title="Edit">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-8">
+            <i class="fas fa-users text-gray-500 text-3xl mb-3"></i>
+            <p class="text-gray-400">No participants in this combat session.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- DM Notes -->
+    {% if combat_session.dm_notes %}
+    <div class="mt-8 bg-gray-800 rounded-lg shadow-xl p-6">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="fas fa-sticky-note mr-2 text-yellow-400"></i>DM Notes
+      </h3>
+      <div class="text-gray-300 whitespace-pre-wrap">{{ combat_session.dm_notes }}</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Combat control functions
+function startCombat() {
+    if (confirm('Start this combat session?')) {
+        fetch(`{% url 'campaigns:combat_session_start' campaign.id chapter.id encounter.id combat_session.id %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while starting combat.');
+        });
+    }
+}
+
+function rollInitiative() {
+    if (confirm('Roll initiative for all NPCs/enemies? Players will need to enter their initiative manually.')) {
+        fetch(`{% url 'campaigns:combat_session_roll_initiative' campaign.id chapter.id encounter.id combat_session.id %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while rolling initiative.');
+        });
+    }
+}
+
+function nextTurn() {
+    fetch(`{% url 'campaigns:combat_session_next_turn' campaign.id chapter.id encounter.id combat_session.id %}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while advancing turn.');
+    });
+}
+
+function endCombat() {
+    if (confirm('End this combat session? This will mark it as completed.')) {
+        fetch(`{% url 'campaigns:combat_session_end' campaign.id chapter.id encounter.id combat_session.id %}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while ending combat.');
+        });
+    }
+}
+
+// Participant management functions
+function damageParticipant(participantId) {
+    const damage = prompt('Enter damage amount:');
+    if (damage && !isNaN(damage) && parseInt(damage) > 0) {
+        // TODO: Implement damage dealing endpoint
+        alert('Damage dealing functionality coming soon!');
+    }
+}
+
+function healParticipant(participantId) {
+    const healing = prompt('Enter healing amount:');
+    if (healing && !isNaN(healing) && parseInt(healing) > 0) {
+        // TODO: Implement healing endpoint
+        alert('Healing functionality coming soon!');
+    }
+}
+
+function editParticipant(participantId) {
+    // TODO: Implement participant editing
+    alert('Participant editing functionality coming soon!');
+}
+</script>
+{% endblock %}

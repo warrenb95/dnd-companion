@@ -1,6 +1,6 @@
 from django import forms
 
-from ..models import Location, NPC
+from ..models import Location, NPC, Enemy
 
 
 class LocationForm(forms.ModelForm):
@@ -100,3 +100,69 @@ class NPCForm(forms.ModelForm):
         if campaign:
             self.fields['location'].queryset = Location.objects.filter(campaign=campaign)
             self.fields['chapters'].queryset = campaign.chapters.all()
+
+
+class EnemyForm(forms.ModelForm):
+    class Meta:
+        model = Enemy
+        fields = [
+            # Basic Info
+            "name", "creature_type", "size", "description",
+            
+            # Core Combat Stats
+            "armor_class", "hit_points", "hit_dice", "speed",
+            
+            # Ability Scores
+            "strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma",
+            
+            # Combat Mechanics
+            "challenge_rating", "proficiency_bonus", "saving_throws", "skills",
+            
+            # Defenses
+            "damage_resistances", "damage_immunities", "condition_immunities", "senses",
+            
+            # Combat Actions
+            "special_abilities", "actions", "legendary_actions",
+            
+            # Relationships
+            "encounters"
+        ]
+        widgets = {
+            # Textareas for longer content
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'special_abilities': forms.Textarea(attrs={'rows': 4}),
+            'actions': forms.Textarea(attrs={'rows': 4}),
+            'legendary_actions': forms.Textarea(attrs={'rows': 3}),
+            
+            # Number inputs with constraints
+            'armor_class': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'hit_points': forms.NumberInput(attrs={'min': 1, 'max': 999}),
+            'strength': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'dexterity': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'constitution': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'intelligence': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'wisdom': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'charisma': forms.NumberInput(attrs={'min': 1, 'max': 30}),
+            'proficiency_bonus': forms.NumberInput(attrs={'min': 2, 'max': 9}),
+            
+            # Multiple select for encounters
+            'encounters': forms.SelectMultiple(attrs={
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500',
+                'size': '4'
+            }),
+        }
+        
+    def __init__(self, *args, **kwargs):
+        campaign = kwargs.pop('campaign', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filter encounter choices to only show encounters from the current campaign
+        if campaign:
+            # Get all encounters from all chapters in this campaign
+            from ..models import Encounter
+            self.fields['encounters'].queryset = Encounter.objects.filter(
+                chapter__campaign=campaign
+            ).select_related('chapter')
+        
+        # Add help text
+        self.fields['encounters'].help_text = 'Hold Ctrl/Cmd to select multiple encounters where this enemy appears'

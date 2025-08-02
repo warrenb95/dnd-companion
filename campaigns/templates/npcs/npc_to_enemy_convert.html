@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% block title %}Convert {{ npc.name }} to Enemy - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-8 max-w-4xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-red-500">
+    <div class="bg-red-900 px-6 py-4 border-b border-red-700">
+      <h2 class="text-xl font-semibold text-white flex items-center">
+        <i class="fas fa-exchange-alt mr-3 text-yellow-400"></i>
+        Convert NPC to Enemy
+      </h2>
+    </div>
+    
+    <div class="p-6">
+      {% if existing_enemy %}
+        <!-- Already Converted -->
+        <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-6 text-center">
+          <i class="fas fa-info-circle text-yellow-400 text-3xl mb-4"></i>
+          <h3 class="text-xl font-semibold text-yellow-200 mb-2">Already Converted</h3>
+          <p class="text-yellow-100 mb-4">
+            <strong>{{ npc.name }}</strong> has already been converted to an enemy.
+          </p>
+          <div class="flex gap-4 justify-center">
+            <a href="{% url 'campaigns:enemy_detail' campaign_id=campaign.id enemy_id=existing_enemy.id %}" 
+               class="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors">
+              <i class="fas fa-user-ninja mr-2"></i>View Enemy
+            </a>
+            <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+               class="inline-flex items-center px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i>Back to NPC
+            </a>
+          </div>
+        </div>
+      {% else %}
+        <!-- Conversion Preview -->
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-white mb-4">Convert NPC to Combat Enemy</h3>
+          <p class="text-gray-300 mb-6">
+            This will create a streamlined combat-focused enemy based on <strong class="text-white">{{ npc.name }}</strong>. 
+            The original NPC will remain unchanged, and you'll have a separate enemy optimized for encounters.
+          </p>
+          
+          <!-- Preview of what will be converted -->
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <!-- Current NPC Stats -->
+            <div class="bg-gray-750 rounded-lg p-6">
+              <h4 class="text-white font-semibold mb-4 flex items-center">
+                <i class="fas fa-user mr-2 text-blue-400"></i>Current NPC
+              </h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Name:</span>
+                  <span class="text-white">{{ npc.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Type:</span>
+                  <span class="text-white">{{ npc.get_size_display|default:"Medium" }} {{ npc.get_creature_type_display|default:"Humanoid" }}</span>
+                </div>
+                {% if npc.role %}
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Role:</span>
+                  <span class="text-white">{{ npc.role }}</span>
+                </div>
+                {% endif %}
+                {% if npc.armor_class %}
+                <div class="flex justify-between">
+                  <span class="text-gray-400">AC:</span>
+                  <span class="text-white">{{ npc.armor_class }}</span>
+                </div>
+                {% endif %}
+                {% if npc.hit_points %}
+                <div class="flex justify-between">
+                  <span class="text-gray-400">HP:</span>
+                  <span class="text-white">{{ npc.hit_points }}</span>
+                </div>
+                {% endif %}
+                {% if npc.challenge_rating %}
+                <div class="flex justify-between">
+                  <span class="text-gray-400">CR:</span>
+                  <span class="text-white">{{ npc.challenge_rating }}</span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- What Enemy Will Have -->
+            <div class="bg-gray-750 rounded-lg p-6 border-l-4 border-red-500">
+              <h4 class="text-white font-semibold mb-4 flex items-center">
+                <i class="fas fa-user-ninja mr-2 text-red-400"></i>New Enemy
+              </h4>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Name:</span>
+                  <span class="text-white">{{ npc.name }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Type:</span>
+                  <span class="text-white">{{ npc.get_size_display|default:"Medium" }} {{ npc.get_creature_type_display|default:"Humanoid" }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">AC:</span>
+                  <span class="text-white">{{ npc.armor_class|default:"10" }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">HP:</span>
+                  <span class="text-white">{{ npc.hit_points|default:"1" }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">CR:</span>
+                  <span class="text-white">{{ npc.challenge_rating|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Initiative:</span>
+                  <span class="text-white">{{ npc.dexterity_modifier_formatted|default:"+0" }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- What Gets Copied -->
+          <div class="bg-gray-750 rounded-lg p-6 mb-6">
+            <h4 class="text-white font-semibold mb-4 flex items-center">
+              <i class="fas fa-copy mr-2 text-green-400"></i>Combat Data to Copy
+            </h4>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h5 class="text-green-400 font-medium mb-2">Core Stats</h5>
+                <ul class="text-gray-300 space-y-1">
+                  <li>• Basic information (name, size, type)</li>
+                  <li>• Combat stats (AC, HP, speed)</li>
+                  <li>• Ability scores</li>
+                  <li>• Challenge rating & proficiency</li>
+                </ul>
+              </div>
+              <div>
+                <h5 class="text-green-400 font-medium mb-2">Combat Abilities</h5>
+                <ul class="text-gray-300 space-y-1">
+                  <li>• Saving throws & skills</li>
+                  <li>• Damage resistances/immunities</li>
+                  <li>• Special abilities & actions</li>
+                  <li>• Legendary actions (if any)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          
+          <!-- What Doesn't Get Copied -->
+          <div class="bg-gray-750 rounded-lg p-6 mb-6">
+            <h4 class="text-white font-semibold mb-4 flex items-center">
+              <i class="fas fa-times mr-2 text-yellow-400"></i>Roleplay Data (Not Copied)
+            </h4>
+            <div class="text-sm text-gray-300">
+              <p class="mb-2">These fields are specific to roleplay and won't be included in the enemy:</p>
+              <ul class="grid md:grid-cols-2 gap-2">
+                <li>• Role/title in society</li>
+                <li>• Personality traits</li>
+                <li>• Status (alive/dead/missing)</li>
+                <li>• Secret information</li>
+                <li>• Chapter relationships</li>
+                <li>• Location associations</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Benefits -->
+          <div class="bg-blue-900 border border-blue-700 rounded-lg p-4 mb-6">
+            <h4 class="text-blue-200 font-medium mb-2 flex items-center">
+              <i class="fas fa-lightbulb mr-2"></i>Why Convert?
+            </h4>
+            <ul class="text-blue-100 text-sm space-y-1">
+              <li>• <strong>Combat Focus:</strong> Streamlined interface optimized for encounters</li>
+              <li>• <strong>Initiative Tracking:</strong> Built-in initiative modifier calculation</li>
+              <li>• <strong>Encounter Management:</strong> Easy assignment to specific encounters</li>
+              <li>• <strong>Separate Concerns:</strong> Keep roleplay NPC distinct from combat enemy</li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Confirm Conversion -->
+        <form method="post" class="space-y-4">
+          {% csrf_token %}
+          
+          <div class="flex gap-4">
+            <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+              <i class="fas fa-exchange-alt mr-2"></i>
+              Convert to Enemy
+            </button>
+            <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+               class="flex-1 text-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-3 px-6 rounded-lg transition-colors">
+              <i class="fas fa-times mr-2"></i>
+              Cancel
+            </a>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Back to NPC Detail -->
+<div class="my-4 max-w-4xl mx-auto px-4">
+  <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+     class="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors">
+    <i class="fas fa-arrow-left mr-2"></i>Back to {{ npc.name }}
+  </a>
+</div>
+{% endblock %}
