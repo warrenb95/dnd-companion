@@ -187,6 +187,10 @@
               <i class="fas fa-plus mr-1"></i>Add NPC
             </a>
             {% if campaign.npcs.exists %}
+            <a href="{% url 'campaigns:campaign_npc_list' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-list mr-1"></i>View All NPCs
+            </a>
             <div class="text-xs text-gray-400">
               Recent: 
               {% for npc in campaign.npcs.all|slice:":3" %}
@@ -211,10 +215,15 @@
               <i class="fas fa-plus mr-1"></i>Add Location
             </a>
             {% if campaign.locations.exists %}
+            <a href="{% url 'campaigns:campaign_location_list' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-list mr-1"></i>View All Locations
+            </a>
             <div class="text-xs text-gray-400">
               Recent: 
               {% for location in campaign.locations.all|slice:":3" %}
-                {{ location.name }}{% if not forloop.last %}, {% endif %}
+                <a href="{% url 'campaigns:location_detail' campaign_id=campaign.id location_id=location.id %}" 
+                   class="text-indigo-400 hover:text-indigo-300">{{ location.name }}</a>{% if not forloop.last %}, {% endif %}
               {% endfor %}
             </div>
             {% endif %}
@@ -234,11 +243,15 @@
               <i class="fas fa-plus mr-1"></i>Add Character
             </a>
             {% if campaign.characters.exists %}
+            <a href="{% url 'campaigns:campaign_character_list' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-list mr-1"></i>View All Characters
+            </a>
             <div class="text-xs text-gray-400">
               Recent: 
               {% for character in campaign.characters.all|slice:":3" %}
                 <a href="{% url 'campaigns:view_character' campaign_id=campaign.id character_id=character.id %}" 
-                   class="text-indigo-400 hover:text-indigo-300">{{ character.name }}</a>{% if not forloop.last %}, {% endif %}
+                   class="text-indigo-400 hover:text-indigo-300">{{ character.character_name }}</a>{% if not forloop.last %}, {% endif %}
               {% endfor %}
             </div>
             {% endif %}

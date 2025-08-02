@@ -18,6 +18,10 @@
               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-map-marker-alt mr-2"></i>Add Location
       </button>
+      <a href="{% url 'campaigns:chapter_character_list' campaign_id=chapter.campaign.id chapter_id=chapter.id %}"
+         class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+        <i class="fas fa-users mr-2"></i>Characters
+      </a>
       <a href="{% url 'campaigns:chapter_edit' campaign_id=chapter.campaign.id chapter_id=chapter.id %}"
          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
         Edit Chapter
