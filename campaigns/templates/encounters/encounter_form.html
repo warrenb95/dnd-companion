@@ -37,7 +37,7 @@
             <label for="{{ form.type.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
               Type *
             </label>
-            {{ form.type|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base" }}
+            {{ form.type|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base appearance-none" }}
             {% if form.type.errors %}
               <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.type.errors }}</div>
             {% endif %}
@@ -88,6 +88,27 @@
           {% endif %}
         </div>
 
+        <!-- Location -->
+        <div>
+          <label for="{{ form.location.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+            Location
+          </label>
+          <div class="flex gap-2">
+            {{ form.location|add_class:"flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base appearance-none" }}
+            <a href="{% url 'campaigns:location_create' campaign_id=chapter.campaign.id %}" 
+               target="_blank"
+               class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              <i class="fas fa-plus mr-1"></i>New
+            </a>
+          </div>
+          {% if form.location.help_text %}
+            <p class="text-gray-400 text-xs mt-1">{{ form.location.help_text }}</p>
+          {% endif %}
+          {% if form.location.errors %}
+            <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.location.errors }}</div>
+          {% endif %}
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <!-- Map Reference -->
           <div>
@@ -105,22 +126,11 @@
             <label for="{{ form.danger_level.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
               Danger Level
             </label>
-            {{ form.danger_level|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base" }}
+            {{ form.danger_level|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base appearance-none" }}
             {% if form.danger_level.errors %}
               <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.danger_level.errors }}</div>
             {% endif %}
           </div>
-        </div>
-
-        <!-- Map Image -->
-        <div>
-          <label for="{{ form.map_image.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-            Map Image
-          </label>
-          {{ form.map_image|add_class:"w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base" }}
-          {% if form.map_image.errors %}
-            <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.map_image.errors }}</div>
-          {% endif %}
         </div>
 
         <!-- Tags -->

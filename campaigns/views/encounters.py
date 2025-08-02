@@ -31,6 +31,11 @@ class EncounterCreateView(LoginRequiredMixin, CreateView):
         context["chapter"] = self.chapter
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['campaign'] = self.chapter.campaign
+        return kwargs
+
     def form_valid(self, form):
         # Auto-assign the encounter to the correct chapter and owner
         form.instance.chapter = self.chapter
@@ -68,6 +73,11 @@ class EncounterUpdateView(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["chapter"] = self.object.chapter
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['campaign'] = self.object.chapter.campaign
+        return kwargs
 
     def form_valid(self, form):
         import logging

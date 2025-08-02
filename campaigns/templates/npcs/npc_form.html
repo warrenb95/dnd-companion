@@ -7,100 +7,289 @@
       <h2 class="text-xl sm:text-2xl font-semibold text-white">
         {{ view.object.name|default:"Add NPC" }} for {{ campaign.title }}
       </h2>
-      <p class="text-gray-400 text-xs sm:text-sm mt-1">Create memorable NPCs for your campaign</p>
+      <p class="text-gray-400 text-xs sm:text-sm mt-1">Create detailed NPCs with D&D 5e stat blocks</p>
     </div>
 
     <div class="p-4 sm:p-6">
-      <form method="post" class="space-y-4 sm:space-y-6">
+      <form method="post" class="space-y-6">
         {% csrf_token %}
         
-        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
-          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">NPC Details</h3>
+        <!-- Basic Information -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-user mr-2 text-blue-400"></i>Basic Information
+          </h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Name -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
-              <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                NPC Name *
-              </label>
+              <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-white mb-2">Name *</label>
               {{ form.name }}
-              {% if form.name.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.name.errors }}</div>
-              {% endif %}
+              {% if form.name.errors %}<div class="text-red-400 text-sm mt-1">{{ form.name.errors }}</div>{% endif %}
             </div>
             
-            <!-- Role -->
             <div>
-              <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                Role/Title
-              </label>
+              <label for="{{ form.creature_type.id_for_label }}" class="block text-sm font-medium text-white mb-2">Creature Type</label>
+              {{ form.creature_type }}
+              {% if form.creature_type.errors %}<div class="text-red-400 text-sm mt-1">{{ form.creature_type.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.size.id_for_label }}" class="block text-sm font-medium text-white mb-2">Size</label>
+              {{ form.size }}
+              {% if form.size.errors %}<div class="text-red-400 text-sm mt-1">{{ form.size.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.alignment.id_for_label }}" class="block text-sm font-medium text-white mb-2">Alignment</label>
+              {{ form.alignment }}
+              {% if form.alignment.errors %}<div class="text-red-400 text-sm mt-1">{{ form.alignment.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-white mb-2">Role/Title</label>
               {{ form.role }}
-              {% if form.role.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.role.help_text }}</p>
-              {% endif %}
-              {% if form.role.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.role.errors }}</div>
-              {% endif %}
+              {% if form.role.errors %}<div class="text-red-400 text-sm mt-1">{{ form.role.errors }}</div>{% endif %}
             </div>
             
-            <!-- Location -->
             <div>
-              <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                Location
-              </label>
-              {{ form.location }}
-              {% if form.location.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.location.help_text }}</p>
-              {% endif %}
-              {% if form.location.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.location.errors }}</div>
-              {% endif %}
-            </div>
-            
-            <!-- Status -->
-            <div>
-              <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                Status
-              </label>
+              <label for="{{ form.status.id_for_label }}" class="block text-sm font-medium text-white mb-2">Status</label>
               {{ form.status }}
-              {% if form.status.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.status.help_text }}</p>
-              {% endif %}
-              {% if form.status.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.status.errors }}</div>
-              {% endif %}
+              {% if form.status.errors %}<div class="text-red-400 text-sm mt-1">{{ form.status.errors }}</div>{% endif %}
             </div>
             
-            <!-- Description -->
-            <div class="md:col-span-2">
-              <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                Description
-              </label>
-              {{ form.description }}
-              {% if form.description.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.description.help_text }}</p>
-              {% endif %}
-              {% if form.description.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.description.errors }}</div>
-              {% endif %}
+            <div>
+              <label for="{{ form.location.id_for_label }}" class="block text-sm font-medium text-white mb-2">Location</label>
+              {{ form.location }}
+              {% if form.location.errors %}<div class="text-red-400 text-sm mt-1">{{ form.location.errors }}</div>{% endif %}
             </div>
             
-            <!-- Tags -->
             <div class="md:col-span-2">
-              <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-white mb-2">
-                Tags
-              </label>
+              <label for="{{ form.chapters.id_for_label }}" class="block text-sm font-medium text-white mb-2">Related Chapters</label>
+              {{ form.chapters }}
+              {% if form.chapters.errors %}<div class="text-red-400 text-sm mt-1">{{ form.chapters.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="md:col-span-3">
+              <label for="{{ form.tags.id_for_label }}" class="block text-sm font-medium text-white mb-2">Tags</label>
               {{ form.tags }}
-              {% if form.tags.help_text %}
-                <p class="text-gray-400 text-sm mt-1">{{ form.tags.help_text }}</p>
-              {% endif %}
-              {% if form.tags.errors %}
-                <div class="text-red-400 text-sm mt-1">{{ form.tags.errors }}</div>
-              {% endif %}
+              <p class="text-gray-400 text-sm mt-1">Comma-separated tags (e.g., merchant, guild member, quest giver)</p>
+              {% if form.tags.errors %}<div class="text-red-400 text-sm mt-1">{{ form.tags.errors }}</div>{% endif %}
             </div>
           </div>
         </div>
-        
+
+        <!-- Core Stats -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-shield-alt mr-2 text-red-400"></i>Core Stats
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div>
+              <label for="{{ form.armor_class.id_for_label }}" class="block text-sm font-medium text-white mb-2">Armor Class</label>
+              {{ form.armor_class }}
+              {% if form.armor_class.errors %}<div class="text-red-400 text-sm mt-1">{{ form.armor_class.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.hit_points.id_for_label }}" class="block text-sm font-medium text-white mb-2">Hit Points</label>
+              {{ form.hit_points }}
+              {% if form.hit_points.errors %}<div class="text-red-400 text-sm mt-1">{{ form.hit_points.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.hit_dice.id_for_label }}" class="block text-sm font-medium text-white mb-2">Hit Dice</label>
+              {{ form.hit_dice }}
+              <p class="text-gray-400 text-xs mt-1">e.g., 2d8+2</p>
+              {% if form.hit_dice.errors %}<div class="text-red-400 text-sm mt-1">{{ form.hit_dice.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.speed.id_for_label }}" class="block text-sm font-medium text-white mb-2">Speed</label>
+              {{ form.speed }}
+              <p class="text-gray-400 text-xs mt-1">e.g., 30 ft., fly 60 ft.</p>
+              {% if form.speed.errors %}<div class="text-red-400 text-sm mt-1">{{ form.speed.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Ability Scores -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-dice-d20 mr-2 text-green-400"></i>Ability Scores
+          </h3>
+          
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div class="text-center">
+              <label for="{{ form.strength.id_for_label }}" class="block text-sm font-medium text-white mb-2">STR</label>
+              {{ form.strength }}
+              {% if form.strength.errors %}<div class="text-red-400 text-sm mt-1">{{ form.strength.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="text-center">
+              <label for="{{ form.dexterity.id_for_label }}" class="block text-sm font-medium text-white mb-2">DEX</label>
+              {{ form.dexterity }}
+              {% if form.dexterity.errors %}<div class="text-red-400 text-sm mt-1">{{ form.dexterity.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="text-center">
+              <label for="{{ form.constitution.id_for_label }}" class="block text-sm font-medium text-white mb-2">CON</label>
+              {{ form.constitution }}
+              {% if form.constitution.errors %}<div class="text-red-400 text-sm mt-1">{{ form.constitution.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="text-center">
+              <label for="{{ form.intelligence.id_for_label }}" class="block text-sm font-medium text-white mb-2">INT</label>
+              {{ form.intelligence }}
+              {% if form.intelligence.errors %}<div class="text-red-400 text-sm mt-1">{{ form.intelligence.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="text-center">
+              <label for="{{ form.wisdom.id_for_label }}" class="block text-sm font-medium text-white mb-2">WIS</label>
+              {{ form.wisdom }}
+              {% if form.wisdom.errors %}<div class="text-red-400 text-sm mt-1">{{ form.wisdom.errors }}</div>{% endif %}
+            </div>
+            
+            <div class="text-center">
+              <label for="{{ form.charisma.id_for_label }}" class="block text-sm font-medium text-white mb-2">CHA</label>
+              {{ form.charisma }}
+              {% if form.charisma.errors %}<div class="text-red-400 text-sm mt-1">{{ form.charisma.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills & Defenses -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-cog mr-2 text-yellow-400"></i>Skills & Defenses
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="{{ form.saving_throws.id_for_label }}" class="block text-sm font-medium text-white mb-2">Saving Throws</label>
+              {{ form.saving_throws }}
+              <p class="text-gray-400 text-xs mt-1">e.g., Dex +5, Wis +3</p>
+              {% if form.saving_throws.errors %}<div class="text-red-400 text-sm mt-1">{{ form.saving_throws.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.skills.id_for_label }}" class="block text-sm font-medium text-white mb-2">Skills</label>
+              {{ form.skills }}
+              <p class="text-gray-400 text-xs mt-1">e.g., Perception +5, Stealth +7</p>
+              {% if form.skills.errors %}<div class="text-red-400 text-sm mt-1">{{ form.skills.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.damage_resistances.id_for_label }}" class="block text-sm font-medium text-white mb-2">Damage Resistances</label>
+              {{ form.damage_resistances }}
+              <p class="text-gray-400 text-xs mt-1">e.g., fire, cold</p>
+              {% if form.damage_resistances.errors %}<div class="text-red-400 text-sm mt-1">{{ form.damage_resistances.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.damage_immunities.id_for_label }}" class="block text-sm font-medium text-white mb-2">Damage Immunities</label>
+              {{ form.damage_immunities }}
+              <p class="text-gray-400 text-xs mt-1">e.g., poison, necrotic</p>
+              {% if form.damage_immunities.errors %}<div class="text-red-400 text-sm mt-1">{{ form.damage_immunities.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.condition_immunities.id_for_label }}" class="block text-sm font-medium text-white mb-2">Condition Immunities</label>
+              {{ form.condition_immunities }}
+              <p class="text-gray-400 text-xs mt-1">e.g., charmed, frightened</p>
+              {% if form.condition_immunities.errors %}<div class="text-red-400 text-sm mt-1">{{ form.condition_immunities.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.senses.id_for_label }}" class="block text-sm font-medium text-white mb-2">Senses</label>
+              {{ form.senses }}
+              <p class="text-gray-400 text-xs mt-1">e.g., darkvision 60 ft., passive Perception 13</p>
+              {% if form.senses.errors %}<div class="text-red-400 text-sm mt-1">{{ form.senses.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.languages.id_for_label }}" class="block text-sm font-medium text-white mb-2">Languages</label>
+              {{ form.languages }}
+              <p class="text-gray-400 text-xs mt-1">e.g., Common, Elvish</p>
+              {% if form.languages.errors %}<div class="text-red-400 text-sm mt-1">{{ form.languages.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.challenge_rating.id_for_label }}" class="block text-sm font-medium text-white mb-2">Challenge Rating</label>
+              {{ form.challenge_rating }}
+              <p class="text-gray-400 text-xs mt-1">e.g., 1/2, 2, 5</p>
+              {% if form.challenge_rating.errors %}<div class="text-red-400 text-sm mt-1">{{ form.challenge_rating.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.proficiency_bonus.id_for_label }}" class="block text-sm font-medium text-white mb-2">Proficiency Bonus</label>
+              {{ form.proficiency_bonus }}
+              <p class="text-gray-400 text-xs mt-1">+2 to +9</p>
+              {% if form.proficiency_bonus.errors %}<div class="text-red-400 text-sm mt-1">{{ form.proficiency_bonus.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Abilities & Actions -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-magic mr-2 text-purple-400"></i>Abilities & Actions
+          </h3>
+          
+          <div class="space-y-6">
+            <div>
+              <label for="{{ form.special_abilities.id_for_label }}" class="block text-sm font-medium text-white mb-2">Special Abilities</label>
+              {{ form.special_abilities }}
+              <p class="text-gray-400 text-xs mt-1">Special abilities, traits, and features</p>
+              {% if form.special_abilities.errors %}<div class="text-red-400 text-sm mt-1">{{ form.special_abilities.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.actions.id_for_label }}" class="block text-sm font-medium text-white mb-2">Actions</label>
+              {{ form.actions }}
+              <p class="text-gray-400 text-xs mt-1">Available actions in combat</p>
+              {% if form.actions.errors %}<div class="text-red-400 text-sm mt-1">{{ form.actions.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.legendary_actions.id_for_label }}" class="block text-sm font-medium text-white mb-2">Legendary Actions</label>
+              {{ form.legendary_actions }}
+              <p class="text-gray-400 text-xs mt-1">Legendary actions (if applicable)</p>
+              {% if form.legendary_actions.errors %}<div class="text-red-400 text-sm mt-1">{{ form.legendary_actions.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Roleplay Information -->
+        <div class="bg-gray-750 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <i class="fas fa-theater-masks mr-2 text-pink-400"></i>Roleplay Information
+          </h3>
+          
+          <div class="space-y-6">
+            <div>
+              <label for="{{ form.appearance.id_for_label }}" class="block text-sm font-medium text-white mb-2">Appearance</label>
+              {{ form.appearance }}
+              <p class="text-gray-400 text-xs mt-1">Physical description, clothing, distinctive features</p>
+              {% if form.appearance.errors %}<div class="text-red-400 text-sm mt-1">{{ form.appearance.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.personality.id_for_label }}" class="block text-sm font-medium text-white mb-2">Personality</label>
+              {{ form.personality }}
+              <p class="text-gray-400 text-xs mt-1">Personality traits, mannerisms, speech patterns, motivations</p>
+              {% if form.personality.errors %}<div class="text-red-400 text-sm mt-1">{{ form.personality.errors }}</div>{% endif %}
+            </div>
+            
+            <div>
+              <label for="{{ form.secret.id_for_label }}" class="block text-sm font-medium text-white mb-2">Secret <em class="text-gray-400">(DM Only)</em></label>
+              {{ form.secret }}
+              <p class="text-gray-400 text-xs mt-1">Hidden information, plot hooks, or secrets only the DM knows</p>
+              {% if form.secret.errors %}<div class="text-red-400 text-sm mt-1">{{ form.secret.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
         {% if form.non_field_errors %}
           <div class="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded">
             {{ form.non_field_errors }}

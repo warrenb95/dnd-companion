@@ -1,0 +1,45 @@
+{% load markdown_extras %}
+{% if available_locations %}
+  <div class="space-y-3 max-h-64 overflow-y-auto">
+    {% for location in available_locations %}
+    <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+      <div class="flex-1">
+        <h4 class="font-medium text-white">{{ location.name }}</h4>
+        {% if location.region %}
+        <p class="text-sm text-gray-400">{{ location.region }}</p>
+        {% endif %}
+        {% if location.description %}
+        <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ location.description|truncatewords:15 }}</p>
+        {% endif %}
+        {% if location.tags %}
+        <div class="flex flex-wrap gap-1 mt-2">
+          {% for tag in location.tags|split:"," %}
+            {% if tag.strip %}
+            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+              {{ tag.strip }}
+            </span>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      <button onclick="addLocationToChapter({{ location.id }})" 
+              class="ml-3 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors">
+        Add
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-8">
+    <i class="fas fa-map-marker-alt text-gray-500 text-3xl mb-3"></i>
+    <p class="text-gray-400 mb-4">No locations available to add to this chapter.</p>
+    <p class="text-sm text-gray-500">
+      All locations in this campaign are already featured in this chapter, or you haven't created any locations yet.
+    </p>
+    <a href="{% url 'campaigns:location_create' campaign_id=campaign.id %}" 
+       class="inline-flex items-center mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors">
+      <i class="fas fa-plus mr-2"></i>Create New Location
+    </a>
+  </div>
+{% endif %}

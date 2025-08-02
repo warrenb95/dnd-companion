@@ -10,6 +10,14 @@
     </div>
     
     <div class="flex items-center gap-3">
+      <button onclick="openNPCModal()" 
+              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+        <i class="fas fa-user-plus mr-2"></i>Add NPC
+      </button>
+      <button onclick="openLocationModal()" 
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+        <i class="fas fa-map-marker-alt mr-2"></i>Add Location
+      </button>
       <a href="{% url 'campaigns:chapter_edit' campaign_id=chapter.campaign.id chapter_id=chapter.id %}"
          class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
         Edit Chapter
@@ -29,33 +37,51 @@
   
   <hr class="border-gray-700 mb-4" />
   
-  <div class="space-y-4 text-gray-300">
-    {% if chapter.summary %}
+  <!-- NPCs and Locations Side-by-Side -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- NPCs Section -->
     <div>
-      <h2 class="text-xl font-semibold text-white mb-2">Summary</h2>
-      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.summary|markdown }}</div>
+      {% include "chapters/components/_npcs_section.html" %}
     </div>
-    {% endif %}
     
-    {% if chapter.intro %}
+    <!-- Locations Section -->
     <div>
-      <h2 class="text-xl font-semibold text-white mb-2">Introduction</h2>
-      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.intro|markdown }}</div>
+      {% include "chapters/components/_locations_section.html" %}
     </div>
-    {% endif %}
+  </div>
+
+  <!-- Description Sections in 2-Column Layout -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 text-gray-300">
+    <div class="space-y-4">
+      {% if chapter.summary %}
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-2">Summary</h2>
+        <div class="prose prose-invert prose-sm max-w-none">{{ chapter.summary|markdown }}</div>
+      </div>
+      {% endif %}
+      
+      {% if chapter.intro %}
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-2">Introduction</h2>
+        <div class="prose prose-invert prose-sm max-w-none">{{ chapter.intro|markdown }}</div>
+      </div>
+      {% endif %}
+    </div>
     
-    {% if chapter.dm_notes %}
-    <div>
-      <h2 class="text-xl font-semibold text-white mb-2">DM Notes</h2>
-      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.dm_notes|markdown }}</div>
+    <div class="space-y-4">
+      {% if chapter.dm_notes %}
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-2">DM Notes</h2>
+        <div class="prose prose-invert prose-sm max-w-none">{{ chapter.dm_notes|markdown }}</div>
+      </div>
+      {% endif %}
+      
+      {% if chapter.conclusion %}
+      <div>
+        <h2 class="text-xl font-semibold text-white mb-2">Conclusion</h2>
+        <div class="prose prose-invert prose-sm max-w-none">{{ chapter.conclusion|markdown }}</div>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-    
-    {% if chapter.conclusion %}
-    <div>
-      <h2 class="text-xl font-semibold text-white mb-2">Conclusion</h2>
-      <div class="prose prose-invert prose-sm max-w-none">{{ chapter.conclusion|markdown }}</div>
-    </div>
-    {% endif %}
   </div>
 </div>

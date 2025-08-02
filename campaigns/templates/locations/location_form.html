@@ -11,7 +11,7 @@
     </div>
 
     <div class="p-4 sm:p-6">
-      <form method="post" class="space-y-4 sm:space-y-6">
+      <form method="post" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
         {% csrf_token %}
         
         <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
@@ -68,6 +68,41 @@
               {% endif %}
               {% if form.tags.errors %}
                 <div class="text-red-400 text-sm mt-1">{{ form.tags.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Map Image -->
+            <div>
+              <label for="{{ form.map_image.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Location Map <em class="text-gray-400">(Optional)</em>
+              </label>
+              {{ form.map_image }}
+              {% if form.map_image.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.map_image.help_text }}</p>
+              {% endif %}
+              {% if form.instance.map_image %}
+                <div class="mt-2">
+                  <p class="text-sm text-gray-400 mb-2">Current map:</p>
+                  <img src="{{ form.instance.map_image.url }}" alt="Current location map" 
+                       class="max-w-sm max-h-32 object-contain rounded border border-gray-600">
+                </div>
+              {% endif %}
+              {% if form.map_image.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.map_image.errors }}</div>
+              {% endif %}
+            </div>
+            
+            <!-- Chapters -->
+            <div>
+              <label for="{{ form.chapters.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Featured in Chapters
+              </label>
+              {{ form.chapters }}
+              {% if form.chapters.help_text %}
+                <p class="text-gray-400 text-sm mt-1">{{ form.chapters.help_text }}</p>
+              {% endif %}
+              {% if form.chapters.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.chapters.errors }}</div>
               {% endif %}
             </div>
           </div>

@@ -31,8 +31,12 @@ from .encounters import (
 from .world import (
     LocationCreateView,
     LocationUpdateView,
+    LocationDetailView,
+    LocationDeleteView,
     NPCCreateView,
-    NPCUpdateView
+    NPCUpdateView,
+    NPCDetailView,
+    NPCDeleteView
 )
 from .characters import (
     CharacterDetailView,
@@ -84,8 +88,12 @@ __all__ = [
     # World views
     'LocationCreateView',
     'LocationUpdateView',
+    'LocationDetailView',
+    'LocationDeleteView',
     'NPCCreateView',
     'NPCUpdateView',
+    'NPCDetailView',
+    'NPCDeleteView',
     
     # Character views
     'CharacterDetailView',

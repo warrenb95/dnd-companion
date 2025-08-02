@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
 from django.forms import modelformset_factory
-from .models import Campaign, Encounter
+from .models import Campaign, Encounter, Chapter, NPC, Location
 from .forms import EncounterForm
 
 @login_required
@@ -102,3 +102,133 @@ def refresh_campaign_detail(request, campaign_id):
             'campaign': campaign,
             'is_owner': True
         })
+
+
+@login_required
+@require_http_methods(["GET"])
+def chapter_npc_selection(request, campaign_id, chapter_id):
+    """
+    Get available NPCs for selection to add to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    # Get all NPCs in the campaign that are not already in this chapter
+    available_npcs = campaign.npcs.exclude(chapters=chapter)
+    
+    context = {
+        'campaign': campaign,
+        'chapter': chapter,
+        'available_npcs': available_npcs
+    }
+    
+    return render(request, 'chapters/components/_npc_selection.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_add_npc(request, campaign_id, chapter_id):
+    """
+    Add an NPC to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    npc_id = request.POST.get('npc_id')
+    if npc_id:
+        npc = get_object_or_404(NPC, id=npc_id, campaign=campaign)
+        chapter.involved_npcs.add(npc)
+    
+    # Return the updated NPCs section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_npcs_section.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_remove_npc(request, campaign_id, chapter_id):
+    """
+    Remove an NPC from a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    npc_id = request.POST.get('npc_id')
+    if npc_id:
+        npc = get_object_or_404(NPC, id=npc_id, campaign=campaign)
+        chapter.involved_npcs.remove(npc)
+    
+    # Return the updated NPCs section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_npcs_section.html', context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def chapter_location_selection(request, campaign_id, chapter_id):
+    """
+    Get available locations for selection to add to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    # Get all locations in the campaign that are not already in this chapter
+    available_locations = campaign.locations.exclude(chapters=chapter)
+    
+    context = {
+        'campaign': campaign,
+        'chapter': chapter,
+        'available_locations': available_locations
+    }
+    
+    return render(request, 'chapters/components/_location_selection.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_add_location(request, campaign_id, chapter_id):
+    """
+    Add a location to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    location_id = request.POST.get('location_id')
+    if location_id:
+        location = get_object_or_404(Location, id=location_id, campaign=campaign)
+        chapter.involved_locations.add(location)
+    
+    # Return the updated locations section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_locations_section.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_remove_location(request, campaign_id, chapter_id):
+    """
+    Remove a location from a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    location_id = request.POST.get('location_id')
+    if location_id:
+        location = get_object_or_404(Location, id=location_id, campaign=campaign)
+        chapter.involved_locations.remove(location)
+    
+    # Return the updated locations section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_locations_section.html', context)
