@@ -1,0 +1,124 @@
+{% if encounter.enemies.exists %}
+<div class="mb-6" id="enemies-section">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-lg font-semibold text-white flex items-center">
+      <i class="fas fa-user-ninja mr-2 text-red-400"></i>Enemies
+    </h3>
+    <button onclick="showEnemySelection()" 
+            class="text-sm text-red-400 hover:text-red-300 transition-colors">
+      Add Enemy <i class="fas fa-plus ml-1"></i>
+    </button>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="enemies-list">
+    {% for enemy in encounter.enemies.all %}
+    <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-650 transition-colors border-l-4 border-red-500">
+      <div class="flex items-center justify-between">
+        <div class="flex-1">
+          <h4 class="font-medium text-white">
+            <a href="{% url 'campaigns:enemy_detail' campaign_id=encounter.chapter.campaign.id enemy_id=enemy.id %}" 
+               class="hover:text-red-400 transition-colors">
+              {{ enemy.name }}
+            </a>
+          </h4>
+          <p class="text-sm text-gray-400">{{ enemy.get_size_display }} {{ enemy.get_creature_type_display }}</p>
+          <div class="flex items-center gap-1 mt-2 flex-wrap">
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 whitespace-nowrap">
+              CR {{ enemy.challenge_rating }}
+            </span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 whitespace-nowrap">
+              AC {{ enemy.armor_class }}
+            </span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 whitespace-nowrap">
+              {{ enemy.hit_points }} HP
+            </span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 whitespace-nowrap">
+              Init {{ enemy.initiative_modifier_formatted }}
+            </span>
+          </div>
+        </div>
+        <button onclick="removeEnemyFromEncounter({{ enemy.id }})" 
+                class="ml-2 text-red-400 hover:text-red-300 p-1 rounded transition-colors"
+                title="Remove enemy from encounter">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% else %}
+<div class="mb-6" id="enemies-section" style="display: none;">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-lg font-semibold text-white flex items-center">
+      <i class="fas fa-user-ninja mr-2 text-red-400"></i>Enemies
+    </h3>
+    <button onclick="showEnemySelection()" 
+            class="text-sm text-red-400 hover:text-red-300 transition-colors">
+      Add Enemy <i class="fas fa-plus ml-1"></i>
+    </button>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="enemies-list">
+  </div>
+</div>
+{% endif %}
+
+<!-- Enemy Selection Modal -->
+<div id="enemy-selection-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-hidden">
+      <div class="bg-gray-900 px-6 py-4 border-b border-gray-700">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold text-white">Add Enemy to Encounter</h3>
+          <button onclick="hideEnemySelection()" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      <div class="p-6" id="enemy-selection-content">
+        <!-- HTMX will load enemy selection here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showEnemySelection() {
+    const modal = document.getElementById('enemy-selection-modal');
+    const content = document.getElementById('enemy-selection-content');
+    
+    // Load enemy selection via HTMX
+    htmx.get('{% url "campaigns:encounter_enemy_selection" campaign_id=encounter.chapter.campaign.id encounter_id=encounter.id %}', {
+        target: '#enemy-selection-content'
+    });
+    
+    modal.classList.remove('hidden');
+    document.getElementById('enemies-section').style.display = 'block';
+}
+
+function hideEnemySelection() {
+    document.getElementById('enemy-selection-modal').classList.add('hidden');
+}
+
+function addEnemyToEncounter(enemyId) {
+    const formData = new FormData();
+    formData.append('enemy_id', enemyId);
+    
+    htmx.ajax('POST', '{% url "campaigns:encounter_add_enemy" campaign_id=encounter.chapter.campaign.id encounter_id=encounter.id %}', {
+        values: {enemy_id: enemyId},
+        target: '#enemies-section',
+        swap: 'outerHTML'
+    });
+    
+    hideEnemySelection();
+}
+
+function removeEnemyFromEncounter(enemyId) {
+    if (confirm('Remove this enemy from the encounter?')) {
+        htmx.ajax('POST', '{% url "campaigns:encounter_remove_enemy" campaign_id=encounter.chapter.campaign.id encounter_id=encounter.id %}', {
+            values: {enemy_id: enemyId},
+            target: '#enemies-section',
+            swap: 'outerHTML'
+        });
+    }
+}
+</script>

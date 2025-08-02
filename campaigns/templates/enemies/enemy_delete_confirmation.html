@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Delete {{ enemy.name }} - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-8 max-w-2xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-red-500">
+    <div class="bg-red-900 px-6 py-4 border-b border-red-700">
+      <h2 class="text-xl font-semibold text-white flex items-center">
+        <i class="fas fa-exclamation-triangle mr-3 text-yellow-400"></i>
+        Confirm Enemy Deletion
+      </h2>
+    </div>
+    
+    <div class="p-6">
+      <div class="mb-6">
+        <p class="text-gray-300 mb-4">
+          Are you sure you want to delete <strong class="text-white">{{ enemy.name }}</strong>?
+        </p>
+        
+        <!-- Enemy Summary -->
+        <div class="bg-gray-750 rounded-lg p-4 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div>
+              <span class="text-gray-400">Type:</span>
+              <span class="text-white ml-2">{{ enemy.get_size_display }} {{ enemy.get_creature_type_display }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400">Challenge Rating:</span>
+              <span class="text-white ml-2">{{ enemy.challenge_rating }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400">Armor Class:</span>
+              <span class="text-white ml-2">{{ enemy.armor_class }}</span>
+            </div>
+            <div>
+              <span class="text-gray-400">Hit Points:</span>
+              <span class="text-white ml-2">{{ enemy.hit_points }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Warning about encounters -->
+        {% if enemy.encounters.exists %}
+        <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-4 mb-4">
+          <div class="flex items-start">
+            <i class="fas fa-exclamation-triangle text-yellow-400 mt-1 mr-3"></i>
+            <div>
+              <h4 class="text-yellow-200 font-medium mb-2">Warning: Enemy appears in encounters</h4>
+              <p class="text-yellow-100 text-sm mb-2">
+                This enemy is currently associated with {{ enemy.encounters.count }} encounter{{ enemy.encounters.count|pluralize }}.
+                Deleting this enemy will remove it from these encounters:
+              </p>
+              <ul class="text-yellow-100 text-sm list-disc list-inside">
+                {% for encounter in enemy.encounters.all %}
+                <li>{{ encounter.title }} ({{ encounter.chapter.title }})</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="bg-red-900 border border-red-700 rounded-lg p-4">
+          <p class="text-red-200 text-sm flex items-start">
+            <i class="fas fa-exclamation-circle text-red-400 mt-0.5 mr-2"></i>
+            <span><strong>This action cannot be undone.</strong> All enemy data will be permanently deleted.</span>
+          </p>
+        </div>
+      </div>
+      
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="flex gap-4">
+          <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-trash mr-2"></i>
+            Yes, Delete Enemy
+          </button>
+          <a href="{% url 'campaigns:enemy_detail' campaign_id=campaign.id enemy_id=enemy.id %}" 
+             class="flex-1 text-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+            <i class="fas fa-times mr-2"></i>
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Back to Enemy Detail -->
+<div class="my-4 max-w-2xl mx-auto px-4">
+  <a href="{% url 'campaigns:enemy_detail' campaign_id=campaign.id enemy_id=enemy.id %}" 
+     class="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors">
+    <i class="fas fa-arrow-left mr-2"></i>Back to {{ enemy.name }}
+  </a>
+</div>
+{% endblock %}

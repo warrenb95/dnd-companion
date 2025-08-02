@@ -1,10 +1,11 @@
 # Import all models for Django migrations compatibility
 from .base import Campaign, CampaignCollaborator
 from .content import Chapter, Encounter
-from .world import Location, NPC
+from .world import Location, NPC, Enemy
 from .characters import CharacterSummary
 from .sessions import SessionNote, ChatMessage, ChapterChatMessage, SessionSchedule, PlayerAvailability, ScheduledSession
 from .users import UserProfile
+from .combat import CombatSession, CombatParticipant, StatusEffect, CombatAction
 
 # Make all models available when importing from campaigns.models
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     'Encounter',
     'Location',
     'NPC',
+    'Enemy',
     'CharacterSummary',
     'SessionNote',
     'ChatMessage',
@@ -22,4 +24,8 @@ __all__ = [
     'PlayerAvailability',
     'ScheduledSession',
     'UserProfile',
+    'CombatSession',
+    'CombatParticipant',
+    'StatusEffect',
+    'CombatAction',
 ]

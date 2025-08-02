@@ -37,10 +37,16 @@ from .world import (
     NPCUpdateView,
     NPCDetailView,
     NPCDeleteView,
+    NPCToEnemyConvertView,
+    EnemyCreateView,
+    EnemyUpdateView,
+    EnemyDetailView,
+    EnemyDeleteView,
     ChapterNPCListView,
     ChapterLocationListView,
     ChapterCharacterListView,
     CampaignNPCListView,
+    CampaignEnemyListView,
     CampaignLocationListView,
     CampaignCharacterListView
 )
@@ -58,6 +64,12 @@ from .sessions import (
     SessionScheduleDetailView,
     PlayerAvailabilityView,
     ScheduleSessionView
+)
+from .combat import (
+    CombatSessionCreateView,
+    CombatSessionDetailView,
+    CombatSessionUpdateView,
+    CombatSessionDeleteView
 )
 
 # Make all views available when importing from campaigns.views
@@ -100,10 +112,16 @@ __all__ = [
     'NPCUpdateView',
     'NPCDetailView',
     'NPCDeleteView',
+    'NPCToEnemyConvertView',
+    'EnemyCreateView',
+    'EnemyUpdateView',
+    'EnemyDetailView',
+    'EnemyDeleteView',
     'ChapterNPCListView',
     'ChapterLocationListView',
     'ChapterCharacterListView',
     'CampaignNPCListView',
+    'CampaignEnemyListView',
     'CampaignLocationListView',
     'CampaignCharacterListView',
     
@@ -131,4 +149,10 @@ __all__ = [
     'SessionScheduleDetailView',
     'PlayerAvailabilityView',
     'ScheduleSessionView',
+    
+    # Combat views
+    'CombatSessionCreateView',
+    'CombatSessionDetailView',
+    'CombatSessionUpdateView',
+    'CombatSessionDeleteView',
 ]

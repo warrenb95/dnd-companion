@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
 from django.forms import modelformset_factory
-from .models import Campaign, Encounter, Chapter, NPC, Location
+from .models import Campaign, Encounter, Chapter, NPC, Enemy, Location
 from .forms import EncounterForm
 
 @login_required
@@ -213,6 +213,71 @@ def chapter_add_location(request, campaign_id, chapter_id):
 
 
 @login_required
+@require_http_methods(["GET"])
+def encounter_enemy_selection(request, campaign_id, encounter_id):
+    """
+    Get available enemies for selection to add to an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    # Get all enemies in the campaign that are not already in this encounter
+    available_enemies = campaign.enemies.exclude(encounters=encounter)
+    
+    context = {
+        'campaign': campaign,
+        'encounter': encounter,
+        'available_enemies': available_enemies
+    }
+    
+    return render(request, 'encounters/components/_enemy_selection.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def encounter_add_enemy(request, campaign_id, encounter_id):
+    """
+    Add an enemy to an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        encounter.enemies.add(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'encounter': encounter
+    }
+    
+    return render(request, 'encounters/components/_enemies_section.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def encounter_remove_enemy(request, campaign_id, encounter_id):
+    """
+    Remove an enemy from an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        encounter.enemies.remove(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'encounter': encounter
+    }
+    
+    return render(request, 'encounters/components/_enemies_section.html', context)
+
+
+@login_required
 @require_http_methods(["POST"])
 def chapter_remove_location(request, campaign_id, chapter_id):
     """
@@ -232,3 +297,68 @@ def chapter_remove_location(request, campaign_id, chapter_id):
     }
     
     return render(request, 'chapters/components/_locations_section.html', context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def encounter_enemy_selection(request, campaign_id, encounter_id):
+    """
+    Get available enemies for selection to add to an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    # Get all enemies in the campaign that are not already in this encounter
+    available_enemies = campaign.enemies.exclude(encounters=encounter)
+    
+    context = {
+        'campaign': campaign,
+        'encounter': encounter,
+        'available_enemies': available_enemies
+    }
+    
+    return render(request, 'encounters/components/_enemy_selection.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def encounter_add_enemy(request, campaign_id, encounter_id):
+    """
+    Add an enemy to an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        encounter.enemies.add(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'encounter': encounter
+    }
+    
+    return render(request, 'encounters/components/_enemies_section.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def encounter_remove_enemy(request, campaign_id, encounter_id):
+    """
+    Remove an enemy from an encounter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    encounter = get_object_or_404(Encounter, id=encounter_id, chapter__campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        encounter.enemies.remove(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'encounter': encounter
+    }
+    
+    return render(request, 'encounters/components/_enemies_section.html', context)

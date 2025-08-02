@@ -109,6 +109,46 @@
           {% endif %}
         </div>
 
+        <!-- NPCs -->
+        <div>
+          <label for="{{ form.npcs.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+            NPCs in this Encounter
+          </label>
+          <div class="flex gap-2">
+            {{ form.npcs }}
+            <a href="{% url 'campaigns:npc_create' campaign_id=chapter.campaign.id %}" 
+               class="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              <i class="fas fa-plus mr-1"></i>New
+            </a>
+          </div>
+          {% if form.npcs.help_text %}
+            <p class="text-gray-400 text-xs mt-1">{{ form.npcs.help_text }}</p>
+          {% endif %}
+          {% if form.npcs.errors %}
+            <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.npcs.errors }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Enemies -->
+        <div>
+          <label for="{{ form.enemies.id_for_label }}" class="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
+            Enemies in this Encounter
+          </label>
+          <div class="flex gap-2">
+            {{ form.enemies }}
+            <a href="{% url 'campaigns:enemy_create' campaign_id=chapter.campaign.id %}" 
+               class="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition-colors whitespace-nowrap">
+              <i class="fas fa-plus mr-1"></i>New
+            </a>
+          </div>
+          {% if form.enemies.help_text %}
+            <p class="text-gray-400 text-xs mt-1">{{ form.enemies.help_text }}</p>
+          {% endif %}
+          {% if form.enemies.errors %}
+            <div class="text-red-400 text-xs sm:text-sm mt-1">{{ form.enemies.errors }}</div>
+          {% endif %}
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           <!-- Map Reference -->
           <div>

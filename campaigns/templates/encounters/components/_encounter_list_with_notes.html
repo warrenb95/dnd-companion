@@ -23,6 +23,12 @@
               {% endif %}
             </h3>
             <div class="flex gap-2">
+              {% if enc.enemies.exists or enc.chapter.campaign.characters.exists %}
+              <a href="{% url 'campaigns:combat_session_create' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id %}" 
+                 class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200">
+                <i class="fas fa-play mr-1"></i>Play
+              </a>
+              {% endif %}
               <a href="{% url 'campaigns:encounter_edit' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id %}" 
                  class="bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium py-1 px-3 rounded transition duration-200">
                 Edit
@@ -104,15 +110,44 @@
             
             <!-- NPCs Section -->
             <div>
-              {% if enc.chapter.involved_npcs.exists %}
-              <div>
-                <strong class="text-yellow-400">Involved NPCs:</strong>
+              {% if enc.npcs.exists %}
+              <div class="mb-3">
+                <strong class="text-yellow-400">NPCs in this Encounter:</strong>
                 <div class="flex flex-wrap gap-2 mt-1">
-                  {% for npc in enc.chapter.involved_npcs.all %}
+                  {% for npc in enc.npcs.all %}
                   <a href="{% url 'campaigns:npc_detail' campaign_id=enc.chapter.campaign.id npc_id=npc.id %}" 
                      class="inline-flex items-center px-2 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded transition-colors">
                     <i class="fas fa-user mr-1"></i>{{ npc.name }}
                     {% if npc.role %} - {{ npc.role }}{% endif %}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% elif enc.chapter.involved_npcs.exists %}
+              <div class="mb-3">
+                <strong class="text-yellow-400">Chapter NPCs:</strong>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  {% for npc in enc.chapter.involved_npcs.all %}
+                  <a href="{% url 'campaigns:npc_detail' campaign_id=enc.chapter.campaign.id npc_id=npc.id %}" 
+                     class="inline-flex items-center px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-xs rounded transition-colors">
+                    <i class="fas fa-user mr-1"></i>{{ npc.name }}
+                    {% if npc.role %} - {{ npc.role }}{% endif %}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+              
+              <!-- Enemies Section -->
+              {% if enc.enemies.exists %}
+              <div>
+                <strong class="text-red-400">Enemies:</strong>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  {% for enemy in enc.enemies.all %}
+                  <a href="{% url 'campaigns:enemy_detail' campaign_id=enc.chapter.campaign.id enemy_id=enemy.id %}" 
+                     class="inline-flex items-center px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors">
+                    <i class="fas fa-user-ninja mr-1"></i>{{ enemy.name }}
+                    <span class="ml-1 text-xs opacity-75">CR {{ enemy.challenge_rating }}</span>
                   </a>
                   {% endfor %}
                 </div>
@@ -137,6 +172,9 @@
         {% endif %}
       </div>
 
+      <!-- Enemy Management Section -->
+      {% include "encounters/components/_enemies_section.html" with encounter=enc %}
+      
       {% include "encounters/components/_notes_list.html" %}
     </div>
     {% endfor %} {% else %}

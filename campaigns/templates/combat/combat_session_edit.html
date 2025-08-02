@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Edit Combat Session - {{ object.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 text-white">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <nav class="text-sm text-gray-400 mb-4">
+        <a href="{% url 'campaigns:campaign_detail' campaign.id %}" class="hover:text-white transition-colors">{{ campaign.title }}</a>
+        <span class="mx-2">→</span>
+        <a href="{% url 'campaigns:chapter_detail' campaign.id chapter.id %}" class="hover:text-white transition-colors">{{ chapter.title }}</a>
+        <span class="mx-2">→</span>
+        <a href="{% url 'campaigns:combat_session_detail' campaign.id chapter.id encounter.id object.id %}" class="hover:text-white transition-colors">{{ object.name }}</a>
+        <span class="mx-2">→</span>
+        <span class="text-white">Edit</span>
+      </nav>
+      <h1 class="text-3xl font-bold text-white flex items-center">
+        <i class="fas fa-edit mr-3 text-blue-500"></i>
+        Edit Combat Session
+      </h1>
+      <p class="text-gray-400 mt-2">Modify combat session details</p>
+    </div>
+
+    <!-- Edit Form -->
+    <div class="bg-gray-800 rounded-lg shadow-xl p-6">
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+          <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            Combat Session Name
+          </label>
+          {{ form.name }}
+          {% if form.name.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ form.name.help_text }}</p>
+          {% endif %}
+          {% if form.name.errors %}
+            <div class="mt-1 text-sm text-red-400">
+              {{ form.name.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div>
+          <label for="{{ form.dm_notes.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+            DM Notes
+          </label>
+          {{ form.dm_notes }}
+          {% if form.dm_notes.help_text %}
+            <p class="mt-1 text-xs text-gray-500">{{ form.dm_notes.help_text }}</p>
+          {% endif %}
+          {% if form.dm_notes.errors %}
+            <div class="mt-1 text-sm text-red-400">
+              {{ form.dm_notes.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+          <a href="{% url 'campaigns:combat_session_detail' campaign.id chapter.id encounter.id object.id %}" 
+             class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md transition-colors">
+            Cancel
+          </a>
+          
+          <div class="flex gap-3">
+            <a href="{% url 'campaigns:combat_session_delete' campaign.id chapter.id encounter.id object.id %}" 
+               class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors">
+              <i class="fas fa-trash mr-2"></i>Delete
+            </a>
+            <button type="submit" 
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors font-medium">
+              <i class="fas fa-save mr-2"></i>Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -8,9 +8,12 @@ from .views import CampaignListView, CampaignDetailView, CampaignCreateView, Cam
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
-from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView
+from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView, NPCToEnemyConvertView
+from .views import EnemyCreateView, EnemyUpdateView, EnemyDetailView, EnemyDeleteView
+from .views import CombatSessionCreateView, CombatSessionDetailView, CombatSessionUpdateView, CombatSessionDeleteView
+from .views.combat import start_combat, roll_initiative, next_turn, end_combat
 from .views import ChapterNPCListView, ChapterLocationListView, ChapterCharacterListView
-from .views import CampaignNPCListView, CampaignLocationListView, CampaignCharacterListView
+from .views import CampaignNPCListView, CampaignEnemyListView, CampaignLocationListView, CampaignCharacterListView
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
@@ -46,6 +49,7 @@ urlpatterns = [
     
     # Campaign Resource Lists
     path("campaigns/<int:campaign_id>/npcs/", CampaignNPCListView.as_view(), name="campaign_npc_list"),
+    path("campaigns/<int:campaign_id>/enemies/", CampaignEnemyListView.as_view(), name="campaign_enemy_list"),
     path("campaigns/<int:campaign_id>/locations/", CampaignLocationListView.as_view(), name="campaign_location_list"),
     path("campaigns/<int:campaign_id>/characters/", CampaignCharacterListView.as_view(), name="campaign_character_list"),
     
@@ -79,6 +83,18 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/update/", EncounterNoteUpdateView.as_view(), name="encounter_note_update"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/delete/", EncounterNoteDeleteView.as_view(), name="encounter_note_delete"),
     
+    # Combat Sessions (Nested under Encounter)
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/start/", CombatSessionCreateView.as_view(), name="combat_session_create"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/", CombatSessionDetailView.as_view(), name="combat_session_detail"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/edit/", CombatSessionUpdateView.as_view(), name="combat_session_update"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/delete/", CombatSessionDeleteView.as_view(), name="combat_session_delete"),
+    
+    # Combat Action Endpoints
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/start-combat/", start_combat, name="combat_session_start"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/roll-initiative/", roll_initiative, name="combat_session_roll_initiative"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/next-turn/", next_turn, name="combat_session_next_turn"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/end-combat/", end_combat, name="combat_session_end"),
+    
     # Campaign World Resources (Nested under Campaign)
     path("campaigns/<int:campaign_id>/locations/add/", LocationCreateView.as_view(), name="location_create"),
     path("campaigns/<int:campaign_id>/locations/<int:location_id>/", LocationDetailView.as_view(), name="location_detail"),
@@ -88,6 +104,11 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/", NPCDetailView.as_view(), name="npc_detail"),
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/edit/", NPCUpdateView.as_view(), name="npc_edit"),
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/delete/", NPCDeleteView.as_view(), name="npc_delete"),
+    path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/convert-to-enemy/", NPCToEnemyConvertView.as_view(), name="npc_convert_to_enemy"),
+    path("campaigns/<int:campaign_id>/enemies/add/", EnemyCreateView.as_view(), name="enemy_create"),
+    path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/", EnemyDetailView.as_view(), name="enemy_detail"),
+    path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/edit/", EnemyUpdateView.as_view(), name="enemy_edit"),
+    path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/delete/", EnemyDeleteView.as_view(), name="enemy_delete"),
     path("campaigns/<int:campaign_id>/characters/add/", CreateCharacterView.as_view(), name="add_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/view/", CharacterDetailView.as_view(), name="view_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/edit/", UpdateCharacterView.as_view(), name="update_character"),
@@ -113,6 +134,9 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/location-selection/", htmx_views.chapter_location_selection, name="chapter_location_selection"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/add-location/", htmx_views.chapter_add_location, name="chapter_add_location"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/remove-location/", htmx_views.chapter_remove_location, name="chapter_remove_location"),
+    path("campaigns/<int:campaign_id>/encounters/<int:encounter_id>/enemy-selection/", htmx_views.encounter_enemy_selection, name="encounter_enemy_selection"),
+    path("campaigns/<int:campaign_id>/encounters/<int:encounter_id>/add-enemy/", htmx_views.encounter_add_enemy, name="encounter_add_enemy"),
+    path("campaigns/<int:campaign_id>/encounters/<int:encounter_id>/remove-enemy/", htmx_views.encounter_remove_enemy, name="encounter_remove_enemy"),
     
     # Redirects for old URL patterns (temporary compatibility)
     path("chapters/<int:pk>/", redirect_views.redirect_chapter_detail, name="chapter_detail_redirect"),
