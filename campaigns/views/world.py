@@ -1,10 +1,10 @@
-from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView, ListView
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse_lazy
 
-from ..models import Campaign, Location, NPC
+from ..models import Campaign, Location, NPC, Chapter, CharacterSummary
 from ..forms import LocationForm, NPCForm
 
 
@@ -230,3 +230,314 @@ class NPCDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
+
+
+# Chapter Resource List Views
+
+class ChapterNPCListView(LoginRequiredMixin, ListView):
+    model = NPC
+    template_name = "chapters/resources/npc_list.html"
+    context_object_name = 'npcs'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign and chapter access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        self.chapter = get_object_or_404(
+            Chapter.objects.filter(campaign=self.campaign),
+            pk=self.kwargs["chapter_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return NPCs that are involved in this chapter
+        return self.chapter.involved_npcs.all().select_related('campaign', 'location')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        context["chapter"] = self.chapter
+        return context
+
+
+# Campaign Resource List Views
+
+class CampaignNPCListView(LoginRequiredMixin, ListView):
+    model = NPC
+    template_name = "campaigns/resources/npc_list.html"
+    context_object_name = 'npcs'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all NPCs for this campaign
+        return NPC.objects.filter(campaign=self.campaign).select_related('campaign', 'location')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignLocationListView(LoginRequiredMixin, ListView):
+    model = Location
+    template_name = "campaigns/resources/location_list.html" 
+    context_object_name = 'locations'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all locations for this campaign
+        return Location.objects.filter(campaign=self.campaign).select_related('campaign')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignCharacterListView(LoginRequiredMixin, ListView):
+    model = CharacterSummary
+    template_name = "campaigns/resources/character_list.html"
+    context_object_name = 'characters'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all characters for this campaign
+        return CharacterSummary.objects.filter(campaign=self.campaign)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class ChapterLocationListView(LoginRequiredMixin, ListView):
+    model = Location
+    template_name = "chapters/resources/location_list.html" 
+    context_object_name = 'locations'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign and chapter access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        self.chapter = get_object_or_404(
+            Chapter.objects.filter(campaign=self.campaign),
+            pk=self.kwargs["chapter_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return locations that are involved in this chapter
+        return self.chapter.involved_locations.all().select_related('campaign')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        context["chapter"] = self.chapter
+        return context
+
+
+# Campaign Resource List Views
+
+class CampaignNPCListView(LoginRequiredMixin, ListView):
+    model = NPC
+    template_name = "campaigns/resources/npc_list.html"
+    context_object_name = 'npcs'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all NPCs for this campaign
+        return NPC.objects.filter(campaign=self.campaign).select_related('campaign', 'location')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignLocationListView(LoginRequiredMixin, ListView):
+    model = Location
+    template_name = "campaigns/resources/location_list.html" 
+    context_object_name = 'locations'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all locations for this campaign
+        return Location.objects.filter(campaign=self.campaign).select_related('campaign')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignCharacterListView(LoginRequiredMixin, ListView):
+    model = CharacterSummary
+    template_name = "campaigns/resources/character_list.html"
+    context_object_name = 'characters'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all characters for this campaign
+        return CharacterSummary.objects.filter(campaign=self.campaign)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class ChapterCharacterListView(LoginRequiredMixin, ListView):
+    model = CharacterSummary
+    template_name = "chapters/resources/character_list.html"
+    context_object_name = 'characters'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign and chapter access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        self.chapter = get_object_or_404(
+            Chapter.objects.filter(campaign=self.campaign),
+            pk=self.kwargs["chapter_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all characters for this campaign (characters aren't chapter-specific)
+        return CharacterSummary.objects.filter(campaign=self.campaign)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        context["chapter"] = self.chapter
+        return context
+
+
+# Campaign Resource List Views
+
+class CampaignNPCListView(LoginRequiredMixin, ListView):
+    model = NPC
+    template_name = "campaigns/resources/npc_list.html"
+    context_object_name = 'npcs'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all NPCs for this campaign
+        return NPC.objects.filter(campaign=self.campaign).select_related('campaign', 'location')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignLocationListView(LoginRequiredMixin, ListView):
+    model = Location
+    template_name = "campaigns/resources/location_list.html" 
+    context_object_name = 'locations'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all locations for this campaign
+        return Location.objects.filter(campaign=self.campaign).select_related('campaign')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context
+
+
+class CampaignCharacterListView(LoginRequiredMixin, ListView):
+    model = CharacterSummary
+    template_name = "campaigns/resources/character_list.html"
+    context_object_name = 'characters'
+    paginate_by = 20
+
+    def dispatch(self, request, *args, **kwargs):
+        # Secure campaign access by ownership
+        self.campaign = get_object_or_404(
+            Campaign.objects.filter(owner=self.request.user),
+            pk=self.kwargs["campaign_id"]
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        # Return all characters for this campaign
+        return CharacterSummary.objects.filter(campaign=self.campaign)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.campaign
+        return context

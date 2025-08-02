@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Characters - {{ chapter.title }} - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-4 sm:my-8 max-w-screen-xl mx-auto px-4">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <a href="{% url 'campaigns:chapter_detail' campaign_id=campaign.id chapter_id=chapter.id %}"
+         class="inline-flex items-center text-indigo-400 hover:text-indigo-300 text-sm mb-2">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Chapter
+      </a>
+      <h1 class="text-3xl font-bold text-white">Player Characters</h1>
+      <p class="text-gray-400 mt-1">{{ campaign.title }}</p>
+    </div>
+    <a href="{% url 'campaigns:add_character' campaign_id=campaign.id %}"
+       class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+      <i class="fas fa-plus mr-2"></i>Add New Character
+    </a>
+  </div>
+
+  {% if characters %}
+  <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+      {% for character in characters %}
+      <div class="bg-gray-700 rounded-lg p-4 hover:bg-gray-650 transition-colors">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-white mb-1">
+              <a href="{% url 'campaigns:view_character' campaign_id=campaign.id character_id=character.id %}" 
+                 class="hover:text-indigo-400 transition-colors">
+                {{ character.character_name }}
+              </a>
+            </h3>
+            
+            <p class="text-sm text-gray-400 mb-2">
+              <i class="fas fa-user mr-1"></i>{{ character.player_name }}
+            </p>
+            
+            <div class="space-y-2 mb-3">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-gray-400">Level {{ character.level }}</span>
+                <span class="text-gray-300">{{ character.race }}</span>
+                {% if character.character_class %}
+                <span class="text-blue-400">{{ character.character_class }}</span>
+                {% endif %}
+              </div>
+              
+              {% if character.character_sub_class %}
+              <div class="text-sm text-purple-400">
+                {{ character.character_sub_class }}
+              </div>
+              {% endif %}
+              
+              {% if character.background %}
+              <div class="text-sm text-green-400">
+                {{ character.background }}
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Combat Stats -->
+            <div class="grid grid-cols-2 gap-2 text-xs text-gray-300 mb-3">
+              <div class="flex justify-between">
+                <span>AC:</span>
+                <span class="font-medium">{{ character.armor_class }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>HP:</span>
+                <span class="font-medium">{{ character.current_hit_points }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Initiative:</span>
+                <span class="font-medium">
+                  {% if character.initiative_modifier >= 0 %}+{% endif %}{{ character.initiative_modifier }}
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Perception:</span>
+                <span class="font-medium">{{ character.passive_perception }}</span>
+              </div>
+            </div>
+            
+            <!-- Status indicators -->
+            <div class="flex items-center gap-2 mt-3">
+              {% if character.alignment %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                {{ character.alignment }}
+              </span>
+              {% endif %}
+              
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                {% if character.alive %}bg-green-100 text-green-800
+                {% else %}bg-red-100 text-red-800{% endif %}">
+                {% if character.alive %}Alive{% else %}Dead{% endif %}
+              </span>
+              
+              {% if character.heroic_inspiration %}
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <i class="fas fa-star mr-1"></i>Inspiration
+              </span>
+              {% endif %}
+            </div>
+            
+            {% if character.notable_traits %}
+            <div class="mt-3 p-2 bg-gray-600 rounded text-xs text-gray-300">
+              <strong class="text-white">Traits:</strong> {{ character.notable_traits|truncatewords:15 }}
+            </div>
+            {% endif %}
+          </div>
+          
+          <div class="flex flex-col gap-2 ml-3">
+            <a href="{% url 'campaigns:update_character' campaign_id=campaign.id character_id=character.id %}"
+               class="text-indigo-400 hover:text-indigo-300 p-1 rounded transition-colors"
+               title="Edit Character">
+              <i class="fas fa-edit"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if is_paginated %}
+  <div class="mt-6 flex justify-center">
+    <nav class="flex space-x-2">
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Previous</a>
+      {% endif %}
+      
+      <span class="px-3 py-2 bg-indigo-600 text-white rounded">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      </span>
+      
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">Last</a>
+      {% endif %}
+    </nav>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="bg-gray-800 rounded-lg p-8 text-center">
+    <i class="fas fa-users text-gray-500 text-4xl mb-4"></i>
+    <h3 class="text-xl font-semibold text-white mb-2">No Player Characters</h3>
+    <p class="text-gray-400 mb-4">This campaign doesn't have any player characters yet.</p>
+    <a href="{% url 'campaigns:add_character' campaign_id=campaign.id %}"
+       class="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
+      <i class="fas fa-plus mr-2"></i>Add First Character
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

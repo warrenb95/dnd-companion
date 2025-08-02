@@ -21,6 +21,11 @@ class CharacterDetailView(DetailView):
             campaign_id=campaign_id
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.object.campaign
+        return context
+
 
 class CreateCharacterView(CreateView):
     model = CharacterSummary

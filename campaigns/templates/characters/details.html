@@ -1,89 +1,239 @@
 {% extends "base.html" %}
-
-{% block title %}
-  {{ character.character_name }} &ndash; Details
-{% endblock %}
+{% block title %}{{ character.character_name }} - {{ campaign.title }}{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-  <div class="card shadow-sm">
-    <div class="card-header">
-      <div class="d-flex justify-content-between align-items-center">
-        <h1 class="h4 mb-0">{{ character.character_name }}</h1>
-        <a href="{% url 'campaigns:campaign_detail' character.campaign.pk %}" class="btn btn-primary btn-sm">
-          &larr; Back
-        </a>
+<div class="my-4 sm:my-8 max-w-6xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+    
+    <!-- Header -->
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ character.character_name }}</h1>
+          <p class="text-gray-400 mt-1">
+            <i class="fas fa-user mr-2"></i>Played by {{ character.player_name }}
+          </p>
+          <div class="flex flex-wrap items-center gap-2 mt-2">
+            {% if character.character_class %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Level {{ character.level }} {{ character.character_class }}
+              </span>
+            {% endif %}
+            {% if character.character_sub_class %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {{ character.character_sub_class }}
+              </span>
+            {% endif %}
+            {% if character.race %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {{ character.race }}
+              </span>
+            {% endif %}
+            {% if character.alignment %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                {{ character.alignment }}
+              </span>
+            {% endif %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+              {% if character.alive %}bg-green-100 text-green-800
+              {% else %}bg-red-100 text-red-800{% endif %}">
+              {% if character.alive %}Alive{% else %}Dead{% endif %}
+            </span>
+            {% if character.heroic_inspiration %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <i class="fas fa-star mr-1"></i>Heroic Inspiration
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-2">
+          <a href="{% url 'campaigns:update_character' campaign_id=campaign.id character_id=character.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+            <i class="fas fa-edit mr-2"></i>Edit Character
+          </a>
+        </div>
       </div>
-      <small>
-        Played by <strong>{{ character.player_name }}</strong>
-        in campaign <strong>{{ character.campaign.title }}</strong>
-      </small>
     </div>
 
-    <div class="card-body">
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <h5 class="mb-3">Basics</h5>
-          <dl class="row">
-            <dt class="col-sm-4">Race</dt>
-            <dd class="col-sm-8">{{ character.race }}</dd>
+    <div class="p-4 sm:p-6 space-y-6">
+      
+      <!-- Character Stat Block -->
+      <!-- <div class="bg-gray-750 rounded-lg p-6 border border-gray-600" style="font-family: 'Roboto Slab', serif;"> -->
+      <!--   <h2 class="text-2xl font-bold text-white mb-4 text-center border-b-2 border-blue-600 pb-2"> -->
+      <!--     {{ character.character_name }} -->
+      <!--   </h2> -->
+      <!--   <p class="text-center text-gray-300 italic mb-4"> -->
+      <!--     Level {{ character.level }} {{ character.race }}{% if character.character_class %} {{ character.character_class }}{% endif %}{% if character.character_sub_class %} ({{ character.character_sub_class }}){% endif %} -->
+      <!--   </p> -->
+        
+        <!-- Core Stats -->
+        <!-- <div class="border-t border-b border-blue-600 py-2 mb-4"> -->
+        <!--   <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm"> -->
+        <!--     <div><strong class="text-blue-400">Armor Class</strong> {{ character.armor_class }}</div> -->
+        <!--     <div><strong class="text-blue-400">Hit Points</strong> {{ character.current_hit_points }}</div> -->
+        <!--     <div><strong class="text-blue-400">Initiative</strong>  -->
+        <!--       {% if character.initiative_modifier >= 0 %}+{% endif %}{{ character.initiative_modifier }} -->
+        <!--     </div> -->
+        <!--     <div><strong class="text-blue-400">Passive Perception</strong> {{ character.passive_perception }}</div> -->
+        <!--   </div> -->
+        <!-- </div> -->
 
-            <dt class="col-sm-4">Class</dt>
-            <dd class="col-sm-8">{{ character.character_class }}</dd>
+        <!-- Background & Alignment Info -->
+      <!--   <div class="space-y-2 text-sm mb-4"> -->
+      <!--     {% if character.background %} -->
+      <!--     <div><strong class="text-blue-400">Background</strong> {{ character.background }}</div> -->
+      <!--     {% endif %} -->
+      <!--     {% if character.alignment %} -->
+      <!--     <div><strong class="text-blue-400">Alignment</strong> {{ character.alignment }}</div> -->
+      <!--     {% endif %} -->
+      <!--   </div> -->
+      <!---->
+        <!-- Notable Traits -->
+      <!--   {% if character.notable_traits %} -->
+      <!--   <div class="border-t border-blue-600 pt-4"> -->
+      <!--     <h3 class="text-blue-400 font-bold mb-2">NOTABLE TRAITS</h3> -->
+      <!--     <div class="prose prose-invert prose-sm max-w-none"> -->
+      <!--       {{ character.notable_traits|linebreaks }} -->
+      <!--     </div> -->
+      <!--   </div> -->
+      <!--   {% endif %} -->
+      <!-- </div> -->
 
-            <dt class="col-sm-4">Background</dt>
-            <dd class="col-sm-8">
+      <!-- Character Information Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Player Information -->
+        <div class="space-y-6">
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-user mr-2 text-green-400"></i>Player Information
+            </h3>
+            <div class="space-y-2 text-gray-300">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Player Name:</span>
+                <span class="font-medium text-white">{{ character.player_name }}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Character Level:</span>
+                <span class="font-medium text-white">{{ character.level }}</span>
+              </div>
+              {% if character.character_class %}
+              <div class="flex justify-between">
+                <span class="text-gray-400">Class:</span>
+                <span class="font-medium text-white">{{ character.character_class }}</span>
+              </div>
+              {% endif %}
+              {% if character.character_sub_class %}
+              <div class="flex justify-between">
+                <span class="text-gray-400">Subclass:</span>
+                <span class="font-medium text-white">{{ character.character_sub_class }}</span>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          {% if character.background or character.race %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-scroll mr-2 text-purple-400"></i>Character Background
+            </h3>
+            <div class="space-y-2 text-gray-300">
+              {% if character.race %}
+              <div class="flex justify-between">
+                <span class="text-gray-400">Race:</span>
+                <span class="font-medium text-white">{{ character.race }}</span>
+              </div>
+              {% endif %}
               {% if character.background %}
-                {{ character.background }}
-              {% else %}
-                <span class="text-muted">N/A</span>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Background:</span>
+                <span class="font-medium text-white">{{ character.background }}</span>
+              </div>
               {% endif %}
-            </dd>
-
-            <dt class="col-sm-4">Alignment</dt>
-            <dd class="col-sm-8">
               {% if character.alignment %}
-                {{ character.alignment }}
-              {% else %}
-                <span class="text-muted">N/A</span>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Alignment:</span>
+                <span class="font-medium text-white">{{ character.alignment }}</span>
+              </div>
               {% endif %}
-            </dd>
-          </dl>
+            </div>
+          </div>
+          {% endif %}
         </div>
 
-        <div class="col-md-6">
-          <h5 class="mb-3">Stats</h5>
-          <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Level</span>
-              <span>{{ character.level }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Armor Class</span>
-              <span>{{ character.armor_class }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Passive Perception</span>
-              <span>{{ character.passive_perception }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Initiative Modifier</span>
-              <span>{{ character.initiative_modifier }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between">
-              <span>Current HP</span>
-              <span>{{ character.current_hit_points }}</span>
-            </li>
-          </ul>
+        <!-- Combat Stats -->
+        <div class="space-y-6">
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-sword mr-2 text-red-400"></i>Combat Statistics
+            </h3>
+            <div class="grid grid-cols-2 gap-4 text-gray-300">
+              <div class="text-center p-3 bg-gray-600 rounded">
+                <div class="text-xs text-gray-400 mb-1">ARMOR CLASS</div>
+                <div class="text-2xl font-bold text-white">{{ character.armor_class }}</div>
+              </div>
+              <div class="text-center p-3 bg-gray-600 rounded">
+                <div class="text-xs text-gray-400 mb-1">HIT POINTS</div>
+                <div class="text-2xl font-bold text-white">{{ character.current_hit_points }}</div>
+              </div>
+              <div class="text-center p-3 bg-gray-600 rounded">
+                <div class="text-xs text-gray-400 mb-1">INITIATIVE</div>
+                <div class="text-2xl font-bold text-white">
+                  {% if character.initiative_modifier >= 0 %}+{% endif %}{{ character.initiative_modifier }}
+                </div>
+              </div>
+              <div class="text-center p-3 bg-gray-600 rounded">
+                <div class="text-xs text-gray-400 mb-1">PERCEPTION</div>
+                <div class="text-2xl font-bold text-white">{{ character.passive_perception }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-heart mr-2 text-pink-400"></i>Character Status
+            </h3>
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Status:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+                  {% if character.alive %}bg-green-100 text-green-800
+                  {% else %}bg-red-100 text-red-800{% endif %}">
+                  {% if character.alive %}
+                    <i class="fas fa-heart mr-2"></i>Alive
+                  {% else %}
+                    <i class="fas fa-skull mr-2"></i>Dead
+                  {% endif %}
+                </span>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <span class="text-gray-400">Heroic Inspiration:</span>
+                {% if character.heroic_inspiration %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                  <i class="fas fa-star mr-2"></i>Yes
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                  <i class="fas fa-minus mr-2"></i>No
+                </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <h5 class="mb-3">Notable Traits</h5>
-      {% if character.notable_traits %}
-        <p class="card-text">{{ character.notable_traits|linebreaksbr }}</p>
-      {% else %}
-        <p class="text-muted"><em>No notable traits recorded.</em></p>
-      {% endif %}
+    </div>
+    
+    <!-- Footer -->
+    <div class="bg-gray-750 px-4 sm:px-6 py-4 border-t border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-400">
+        <p>Campaign: <span class="text-white">{{ campaign.title }}</span></p>
+        <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" 
+           class="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i>Back to Campaign
+        </a>
+      </div>
     </div>
   </div>
 </div>

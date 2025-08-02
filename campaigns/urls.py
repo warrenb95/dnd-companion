@@ -9,6 +9,8 @@ from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView,
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
 from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView
+from .views import ChapterNPCListView, ChapterLocationListView, ChapterCharacterListView
+from .views import CampaignNPCListView, CampaignLocationListView, CampaignCharacterListView
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
@@ -42,6 +44,11 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/export/", export_campaign_markdown, name="export_markdown"),
     path("campaigns/<int:campaign_id>/save-summary/", save_campaign_summary, name="save_campaign_summary"),
     
+    # Campaign Resource Lists
+    path("campaigns/<int:campaign_id>/npcs/", CampaignNPCListView.as_view(), name="campaign_npc_list"),
+    path("campaigns/<int:campaign_id>/locations/", CampaignLocationListView.as_view(), name="campaign_location_list"),
+    path("campaigns/<int:campaign_id>/characters/", CampaignCharacterListView.as_view(), name="campaign_character_list"),
+    
     # Campaign Collaboration
     path("campaigns/<int:campaign_id>/collaborators/add/", AddCoDMView.as_view(), name="add_codm"),
     path("campaigns/<int:campaign_id>/collaborators/remove/", RemoveCoDMView.as_view(), name="remove_codm"),
@@ -54,6 +61,11 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/edit/", ChapterUpdateView.as_view(), name="chapter_edit"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/delete/", ChapterDeleteView.as_view(), name="chapter_delete"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/toggle-status/", ChapterStatusToggleView.as_view(), name="chapter_status_toggle"),
+    
+    # Chapter Resource Lists
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/npcs/", ChapterNPCListView.as_view(), name="chapter_npc_list"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/locations/", ChapterLocationListView.as_view(), name="chapter_location_list"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/characters/", ChapterCharacterListView.as_view(), name="chapter_character_list"),
     
     # Encounter Management (Nested under Chapter)
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/add/", EncounterCreateView.as_view(), name="encounter_create"),
