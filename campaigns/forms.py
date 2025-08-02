@@ -19,6 +19,14 @@ class EncounterForm(forms.ModelForm):
     class Meta:
         model = Encounter
         exclude = ['chapter', 'owner', 'order']
+        
+    def __init__(self, *args, **kwargs):
+        campaign = kwargs.pop('campaign', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filter location choices to only show locations from the current campaign
+        if campaign:
+            self.fields['location'].queryset = Location.objects.filter(campaign=campaign)
 
 # Create an inline formset: relate Encounter to Chapter
 EncounterFormSet = inlineformset_factory(
@@ -32,13 +40,16 @@ EncounterFormSet = inlineformset_factory(
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ["name", "description", "region", "tags"]
+        fields = ["name", "description", "region", "tags", "map_image", "chapters"]
+        
+    def __init__(self, *args, **kwargs):
+        campaign = kwargs.pop('campaign', None)
+        super().__init__(*args, **kwargs)
+        
+        # Filter chapter choices to only show chapters from the current campaign
+        if campaign:
+            self.fields['chapters'].queryset = Chapter.objects.filter(campaign=campaign)
 
-
-class NPCForm(forms.ModelForm):
-    class Meta:
-        model = NPC
-        fields = ["name", "description", "role", "location", "status", "tags"]
 
 
 class SessionNoteForm(forms.ModelForm):

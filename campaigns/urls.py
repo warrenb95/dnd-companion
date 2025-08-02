@@ -7,8 +7,8 @@ from dnd_companion import settings
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, CampaignUpdateView, CampaignDeleteView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
-from .views import LocationCreateView, LocationUpdateView
-from .views import NPCCreateView, NPCUpdateView
+from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
+from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
@@ -69,9 +69,13 @@ urlpatterns = [
     
     # Campaign World Resources (Nested under Campaign)
     path("campaigns/<int:campaign_id>/locations/add/", LocationCreateView.as_view(), name="location_create"),
+    path("campaigns/<int:campaign_id>/locations/<int:location_id>/", LocationDetailView.as_view(), name="location_detail"),
     path("campaigns/<int:campaign_id>/locations/<int:location_id>/edit/", LocationUpdateView.as_view(), name="location_edit"),
+    path("campaigns/<int:campaign_id>/locations/<int:location_id>/delete/", LocationDeleteView.as_view(), name="location_delete"),
     path("campaigns/<int:campaign_id>/npcs/add/", NPCCreateView.as_view(), name="npc_create"),
+    path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/", NPCDetailView.as_view(), name="npc_detail"),
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/edit/", NPCUpdateView.as_view(), name="npc_edit"),
+    path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/delete/", NPCDeleteView.as_view(), name="npc_delete"),
     path("campaigns/<int:campaign_id>/characters/add/", CreateCharacterView.as_view(), name="add_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/view/", CharacterDetailView.as_view(), name="view_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/edit/", UpdateCharacterView.as_view(), name="update_character"),
@@ -91,6 +95,12 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/encounter-form/empty/", htmx_views.get_empty_encounter_form, name="get_empty_encounter_form"),
     path("notification/<int:notification_id>/dismiss/", htmx_views.dismiss_notification, name="dismiss_notification"),
     path("campaigns/<int:campaign_id>/refresh/", htmx_views.refresh_campaign_detail, name="refresh_campaign_detail"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/npc-selection/", htmx_views.chapter_npc_selection, name="chapter_npc_selection"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/add-npc/", htmx_views.chapter_add_npc, name="chapter_add_npc"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/remove-npc/", htmx_views.chapter_remove_npc, name="chapter_remove_npc"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/location-selection/", htmx_views.chapter_location_selection, name="chapter_location_selection"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/add-location/", htmx_views.chapter_add_location, name="chapter_add_location"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/remove-location/", htmx_views.chapter_remove_location, name="chapter_remove_location"),
     
     # Redirects for old URL patterns (temporary compatibility)
     path("chapters/<int:pk>/", redirect_views.redirect_chapter_detail, name="chapter_detail_redirect"),

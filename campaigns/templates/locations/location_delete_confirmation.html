@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Delete Location - {{ location.name }}{% endblock %}
+
+{% block content %}
+<div class="my-4 sm:my-8 max-w-2xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-xl border border-red-600/20">
+    <div class="border-b border-gray-700 px-4 sm:px-6 py-4">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center mr-4">
+          <i class="fas fa-exclamation-triangle text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-semibold text-white">Delete Location</h2>
+          <p class="text-gray-400 mt-1 text-sm sm:text-base">This action cannot be undone</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="p-4 sm:p-6">
+      <div class="bg-red-900/20 border border-red-600/30 rounded-lg p-4 mb-6">
+        <h3 class="text-lg font-medium text-red-300 mb-2">⚠️ Warning</h3>
+        <p class="text-red-200 text-sm leading-relaxed">
+          You are about to permanently delete the location "<strong>{{ location.name }}</strong>" from the campaign 
+          "<strong>{{ campaign.title }}</strong>". This will:
+        </p>
+        <ul class="text-red-200 text-sm mt-3 space-y-1 ml-4">
+          <li>• Remove the location from all {{ location.chapters.count }} associated chapter{{ location.chapters.count|pluralize }}</li>
+          <li>• Clear location references from {{ location.encounter_set.count }} encounter{{ location.encounter_set.count|pluralize }}</li>
+          <li>• Delete all location information and details</li>
+        </ul>
+      </div>
+
+      <div class="bg-gray-700 rounded-lg p-4 mb-6">
+        <h4 class="text-white font-medium mb-2">Location Details:</h4>
+        <div class="text-gray-300 text-sm space-y-2">
+          <div class="flex justify-between">
+            <span class="font-medium">Name:</span>
+            <span>{{ location.name }}</span>
+          </div>
+          {% if location.region %}
+          <div class="flex justify-between">
+            <span class="font-medium">Region:</span>
+            <span>{{ location.region }}</span>
+          </div>
+          {% endif %}
+          {% if location.tags %}
+          <div class="flex justify-between">
+            <span class="font-medium">Tags:</span>
+            <span>{{ location.tags }}</span>
+          </div>
+          {% endif %}
+          {% if location.chapters.exists %}
+          <div>
+            <span class="font-medium">Featured in chapters:</span>
+            <div class="mt-1 flex flex-wrap gap-1">
+              {% for chapter in location.chapters.all %}
+                <span class="inline-block px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                  {{ chapter.title }}
+                </span>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+          {% if location.encounter_set.exists %}
+          <div>
+            <span class="font-medium">Used in encounters:</span>
+            <div class="mt-1 text-xs text-gray-400">
+              {% for encounter in location.encounter_set.all|slice:":5" %}
+                {{ encounter.title }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+              {% if location.encounter_set.count > 5 %}
+                and {{ location.encounter_set.count|add:"-5" }} more...
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        
+        <div class="flex flex-col sm:flex-row gap-3 justify-end">
+          <a href="{% url 'campaigns:location_detail' campaign_id=campaign.id location_id=location.id %}" 
+             class="w-full sm:w-auto px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors text-center text-sm sm:text-base">
+            <i class="fas fa-arrow-left mr-2"></i>Cancel
+          </a>
+          
+          <button type="submit" 
+                  class="w-full sm:w-auto px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base"
+                  onclick="return confirm('Are you absolutely sure? This cannot be undone!');">
+            <i class="fas fa-trash mr-2"></i>Delete Location
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

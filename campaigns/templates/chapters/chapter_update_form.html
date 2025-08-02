@@ -177,14 +177,6 @@
                   <label class="ml-2 text-white text-sm">Optional Encounter</label>
                 </div>
 
-                <!-- Map Image -->
-                <div class="lg:col-span-2">
-                  <label class="block text-sm font-medium text-white mb-2">Map Image</label>
-                  {{ enc_form.map_image }}
-                  {% if enc_form.instance.map_image %}
-                  <p class="text-gray-400 text-xs mt-1">Current: {{ enc_form.instance.map_image.name }}</p>
-                  {% endif %}
-                </div>
 
                 <!-- Delete checkbox if available -->
                 {% if enc_form.DELETE %}

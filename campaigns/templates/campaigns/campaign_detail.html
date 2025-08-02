@@ -164,6 +164,107 @@
   </div>
   {% endif %}
 
+  <!-- Campaign Resources Section -->
+  {% if can_edit %}
+  <div class="bg-gray-800 rounded-lg shadow mb-8">
+    <div class="border-b border-gray-700 px-4 sm:px-6 py-4">
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">Campaign Resources</h2>
+      <p class="text-gray-400 text-sm mt-1">Manage locations, NPCs, and characters for your campaign</p>
+    </div>
+    <div class="px-4 sm:px-6 py-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- NPCs -->
+        <div class="bg-gray-750 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white font-medium">NPCs</h3>
+            <i class="fas fa-users text-yellow-400"></i>
+          </div>
+          <p class="text-gray-400 text-sm mb-3">{{ campaign.npcs.count }} character{{ campaign.npcs.count|pluralize }}</p>
+          <div class="space-y-2">
+            <a href="{% url 'campaigns:npc_create' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-plus mr-1"></i>Add NPC
+            </a>
+            {% if campaign.npcs.exists %}
+            <div class="text-xs text-gray-400">
+              Recent: 
+              {% for npc in campaign.npcs.all|slice:":3" %}
+                <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+                   class="text-indigo-400 hover:text-indigo-300">{{ npc.name }}</a>{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Locations -->
+        <div class="bg-gray-750 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white font-medium">Locations</h3>
+            <i class="fas fa-map-marker-alt text-red-400"></i>
+          </div>
+          <p class="text-gray-400 text-sm mb-3">{{ campaign.locations.count }} location{{ campaign.locations.count|pluralize }}</p>
+          <div class="space-y-2">
+            <a href="{% url 'campaigns:location_create' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-plus mr-1"></i>Add Location
+            </a>
+            {% if campaign.locations.exists %}
+            <div class="text-xs text-gray-400">
+              Recent: 
+              {% for location in campaign.locations.all|slice:":3" %}
+                {{ location.name }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Characters -->
+        <div class="bg-gray-750 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white font-medium">Characters</h3>
+            <i class="fas fa-user-friends text-green-400"></i>
+          </div>
+          <p class="text-gray-400 text-sm mb-3">{{ campaign.characters.count }} character{{ campaign.characters.count|pluralize }}</p>
+          <div class="space-y-2">
+            <a href="{% url 'campaigns:add_character' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-plus mr-1"></i>Add Character
+            </a>
+            {% if campaign.characters.exists %}
+            <div class="text-xs text-gray-400">
+              Recent: 
+              {% for character in campaign.characters.all|slice:":3" %}
+                <a href="{% url 'campaigns:view_character' campaign_id=campaign.id character_id=character.id %}" 
+                   class="text-indigo-400 hover:text-indigo-300">{{ character.name }}</a>{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Export -->
+        <div class="bg-gray-750 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white font-medium">Export</h3>
+            <i class="fas fa-download text-indigo-400"></i>
+          </div>
+          <p class="text-gray-400 text-sm mb-3">Download campaign data</p>
+          <div class="space-y-2">
+            <a href="{% url 'campaigns:export_markdown' campaign_id=campaign.id %}" 
+               class="block w-full px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded transition-colors text-center">
+              <i class="fas fa-file-alt mr-1"></i>Markdown
+            </a>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   {% include "campaigns/components/_chapter_list.html" %}
 
   <div class="mt-6 sm:mt-8">

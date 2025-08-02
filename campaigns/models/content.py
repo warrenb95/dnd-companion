@@ -61,7 +61,10 @@ class Chapter(models.Model):
     )
 
     def get_absolute_url(self):
-        return reverse("campaigns:chapter_detail", args=[str(self.id)])
+        return reverse("campaigns:chapter_detail", kwargs={
+            'campaign_id': self.campaign.id,
+            'chapter_id': self.id
+        })
 
     class Meta:
         ordering = ['order']  # Ascending order by default
@@ -91,8 +94,14 @@ class Encounter(models.Model):
         help_text="All-purpose field: tactics, loot, stat block refs, etc."
     )
 
+    location = models.ForeignKey(
+        'Location',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="The location where this encounter takes place"
+    )
     map_reference = models.CharField(max_length=100, blank=True)
-    map_image = models.ImageField(upload_to="images/", blank=True)
 
     tags = models.CharField(
         max_length=200,

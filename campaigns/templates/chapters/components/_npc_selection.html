@@ -1,0 +1,44 @@
+{% if available_npcs %}
+  <div class="space-y-3 max-h-64 overflow-y-auto">
+    {% for npc in available_npcs %}
+    <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors">
+      <div class="flex-1">
+        <h4 class="font-medium text-white">{{ npc.name }}</h4>
+        {% if npc.role %}
+        <p class="text-sm text-gray-400">{{ npc.role }}</p>
+        {% endif %}
+        <div class="flex items-center gap-2 mt-1">
+          {% if npc.alignment %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {{ npc.get_alignment_display }}
+          </span>
+          {% endif %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium 
+            {% if npc.status == 'alive' %}bg-green-100 text-green-800
+            {% elif npc.status == 'dead' %}bg-red-100 text-red-800
+            {% elif npc.status == 'missing' %}bg-yellow-100 text-yellow-800
+            {% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ npc.get_status_display }}
+          </span>
+        </div>
+      </div>
+      <button onclick="addNPCToChapter({{ npc.id }})" 
+              class="ml-3 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded transition-colors">
+        Add
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="text-center py-8">
+    <i class="fas fa-users text-gray-500 text-3xl mb-3"></i>
+    <p class="text-gray-400 mb-4">No NPCs available to add to this chapter.</p>
+    <p class="text-sm text-gray-500">
+      All NPCs in this campaign are already involved in this chapter, or you haven't created any NPCs yet.
+    </p>
+    <a href="{% url 'campaigns:npc_create' campaign_id=campaign.id %}" 
+       class="inline-flex items-center mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded transition-colors">
+      <i class="fas fa-plus mr-2"></i>Create New NPC
+    </a>
+  </div>
+{% endif %}

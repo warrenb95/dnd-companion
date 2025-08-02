@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load markdown_extras %}
+{% block title %}{{ npc.name }} - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="my-4 sm:my-8 max-w-6xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
+    
+    <!-- Header -->
+    <div class="bg-gray-900 px-4 sm:px-6 py-4 border-b border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white">{{ npc.name }}</h1>
+          <div class="flex flex-wrap items-center gap-2 mt-2">
+            {% if npc.size and npc.creature_type %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                {{ npc.get_size_display }} {{ npc.get_creature_type_display }}
+              </span>
+            {% endif %}
+            {% if npc.role %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                {{ npc.role }}
+              </span>
+            {% endif %}
+            {% if npc.alignment %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                {{ npc.get_alignment_display }}
+              </span>
+            {% endif %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+              {% if npc.status == 'alive' %}bg-green-100 text-green-800
+              {% elif npc.status == 'dead' %}bg-red-100 text-red-800
+              {% elif npc.status == 'missing' %}bg-yellow-100 text-yellow-800
+              {% else %}bg-gray-100 text-gray-800{% endif %}">
+              {{ npc.get_status_display }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-2">
+          <a href="{% url 'campaigns:npc_edit' campaign_id=campaign.id npc_id=npc.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors">
+            <i class="fas fa-edit mr-2"></i>Edit NPC
+          </a>
+          <a href="{% url 'campaigns:npc_delete' campaign_id=campaign.id npc_id=npc.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors">
+            <i class="fas fa-trash mr-2"></i>Delete
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 sm:p-6 space-y-6">
+      
+      <!-- D&D 5e Stat Block -->
+      {% if npc.has_structured_stats %}
+      <div class="bg-gray-750 rounded-lg p-6 border border-gray-600" style="font-family: 'Roboto Slab', serif;">
+        <h2 class="text-2xl font-bold text-white mb-4 text-center border-b-2 border-red-600 pb-2">
+          {{ npc.name }}
+        </h2>
+        <p class="text-center text-gray-300 italic mb-4">
+          {% if npc.size and npc.creature_type %}{{ npc.get_size_display|lower }} {{ npc.get_creature_type_display|lower }}{% endif %}{% if npc.alignment %}, {{ npc.get_alignment_display|lower }}{% endif %}
+        </p>
+        
+        <!-- Core Stats -->
+        <div class="border-t border-b border-red-600 py-2 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2 text-sm">
+            {% if npc.armor_class %}
+            <div><strong class="text-red-400">Armor Class</strong> {{ npc.armor_class }}</div>
+            {% endif %}
+            {% if npc.hit_points %}
+            <div><strong class="text-red-400">Hit Points</strong> {{ npc.hit_points }}{% if npc.hit_dice %} ({{ npc.hit_dice }}){% endif %}</div>
+            {% endif %}
+            {% if npc.speed %}
+            <div><strong class="text-red-400">Speed</strong> {{ npc.speed }}</div>
+            {% endif %}
+            {% if npc.challenge_rating %}
+            <div><strong class="text-red-400">Challenge</strong> {{ npc.challenge_rating }}{% if npc.proficiency_bonus %} ({{ npc.proficiency_bonus }} prof. bonus){% endif %}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Ability Scores -->
+        {% if npc.strength or npc.dexterity or npc.constitution or npc.intelligence or npc.wisdom or npc.charisma %}
+        <div class="border-t border-b border-red-600 py-4 mb-4">
+          <div class="grid grid-cols-3 md:grid-cols-6 gap-4 text-center">
+            {% if npc.strength %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">STR</div>
+              <div class="text-white font-bold">{{ npc.strength }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.strength_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+            {% if npc.dexterity %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">DEX</div>
+              <div class="text-white font-bold">{{ npc.dexterity }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.dexterity_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+            {% if npc.constitution %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">CON</div>
+              <div class="text-white font-bold">{{ npc.constitution }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.constitution_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+            {% if npc.intelligence %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">INT</div>
+              <div class="text-white font-bold">{{ npc.intelligence }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.intelligence_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+            {% if npc.wisdom %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">WIS</div>
+              <div class="text-white font-bold">{{ npc.wisdom }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.wisdom_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+            {% if npc.charisma %}
+            <div>
+              <div class="text-red-400 font-bold text-xs">CHA</div>
+              <div class="text-white font-bold">{{ npc.charisma }}</div>
+              <div class="text-gray-400 text-xs">({{ npc.charisma_modifier_formatted }})</div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Skills, Senses, Languages -->
+        <div class="space-y-2 text-sm mb-4">
+          {% if npc.saving_throws %}
+          <div><strong class="text-red-400">Saving Throws</strong> {{ npc.saving_throws }}</div>
+          {% endif %}
+          {% if npc.skills %}
+          <div><strong class="text-red-400">Skills</strong> {{ npc.skills }}</div>
+          {% endif %}
+          {% if npc.damage_resistances %}
+          <div><strong class="text-red-400">Damage Resistances</strong> {{ npc.damage_resistances }}</div>
+          {% endif %}
+          {% if npc.damage_immunities %}
+          <div><strong class="text-red-400">Damage Immunities</strong> {{ npc.damage_immunities }}</div>
+          {% endif %}
+          {% if npc.condition_immunities %}
+          <div><strong class="text-red-400">Condition Immunities</strong> {{ npc.condition_immunities }}</div>
+          {% endif %}
+          {% if npc.senses %}
+          <div><strong class="text-red-400">Senses</strong> {{ npc.senses }}</div>
+          {% endif %}
+          {% if npc.languages %}
+          <div><strong class="text-red-400">Languages</strong> {{ npc.languages }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Special Abilities -->
+        {% if npc.special_abilities %}
+        <div class="border-t border-red-600 pt-4 mb-4">
+          <div class="prose prose-invert prose-sm max-w-none">
+            {{ npc.special_abilities|markdown }}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        {% if npc.actions %}
+        <div class="border-t border-red-600 pt-4 mb-4">
+          <h3 class="text-red-400 font-bold mb-2">ACTIONS</h3>
+          <div class="prose prose-invert prose-sm max-w-none">
+            {{ npc.actions|markdown }}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Legendary Actions -->
+        {% if npc.legendary_actions %}
+        <div class="border-t border-red-600 pt-4">
+          <h3 class="text-red-400 font-bold mb-2">LEGENDARY ACTIONS</h3>
+          <div class="prose prose-invert prose-sm max-w-none">
+            {{ npc.legendary_actions|markdown }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Roleplay Information -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Appearance & Personality -->
+        <div class="space-y-6">
+          {% if npc.appearance %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-eye mr-2 text-blue-400"></i>Appearance
+            </h3>
+            <div class="text-gray-300 prose prose-sm max-w-none">
+              {{ npc.appearance|linebreaks }}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if npc.personality %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-theater-masks mr-2 text-pink-400"></i>Personality
+            </h3>
+            <div class="text-gray-300 prose prose-sm max-w-none">
+              {{ npc.personality|linebreaks }}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if npc.secret %}
+          <div class="bg-red-900 bg-opacity-50 border border-red-600 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-user-secret mr-2 text-red-400"></i>Secret <em class="text-sm text-red-300">(DM Only)</em>
+            </h3>
+            <div class="text-gray-300 prose prose-sm max-w-none">
+              {{ npc.secret|linebreaks }}
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Location & Campaign Info -->
+        <div class="space-y-6">
+          {% if npc.location %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-map-marker-alt mr-2 text-green-400"></i>Location
+            </h3>
+            <div class="text-indigo-400 hover:text-indigo-300 transition-colors">
+              <a href="{% url 'campaigns:location_detail' campaign_id=campaign.id location_id=npc.location.id %}">
+                {{ npc.location.name }}
+              </a>
+              {% if npc.location.region %}
+                <span class="text-gray-400"> - {{ npc.location.region }}</span>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if npc.chapters.exists %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-book-open mr-2 text-yellow-400"></i>Appears in Chapters
+            </h3>
+            <div class="space-y-2">
+              {% for chapter in npc.chapters.all %}
+              <div class="flex items-center justify-between">
+                <a href="{% url 'campaigns:chapter_detail' campaign_id=campaign.id chapter_id=chapter.id %}" 
+                   class="text-indigo-400 hover:text-indigo-300 transition-colors">
+                  {{ chapter.order }}. {{ chapter.title }}
+                </a>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                  {% if chapter.status == 'completed' %}bg-green-100 text-green-800
+                  {% elif chapter.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                  {% else %}bg-gray-100 text-gray-800{% endif %}">
+                  {{ chapter.get_status_display }}
+                </span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if npc.tags %}
+          <div class="bg-gray-750 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+              <i class="fas fa-tags mr-2 text-orange-400"></i>Tags
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {% for tag in npc.tags|split:"," %}
+                {% if tag.strip %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
+                  {{ tag.strip }}
+                </span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="bg-gray-750 px-4 sm:px-6 py-4 border-t border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-400">
+        <p>Campaign: <span class="text-white">{{ campaign.title }}</span></p>
+        <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" 
+           class="inline-flex items-center text-indigo-400 hover:text-indigo-300 transition-colors">
+          <i class="fas fa-arrow-left mr-2"></i>Back to Campaign
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -63,10 +63,8 @@
             <div class="ml-4 mb-3">{{ enc.dm_notes|markdown }}</div>
             {% endif %}
           </div>
-          {% if enc.map_reference %}<p><strong>Map Ref:</strong> {{ enc.map_reference }}</p>{% endif %}
-          
           {% if enc.tags %}
-          <div class="mt-2">
+          <div class="mt-2 mb-4">
             <strong>Tags:</strong>
             {% for tag in enc.tags_as_list %}
             {% if tag.strip %}
@@ -75,16 +73,66 @@
             {% endfor %}
           </div>
           {% endif %}
+          
+          <!-- Location and NPCs Side-by-Side -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <!-- Location Section -->
+            <div>
+              {% if enc.location %}
+              <div class="mb-3">
+                <strong class="text-blue-400">Location:</strong>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  <a href="{% url 'campaigns:location_detail' campaign_id=enc.chapter.campaign.id location_id=enc.location.id %}" 
+                     class="inline-flex items-center px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors">
+                    <i class="fas fa-map-marker-alt mr-1"></i>{{ enc.location.name }}
+                    {% if enc.location.region %} - {{ enc.location.region }}{% endif %}
+                  </a>
+                </div>
+              </div>
+              {% endif %}
+              {% if enc.map_reference %}
+              <div class="mb-3">
+                <strong class="text-blue-400">Map Ref:</strong>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  <span class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded">
+                    <i class="fas fa-map mr-1"></i>{{ enc.map_reference }}
+                  </span>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- NPCs Section -->
+            <div>
+              {% if enc.chapter.involved_npcs.exists %}
+              <div>
+                <strong class="text-yellow-400">Involved NPCs:</strong>
+                <div class="flex flex-wrap gap-2 mt-1">
+                  {% for npc in enc.chapter.involved_npcs.all %}
+                  <a href="{% url 'campaigns:npc_detail' campaign_id=enc.chapter.campaign.id npc_id=npc.id %}" 
+                     class="inline-flex items-center px-2 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded transition-colors">
+                    <i class="fas fa-user mr-1"></i>{{ npc.name }}
+                    {% if npc.role %} - {{ npc.role }}{% endif %}
+                  </a>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
 
-        <!-- Encounter Map -->
-        {% if enc.map_image %}
-        <div class="lg:w-1/2">
+        <!-- Location Map -->
+        {% if enc.location.map_image %}
+        <div class="lg:w-1/2 relative">
           <img
-            src="{{ enc.map_image.url }}"
+            src="{{ enc.location.map_image.url }}"
             class="w-full h-full object-cover rounded-b-lg lg:rounded-l-none lg:rounded-r-lg"
-            alt="Map for {{ enc.title }}"
+            alt="Map of {{ enc.location.name }}"
           />
+          <div class="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+            {{ enc.location.name }}
+          </div>
         </div>
         {% endif %}
       </div>
