@@ -301,6 +301,71 @@ def chapter_remove_location(request, campaign_id, chapter_id):
 
 @login_required
 @require_http_methods(["GET"])
+def chapter_enemy_selection(request, campaign_id, chapter_id):
+    """
+    Get available enemies for selection to add to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    # Get all enemies in the campaign that are not already in this chapter
+    available_enemies = campaign.enemies.exclude(chapters=chapter)
+    
+    context = {
+        'campaign': campaign,
+        'chapter': chapter,
+        'available_enemies': available_enemies
+    }
+    
+    return render(request, 'chapters/components/_enemy_selection.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_add_enemy(request, campaign_id, chapter_id):
+    """
+    Add an enemy to a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        chapter.involved_enemies.add(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_enemies_section.html', context)
+
+
+@login_required
+@require_http_methods(["POST"])
+def chapter_remove_enemy(request, campaign_id, chapter_id):
+    """
+    Remove an enemy from a chapter
+    """
+    campaign = get_object_or_404(Campaign, id=campaign_id, owner=request.user)
+    chapter = get_object_or_404(Chapter, id=chapter_id, campaign=campaign)
+    
+    enemy_id = request.POST.get('enemy_id')
+    if enemy_id:
+        enemy = get_object_or_404(Enemy, id=enemy_id, campaign=campaign)
+        chapter.involved_enemies.remove(enemy)
+    
+    # Return the updated enemies section
+    context = {
+        'chapter': chapter
+    }
+    
+    return render(request, 'chapters/components/_enemies_section.html', context)
+
+
+@login_required
+@require_http_methods(["GET"])
 def encounter_enemy_selection(request, campaign_id, encounter_id):
     """
     Get available enemies for selection to add to an encounter

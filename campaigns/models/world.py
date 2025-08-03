@@ -489,6 +489,12 @@ class Enemy(models.Model):
         related_name='enemies',
         help_text="Encounters where this enemy appears"
     )
+    chapters = models.ManyToManyField(
+        'Chapter',
+        blank=True,
+        related_name='involved_enemies',
+        help_text="Chapters where this enemy is involved or appears"
+    )
     source_npc = models.ForeignKey(
         NPC,
         on_delete=models.SET_NULL,
