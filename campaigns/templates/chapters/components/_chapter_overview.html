@@ -14,10 +14,10 @@
               class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-user-plus mr-2"></i>Add NPC
       </button>
-      <a href="{% url 'campaigns:enemy_create' campaign_id=chapter.campaign.id %}" 
-         class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
+      <button onclick="openEnemyModal()" 
+              class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-user-ninja mr-2"></i>Add Enemy
-      </a>
+      </button>
       <button onclick="openLocationModal()" 
               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
         <i class="fas fa-map-marker-alt mr-2"></i>Add Location
@@ -56,6 +56,11 @@
     <div>
       {% include "chapters/components/_locations_section.html" %}
     </div>
+  </div>
+
+  <!-- Enemies Section -->
+  <div class="mb-6">
+    {% include "chapters/components/_enemies_section.html" %}
   </div>
 
   <!-- Description Sections in 2-Column Layout -->

@@ -48,6 +48,37 @@
   </div>
 </div>
 
+<!-- Enemy Selection Modal -->
+<div id="enemy-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeEnemyModal()"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div class="inline-block align-bottom bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="w-full">
+            <h3 class="text-lg leading-6 font-medium text-white mb-4" id="modal-title">
+              Add Enemy to Chapter
+            </h3>
+            <div id="enemy-selection-content">
+              <!-- Content will be loaded via HTMX -->
+              <div class="text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-red-500"></div>
+                <p class="text-gray-400 mt-2">Loading Enemies...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-750 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" onclick="closeEnemyModal()" class="w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-gray-700 text-base font-medium text-white hover:bg-gray-600 sm:ml-3 sm:w-auto sm:text-sm">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Location Selection Modal -->
 <div id="location-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
   <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -140,6 +171,39 @@ function removeLocationFromChapter(locationId) {
     htmx.ajax('POST', '{% url "campaigns:chapter_remove_location" campaign_id=chapter.campaign.id chapter_id=chapter.id %}', {
       values: { location_id: locationId },
       target: '#locations-section',
+      swap: 'outerHTML'
+    });
+  }
+}
+
+// Enemy management functions
+function openEnemyModal() {
+  document.getElementById('enemy-modal').classList.remove('hidden');
+  // Load available enemies
+  htmx.ajax('GET', '{% url "campaigns:chapter_enemy_selection" campaign_id=chapter.campaign.id chapter_id=chapter.id %}', {
+    target: '#enemy-selection-content'
+  });
+}
+
+function closeEnemyModal() {
+  document.getElementById('enemy-modal').classList.add('hidden');
+}
+
+function addEnemyToChapter(enemyId) {
+  htmx.ajax('POST', '{% url "campaigns:chapter_add_enemy" campaign_id=chapter.campaign.id chapter_id=chapter.id %}', {
+    values: { enemy_id: enemyId },
+    target: '#enemies-section',
+    swap: 'outerHTML'
+  }).then(() => {
+    closeEnemyModal();
+  });
+}
+
+function removeEnemyFromChapter(enemyId) {
+  if (confirm('Remove this enemy from the chapter?')) {
+    htmx.ajax('POST', '{% url "campaigns:chapter_remove_enemy" campaign_id=chapter.campaign.id chapter_id=chapter.id %}', {
+      values: { enemy_id: enemyId },
+      target: '#enemies-section',
       swap: 'outerHTML'
     });
   }
