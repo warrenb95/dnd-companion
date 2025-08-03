@@ -5,6 +5,7 @@ from django.contrib.auth.views import LogoutView
 from dnd_companion import settings
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, CampaignUpdateView, CampaignDeleteView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
+from .views.encounters import EncounterNotesCompressView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
 from .views import CreateCharacterView, UpdateCharacterView
 from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
@@ -79,6 +80,7 @@ urlpatterns = [
     # Session Notes (Nested under Encounter)
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/form/", EncounterNoteFormView.as_view(), name="encounter_note_form"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/add/", EncounterNoteCreateView.as_view(), name="encounter_note_create"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/compress/", EncounterNotesCompressView.as_view(), name="encounter_notes_compress"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/edit/", EncounterNoteEditView.as_view(), name="encounter_note_edit"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/update/", EncounterNoteUpdateView.as_view(), name="encounter_note_update"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/delete/", EncounterNoteDeleteView.as_view(), name="encounter_note_delete"),
