@@ -177,7 +177,19 @@
       
       {% include "encounters/components/_notes_list.html" %}
     </div>
-    {% endfor %} {% else %}
+    {% endfor %} 
+    
+    <!-- Add Encounter Button at End of List -->
+    {% if encounters %}
+    <div class="text-center pt-6">
+      <a href="{% url 'campaigns:encounter_create' campaign_id=chapter.campaign.id chapter_id=chapter.id %}" 
+         class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-md text-sm transition duration-200 inline-flex items-center">
+        <i class="fas fa-plus mr-2"></i>Add Another Encounter
+      </a>
+    </div>
+    {% endif %}
+    
+    {% else %}
     <p class="text-gray-500">No encounters added yet.</p>
     {% endif %}
   </div>
