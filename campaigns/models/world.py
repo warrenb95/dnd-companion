@@ -328,6 +328,7 @@ class NPC(models.Model):
     def charisma_modifier_formatted(self):
         return self.format_modifier(self.get_charisma_modifier())
     
+    @property
     def has_structured_stats(self):
         """Check if this NPC has any structured stat block data."""
         return any([

@@ -58,7 +58,7 @@
       
       <!-- D&D 5e Stat Block -->
       {% if npc.has_structured_stats %}
-      <div class="bg-gray-750 rounded-lg p-6 border border-gray-600" style="font-family: 'Roboto Slab', serif;">
+      <div class="bg-gray-700 rounded-lg p-6 border border-gray-600" style="font-family: 'Roboto Slab', serif;">
         <h2 class="text-2xl font-bold text-white mb-4 text-center border-b-2 border-red-600 pb-2">
           {{ npc.name }}
         </h2>
@@ -195,7 +195,7 @@
         <!-- Appearance & Personality -->
         <div class="space-y-6">
           {% if npc.appearance %}
-          <div class="bg-gray-750 rounded-lg p-4">
+          <div class="bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-eye mr-2 text-blue-400"></i>Appearance
             </h3>
@@ -206,7 +206,7 @@
           {% endif %}
 
           {% if npc.personality %}
-          <div class="bg-gray-750 rounded-lg p-4">
+          <div class="bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-theater-masks mr-2 text-pink-400"></i>Personality
             </h3>
@@ -231,7 +231,7 @@
         <!-- Location & Campaign Info -->
         <div class="space-y-6">
           {% if npc.location %}
-          <div class="bg-gray-750 rounded-lg p-4">
+          <div class="bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-map-marker-alt mr-2 text-green-400"></i>Location
             </h3>
@@ -247,7 +247,7 @@
           {% endif %}
 
           {% if npc.chapters.exists %}
-          <div class="bg-gray-750 rounded-lg p-4">
+          <div class="bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-book-open mr-2 text-yellow-400"></i>Appears in Chapters
             </h3>
@@ -271,7 +271,7 @@
           {% endif %}
 
           {% if npc.tags %}
-          <div class="bg-gray-750 rounded-lg p-4">
+          <div class="bg-gray-700 rounded-lg p-4">
             <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
               <i class="fas fa-tags mr-2 text-orange-400"></i>Tags
             </h3>
@@ -292,7 +292,7 @@
     </div>
     
     <!-- Footer -->
-    <div class="bg-gray-750 px-4 sm:px-6 py-4 border-t border-gray-700">
+    <div class="bg-gray-700 px-4 sm:px-6 py-4 border-t border-gray-700">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-gray-400">
         <p>Campaign: <span class="text-white">{{ campaign.title }}</span></p>
         <a href="{% url 'campaigns:campaign_detail' campaign_id=campaign.id %}" 
