@@ -57,8 +57,8 @@
     <div class="p-4 sm:p-6 space-y-6">
       
       <!-- D&D 5e Stat Block -->
-      {% if npc.has_structured_stats %}
       <div class="bg-gray-700 rounded-lg p-6 border border-gray-600" style="font-family: 'Roboto Slab', serif;">
+      {% if npc.has_structured_stats %}
         <h2 class="text-2xl font-bold text-white mb-4 text-center border-b-2 border-red-600 pb-2">
           {{ npc.name }}
         </h2>
@@ -187,8 +187,24 @@
           </div>
         </div>
         {% endif %}
-      </div>
+      {% else %}
+        <!-- No Stats Available -->
+        <div class="text-center py-8">
+          <h2 class="text-2xl font-bold text-white mb-4 text-center border-b-2 border-red-600 pb-2">
+            {{ npc.name }}
+          </h2>
+          <div class="text-gray-400 mb-6">
+            <i class="fas fa-dice-d20 text-4xl mb-4 text-gray-500"></i>
+            <p class="text-lg mb-2">No combat stats available</p>
+            <p class="text-sm">Add D&D 5e stats to this NPC to see a detailed stat block here.</p>
+          </div>
+          <a href="{% url 'campaigns:npc_edit' campaign_id=campaign.id npc_id=npc.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors">
+            <i class="fas fa-plus mr-2"></i>Add Combat Stats
+          </a>
+        </div>
       {% endif %}
+      </div>
 
       <!-- Roleplay Information -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
