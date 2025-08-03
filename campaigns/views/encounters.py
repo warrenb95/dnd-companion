@@ -87,25 +87,23 @@ class EncounterUpdateView(LoginRequiredMixin, UpdateView):
         logger.info(f"Processing encounter form submission - User: {self.request.user.id}, "
                    f"Encounter: {form.instance.id}, Title: {form.instance.title}")
         
-        # Check if map_image was uploaded
-        if 'map_image' in form.changed_data:
-            map_image = form.cleaned_data.get('map_image')
-            if map_image:
-                logger.info(f"New map image uploaded - Name: {map_image.name}, "
-                           f"Size: {map_image.size} bytes, Content type: {map_image.content_type}")
+        # Check if map_reference was changed
+        if 'map_reference' in form.changed_data:
+            map_reference = form.cleaned_data.get('map_reference')
+            if map_reference:
+                logger.info(f"Map reference updated: {map_reference}")
             else:
-                logger.info("Map image field was changed but no file provided")
+                logger.info("Map reference field was cleared")
         else:
-            logger.info("No map image changes detected")
+            logger.info("No map reference changes detected")
         
         try:
             result = super().form_valid(form)
             logger.info(f"Encounter saved successfully - ID: {form.instance.id}")
             
-            # Log final map_image details if it exists
-            if form.instance.map_image:
-                logger.info(f"Final map image details - Name: {form.instance.map_image.name}, "
-                           f"URL: {form.instance.map_image.url}")
+            # Log final map_reference details if it exists
+            if form.instance.map_reference:
+                logger.info(f"Final map reference: {form.instance.map_reference}")
             
             messages.success(self.request, f"Encounter '{form.instance.title}' updated successfully.")
             return result
