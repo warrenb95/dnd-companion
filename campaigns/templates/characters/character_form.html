@@ -139,6 +139,17 @@
               {% endif %}
             </div>
             
+            <!-- Maximum Hit Points -->
+            <div>
+              <label for="{{ form.maximum_hit_points.id_for_label }}" class="block text-sm font-medium text-white mb-2">
+                Maximum Hit Points
+              </label>
+              {{ form.maximum_hit_points }}
+              {% if form.maximum_hit_points.errors %}
+                <div class="text-red-400 text-sm mt-1">{{ form.maximum_hit_points.errors }}</div>
+              {% endif %}
+            </div>
+            
             <!-- Background -->
             <div class="md:col-span-2">
               <label for="{{ form.background.id_for_label }}" class="block text-sm font-medium text-white mb-2">
@@ -176,6 +187,126 @@
                   Character is Alive
                 </label>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- D&D 5e Conditions Section -->
+        <div class="bg-gray-750 rounded-lg p-4 sm:p-6">
+          <h3 class="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Character Conditions</h3>
+          <p class="text-gray-400 text-sm mb-4">Select any D&D 5e conditions currently affecting this character:</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            <!-- Blinded -->
+            <div class="flex items-center">
+              {{ form.blinded }}
+              <label for="{{ form.blinded.id_for_label }}" class="ml-2 text-white text-sm">
+                Blinded
+              </label>
+            </div>
+            
+            <!-- Charmed -->
+            <div class="flex items-center">
+              {{ form.charmed }}
+              <label for="{{ form.charmed.id_for_label }}" class="ml-2 text-white text-sm">
+                Charmed
+              </label>
+            </div>
+            
+            <!-- Deafened -->
+            <div class="flex items-center">
+              {{ form.deafened }}
+              <label for="{{ form.deafened.id_for_label }}" class="ml-2 text-white text-sm">
+                Deafened
+              </label>
+            </div>
+            
+            <!-- Frightened -->
+            <div class="flex items-center">
+              {{ form.frightened }}
+              <label for="{{ form.frightened.id_for_label }}" class="ml-2 text-white text-sm">
+                Frightened
+              </label>
+            </div>
+            
+            <!-- Grappled -->
+            <div class="flex items-center">
+              {{ form.grappled }}
+              <label for="{{ form.grappled.id_for_label }}" class="ml-2 text-white text-sm">
+                Grappled
+              </label>
+            </div>
+            
+            <!-- Incapacitated -->
+            <div class="flex items-center">
+              {{ form.incapacitated }}
+              <label for="{{ form.incapacitated.id_for_label }}" class="ml-2 text-white text-sm">
+                Incapacitated
+              </label>
+            </div>
+            
+            <!-- Invisible -->
+            <div class="flex items-center">
+              {{ form.invisible }}
+              <label for="{{ form.invisible.id_for_label }}" class="ml-2 text-white text-sm">
+                Invisible
+              </label>
+            </div>
+            
+            <!-- Paralyzed -->
+            <div class="flex items-center">
+              {{ form.paralyzed }}
+              <label for="{{ form.paralyzed.id_for_label }}" class="ml-2 text-white text-sm">
+                Paralyzed
+              </label>
+            </div>
+            
+            <!-- Petrified -->
+            <div class="flex items-center">
+              {{ form.petrified }}
+              <label for="{{ form.petrified.id_for_label }}" class="ml-2 text-white text-sm">
+                Petrified
+              </label>
+            </div>
+            
+            <!-- Poisoned -->
+            <div class="flex items-center">
+              {{ form.poisoned }}
+              <label for="{{ form.poisoned.id_for_label }}" class="ml-2 text-white text-sm">
+                Poisoned
+              </label>
+            </div>
+            
+            <!-- Prone -->
+            <div class="flex items-center">
+              {{ form.prone }}
+              <label for="{{ form.prone.id_for_label }}" class="ml-2 text-white text-sm">
+                Prone
+              </label>
+            </div>
+            
+            <!-- Restrained -->
+            <div class="flex items-center">
+              {{ form.restrained }}
+              <label for="{{ form.restrained.id_for_label }}" class="ml-2 text-white text-sm">
+                Restrained
+              </label>
+            </div>
+            
+            <!-- Stunned -->
+            <div class="flex items-center">
+              {{ form.stunned }}
+              <label for="{{ form.stunned.id_for_label }}" class="ml-2 text-white text-sm">
+                Stunned
+              </label>
+            </div>
+            
+            <!-- Unconscious -->
+            <div class="flex items-center">
+              {{ form.unconscious }}
+              <label for="{{ form.unconscious.id_for_label }}" class="ml-2 text-white text-sm">
+                Unconscious
+              </label>
             </div>
           </div>
         </div>

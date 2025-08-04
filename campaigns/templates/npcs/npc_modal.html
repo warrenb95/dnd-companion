@@ -1,0 +1,154 @@
+<!-- NPC Modal Content -->
+<div class="bg-gray-800 rounded-lg shadow-xl max-w-2xl mx-auto">
+  <!-- Modal Header -->
+  <div class="bg-gray-900 px-6 py-4 border-b border-gray-700 rounded-t-lg">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-white">{{ npc.name }}</h2>
+        {% if npc.role %}
+        <p class="text-gray-400 text-sm">
+          <i class="fas fa-user-tie mr-2"></i>{{ npc.role }}
+        </p>
+        {% endif %}
+      </div>
+      <button type="button" class="text-gray-400 hover:text-white" onclick="closeModal()">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="p-6 max-h-96 overflow-y-auto">
+    <!-- Status and Basic Info -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        {% if npc.status == 'alive' %}bg-green-100 text-green-800
+        {% elif npc.status == 'dead' %}bg-red-100 text-red-800
+        {% elif npc.status == 'missing' %}bg-yellow-100 text-yellow-800
+        {% else %}bg-gray-100 text-gray-800{% endif %}">
+        {{ npc.get_status_display }}
+      </span>
+      
+      {% if npc.size and npc.creature_type %}
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+        {{ npc.get_size_display }} {{ npc.get_creature_type_display }}
+      </span>
+      {% endif %}
+      
+      {% if npc.alignment %}
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+        {{ npc.get_alignment_display }}
+      </span>
+      {% endif %}
+      
+      {% if npc.challenge_rating %}
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-600 text-red-100">
+        CR {{ npc.challenge_rating }}
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- Combat Stats (if available) -->
+    {% if npc.has_structured_stats %}
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+      {% if npc.armor_class %}
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">ARMOR CLASS</div>
+        <div class="text-lg font-bold text-white">{{ npc.armor_class }}</div>
+      </div>
+      {% endif %}
+      {% if npc.hit_points %}
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">HIT POINTS</div>
+        <div class="text-lg font-bold text-white">{{ npc.hit_points }}</div>
+      </div>
+      {% endif %}
+      {% if npc.speed %}
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">SPEED</div>
+        <div class="text-sm font-medium text-white">{{ npc.speed }}</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Location -->
+    {% if npc.location %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Current Location:</h4>
+      <div class="bg-gray-700 rounded-lg p-3">
+        <div class="flex items-center text-white">
+          <i class="fas fa-map-marker-alt mr-2 text-blue-400"></i>
+          <span class="font-medium">{{ npc.location.name }}</span>
+        </div>
+        {% if npc.location.region %}
+        <div class="text-sm text-gray-400 mt-1">{{ npc.location.region }}</div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Appearance -->
+    {% if npc.appearance %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Appearance:</h4>
+      <div class="text-sm text-gray-400">{{ npc.appearance|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Personality -->
+    {% if npc.personality %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Personality:</h4>
+      <div class="text-sm text-gray-400">{{ npc.personality|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Background -->
+    {% if npc.background %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Background:</h4>
+      <div class="text-sm text-gray-400">{{ npc.background|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Goals -->
+    {% if npc.goals %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Goals:</h4>
+      <div class="text-sm text-gray-400">{{ npc.goals|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Notes -->
+    {% if npc.notes %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Notes:</h4>
+      <div class="text-sm text-gray-400">{{ npc.notes|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Special Abilities (if structured stats) -->
+    {% if npc.has_structured_stats and npc.special_abilities %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Special Abilities:</h4>
+      <div class="text-sm text-gray-400">{{ npc.special_abilities|linebreaks }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="bg-gray-750 px-6 py-3 border-t border-gray-700 rounded-b-lg">
+    <div class="flex justify-between items-center">
+      <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+         class="text-indigo-400 hover:text-indigo-300 text-sm transition-colors">
+        <i class="fas fa-external-link-alt mr-1"></i>View Full Details
+      </a>
+      <button type="button" 
+              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-md transition-colors"
+              onclick="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>

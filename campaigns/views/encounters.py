@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
 
-from ..models import Chapter, Encounter, SessionNote
+from ..models import Chapter, Encounter, SessionNote, CharacterSummary
 from ..forms import EncounterForm
 
 
@@ -313,5 +313,50 @@ class EncounterNotesCompressView(LoginRequiredMixin, View):
         except Exception as e:
             messages.error(request, f"Error compressing notes: {str(e)}")
         
-        # Re-render the updated notes list
+        # Re-render the updated notes list  
         return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
+
+
+class EncounterPlayView(LoginRequiredMixin, View):
+    """
+    Comprehensive DM interface for playing an encounter.
+    Provides encounter details, player stats, NPCs, enemies, and location info.
+    """
+    
+    def get(self, request, campaign_id, chapter_id, encounter_id):
+        # Get the encounter and verify ownership
+        encounter = get_object_or_404(
+            Encounter.objects.select_related('chapter__campaign', 'location').prefetch_related(
+                'npcs', 'enemies', 'chapter__campaign__characters'
+            ).filter(
+                chapter__campaign__owner=request.user,
+                chapter__campaign_id=campaign_id,
+                chapter_id=chapter_id
+            ),
+            pk=encounter_id
+        )
+        
+        # Get campaign characters for the sidebar
+        characters = encounter.chapter.campaign.characters.all().order_by('character_name')
+        
+        # Get NPCs involved in this encounter or chapter
+        encounter_npcs = encounter.npcs.all()
+        chapter_npcs = encounter.chapter.involved_npcs.all()
+        all_npcs = (encounter_npcs | chapter_npcs).distinct().order_by('name')
+        
+        # Get enemies involved in this encounter or chapter
+        encounter_enemies = encounter.enemies.all()
+        chapter_enemies = encounter.chapter.involved_enemies.all()
+        all_enemies = (encounter_enemies | chapter_enemies).distinct().order_by('name')
+        
+        context = {
+            'encounter': encounter,
+            'campaign': encounter.chapter.campaign,
+            'chapter': encounter.chapter,
+            'characters': characters,
+            'npcs': all_npcs,
+            'enemies': all_enemies,
+            'location': encounter.location,
+        }
+        
+        return render(request, 'encounters/play_encounter.html', context)

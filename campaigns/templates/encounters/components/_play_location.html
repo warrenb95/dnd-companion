@@ -1,0 +1,120 @@
+{% load markdown_extras %}
+<!-- Location Section -->
+{% if location %}
+<div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <i class="fas fa-map-marker-alt mr-2 text-teal-400"></i>
+    Location
+  </h3>
+  
+  <div class="space-y-3">
+    <!-- Location Name and Region -->
+    <div>
+      <h4 class="font-medium text-white">{{ location.name }}</h4>
+      {% if location.region %}
+      <p class="text-sm text-gray-400">{{ location.region }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Location Description (truncated) -->
+    {% if location.description %}
+    <div class="text-sm text-gray-300">
+      {{ location.description|truncatewords:20 }}
+      {% if location.description|length > 100 %}
+      <button onclick="toggleLocationDescription()" class="text-blue-400 hover:text-blue-300 ml-1">
+        <span id="location-toggle-text">Show more</span>
+      </button>
+      {% endif %}
+    </div>
+    
+    {% if location.description|length > 100 %}
+    <div id="location-full-description" class="hidden text-sm text-gray-300">
+      {{ location.description|linebreaks }}
+      <button onclick="toggleLocationDescription()" class="text-blue-400 hover:text-blue-300 ml-1">
+        Show less
+      </button>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <!-- Location Tags -->
+    {% if location.tags %}
+    <div class="flex flex-wrap gap-1">
+      {% for tag in location.tags|split:"," %}
+      {% if tag.strip %}
+      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-600 text-teal-100">
+        {{ tag.strip }}
+      </span>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Map Image (clickable to open modal) -->
+    {% if location.map_image %}
+    <div class="mt-4">
+      <button onclick="openLocationModal()" 
+              class="w-full group relative overflow-hidden rounded-lg bg-gray-700 hover:bg-gray-600 transition-colors">
+        <img src="{{ location.map_image.url }}" 
+             class="w-full h-32 object-cover group-hover:opacity-75 transition-opacity" 
+             alt="{{ location.name }}">
+        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div class="bg-black bg-opacity-75 rounded-full p-2">
+            <i class="fas fa-expand text-white text-lg"></i>
+          </div>
+        </div>
+        <div class="absolute bottom-2 left-2 right-2">
+          <div class="bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+            Click to view full map
+          </div>
+        </div>
+      </button>
+    </div>
+    {% else %}
+    <div class="text-center py-4 border-2 border-dashed border-gray-600 rounded-lg">
+      <i class="fas fa-map text-gray-500 text-xl mb-2"></i>
+      <p class="text-gray-500 text-sm">No map available</p>
+    </div>
+    {% endif %}
+
+    <!-- Quick Link to Location Detail -->
+    <div class="pt-3 border-t border-gray-600">
+      <a href="{% url 'campaigns:location_detail' campaign_id=campaign.id location_id=location.id %}" 
+         class="inline-flex items-center text-sm text-teal-400 hover:text-teal-300 transition-colors">
+        <i class="fas fa-external-link-alt mr-1"></i>
+        View Full Location Details
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleLocationDescription() {
+  const truncated = document.querySelector('#location-toggle-text').parentElement.parentElement;
+  const full = document.getElementById('location-full-description');
+  const toggleText = document.getElementById('location-toggle-text');
+  
+  if (full.classList.contains('hidden')) {
+    truncated.classList.add('hidden');
+    full.classList.remove('hidden');
+  } else {
+    truncated.classList.remove('hidden');
+    full.classList.add('hidden');
+  }
+}
+</script>
+
+{% else %}
+<!-- No Location -->
+<div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <i class="fas fa-map-marker-alt mr-2 text-teal-400"></i>
+    Location
+  </h3>
+  
+  <div class="text-center py-4">
+    <i class="fas fa-map-marker-alt text-gray-500 text-2xl mb-2"></i>
+    <p class="text-gray-500 text-sm">No location set for this encounter</p>
+  </div>
+</div>
+{% endif %}

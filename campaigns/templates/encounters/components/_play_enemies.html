@@ -1,0 +1,113 @@
+<!-- Enemies Section -->
+<div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <i class="fas fa-user-ninja mr-2 text-red-400"></i>
+    Enemies
+    <span class="ml-2 text-sm text-gray-400">({{ enemies.count }})</span>
+  </h3>
+  
+  {% if enemies %}
+    <div class="space-y-3">
+      {% for enemy in enemies %}
+      <div class="bg-gray-700 rounded-lg p-3 border border-red-600 border-opacity-30 hover:border-opacity-60 transition-colors cursor-pointer"
+           hx-get="{% url 'campaigns:enemy_popup' campaign_id=campaign.id enemy_id=enemy.id %}"
+           hx-target="#modal-content"
+           hx-trigger="click">
+        <!-- Enemy Header -->
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-medium text-white">{{ enemy.name }}</h4>
+            <p class="text-xs text-gray-400">{{ enemy.get_size_display }} {{ enemy.get_creature_type_display }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- Challenge Rating Badge -->
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-600 text-red-100">
+              CR {{ enemy.challenge_rating }}
+            </span>
+            
+            <!-- Quick Link to Detail -->
+            <a href="{% url 'campaigns:enemy_detail' campaign_id=campaign.id enemy_id=enemy.id %}" 
+               class="text-gray-400 hover:text-white" title="View Enemy Details">
+              <i class="fas fa-external-link-alt text-xs"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Combat Stats -->
+        <div class="grid grid-cols-4 gap-2 text-xs mb-2">
+          <div class="text-center">
+            <span class="text-gray-400 block">AC</span>
+            <span class="text-white font-medium">{{ enemy.armor_class }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">HP</span>
+            <span class="text-white font-medium">{{ enemy.hit_points }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">Init</span>
+            <span class="text-white font-medium">{{ enemy.initiative_modifier_formatted }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">Prof</span>
+            <span class="text-white font-medium">+{{ enemy.proficiency_bonus }}</span>
+          </div>
+        </div>
+
+        <!-- Quick Ability Scores -->
+        <div class="grid grid-cols-6 gap-1 text-xs mb-2">
+          <div class="text-center">
+            <span class="text-gray-400 block">STR</span>
+            <span class="text-white font-medium">{{ enemy.strength }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">DEX</span>
+            <span class="text-white font-medium">{{ enemy.dexterity }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">CON</span>
+            <span class="text-white font-medium">{{ enemy.constitution }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">INT</span>
+            <span class="text-white font-medium">{{ enemy.intelligence }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">WIS</span>
+            <span class="text-white font-medium">{{ enemy.wisdom }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">CHA</span>
+            <span class="text-white font-medium">{{ enemy.charisma }}</span>
+          </div>
+        </div>
+
+        <!-- Special Traits (first 50 chars) -->
+        {% if enemy.special_abilities %}
+        <div class="text-xs text-gray-400 mt-2 pt-2 border-t border-gray-600">
+          <strong class="text-gray-300">Abilities:</strong> 
+          {{ enemy.special_abilities|truncatewords:8 }}
+          {% if enemy.special_abilities|length > 50 %}...{% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Resistances/Immunities (if any) -->
+        {% if enemy.damage_resistances or enemy.damage_immunities %}
+        <div class="text-xs text-gray-400 mt-1">
+          {% if enemy.damage_resistances %}
+          <div><strong class="text-yellow-300">Resist:</strong> {{ enemy.damage_resistances }}</div>
+          {% endif %}
+          {% if enemy.damage_immunities %}
+          <div><strong class="text-green-300">Immune:</strong> {{ enemy.damage_immunities }}</div>
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-4">
+      <i class="fas fa-user-ninja text-gray-500 text-2xl mb-2"></i>
+      <p class="text-gray-500 text-sm">No enemies in this encounter</p>
+    </div>
+  {% endif %}
+</div>

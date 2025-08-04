@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% load markdown_extras %}
+{% block title %}Play: {{ encounter.title }} - {{ campaign.title }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 p-4">
+  <!-- Header with encounter title and controls -->
+  <div class="max-w-full mx-auto mb-6">
+    <div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">
+            <i class="fas fa-play-circle text-green-400 mr-2"></i>{{ encounter.title }}
+          </h1>
+          <div class="flex items-center gap-2 text-sm text-gray-400">
+            <span>{{ campaign.title }}</span>
+            <span>•</span>
+            <span>{{ chapter.title }}</span>
+            <span>•</span>
+            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+              {{ encounter.get_type_display }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+          <!-- Combat Button -->
+          {% if encounter.enemies.exists or chapter.campaign.characters.exists %}
+          <a href="{% url 'campaigns:combat_session_create' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
+            <i class="fas fa-crossed-swords mr-2"></i>Start Combat
+          </a>
+          {% endif %}
+          
+          <!-- Back to Chapter Button -->
+          <a href="{% url 'campaigns:chapter_detail' campaign_id=campaign.id chapter_id=chapter.id %}" 
+             class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>Back to Chapter
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main 70/30 Layout -->
+  <div class="max-w-full mx-auto grid grid-cols-1 xl:grid-cols-10 gap-6">
+    
+    <!-- Left Side: Encounter Details (70%) -->
+    <div class="xl:col-span-7">
+      <div class="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+        
+        <!-- Two-column encounter content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          <!-- Column 1 -->
+          <div class="space-y-6">
+            <!-- Summary -->
+            {% if encounter.summary %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-info-circle mr-2 text-blue-400"></i>Summary
+              </h3>
+              <div class="text-gray-300 prose prose-invert prose-sm max-w-none">
+                {{ encounter.summary|markdown }}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Setup -->
+            {% if encounter.setup %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-cogs mr-2 text-yellow-400"></i>Setup
+              </h3>
+              <div class="text-gray-300 prose prose-invert prose-sm max-w-none">
+                {{ encounter.setup|markdown }}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Read-Aloud Text -->
+            {% if encounter.read_aloud %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-quote-left mr-2 text-green-400"></i>Read-Aloud Text
+              </h3>
+              <div class="bg-indigo-900 bg-opacity-50 border-l-4 border-indigo-500 p-4 rounded">
+                <div class="text-indigo-100 prose prose-invert prose-sm max-w-none italic">
+                  {{ encounter.read_aloud|markdown }}
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Column 2 -->
+          <div class="space-y-6">
+            <!-- DM Notes -->
+            {% if encounter.dm_notes %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-clipboard mr-2 text-purple-400"></i>DM Notes
+              </h3>
+              <div class="text-gray-300 prose prose-invert prose-sm max-w-none">
+                {{ encounter.dm_notes|markdown }}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Encounter Tags -->
+            {% if encounter.tags %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-tags mr-2 text-orange-400"></i>Tags
+              </h3>
+              <div class="flex flex-wrap gap-2">
+                {% for tag in encounter.tags_as_list %}
+                {% if tag.strip %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
+                  {{ tag.strip }}
+                </span>
+                {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Map Reference -->
+            {% if encounter.map_reference %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-map mr-2 text-teal-400"></i>Map Reference
+              </h3>
+              <div class="bg-gray-700 p-3 rounded">
+                <span class="text-gray-300">{{ encounter.map_reference }}</span>
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Danger Level -->
+            {% if encounter.danger_level %}
+            <div>
+              <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                <i class="fas fa-exclamation-triangle mr-2 text-red-400"></i>Danger Level
+              </h3>
+              <span class="inline-block px-3 py-1 text-sm rounded-full font-medium
+                {% if encounter.danger_level == 'low' %}bg-green-600 text-white
+                {% elif encounter.danger_level == 'moderate' %}bg-yellow-600 text-white
+                {% elif encounter.danger_level == 'high' %}bg-orange-600 text-white
+                {% elif encounter.danger_level == 'deadly' %}bg-red-600 text-white
+                {% endif %}">
+                {{ encounter.get_danger_level_display }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Characters, NPCs, Enemies, Location (30%) -->
+    <div class="xl:col-span-3 space-y-6">
+      
+      <!-- Characters Section -->
+      {% include "encounters/components/_play_characters.html" %}
+      
+      <!-- NPCs Section -->
+      {% include "encounters/components/_play_npcs.html" %}
+      
+      <!-- Enemies Section -->
+      {% include "encounters/components/_play_enemies.html" %}
+      
+      <!-- Location Section -->
+      {% include "encounters/components/_play_location.html" %}
+      
+    </div>
+  </div>
+</div>
+
+<!-- Location Image Modal -->
+{% if location and location.map_image %}
+<div id="location-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+  <div class="max-w-6xl max-h-full relative">
+    <button onclick="closeLocationModal()" class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+      <i class="fas fa-times text-2xl"></i>
+    </button>
+    <img src="{{ location.map_image.url }}" class="max-w-full max-h-full object-contain rounded" alt="{{ location.name }}">
+  </div>
+</div>
+{% endif %}
+
+<!-- HTMX Modal Container -->
+<div id="modal-container" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+  <div id="modal-content">
+    <!-- HTMX content will be loaded here -->
+  </div>
+</div>
+
+<script>
+function openLocationModal() {
+  document.getElementById('location-modal').classList.remove('hidden');
+}
+
+function closeLocationModal() {
+  document.getElementById('location-modal').classList.add('hidden');
+}
+
+// HTMX Modal Functions
+function openModal() {
+  document.getElementById('modal-container').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal-container').classList.add('hidden');
+  document.getElementById('modal-content').innerHTML = '';
+}
+
+// Close modal on escape key
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    closeLocationModal();
+    closeModal();
+  }
+});
+
+// HTMX Event Listeners
+document.body.addEventListener('htmx:afterRequest', function(event) {
+  if (event.detail.target.id === 'modal-content') {
+    openModal();
+  }
+});
+
+// Auto-save functionality placeholder
+// TODO: Implement periodic auto-save of character states
+</script>
+{% endblock %}

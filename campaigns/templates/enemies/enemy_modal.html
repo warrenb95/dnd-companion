@@ -1,0 +1,175 @@
+<!-- Enemy Modal Content -->
+<div class="bg-gray-800 rounded-lg shadow-xl max-w-3xl mx-auto">
+  <!-- Modal Header -->
+  <div class="bg-gray-900 px-6 py-4 border-b border-gray-700 rounded-t-lg">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-xl font-bold text-white">{{ enemy.name }}</h2>
+        <p class="text-gray-400 text-sm">
+          <i class="fas fa-user-ninja mr-2"></i>{{ enemy.get_size_display }} {{ enemy.get_creature_type_display }}
+        </p>
+      </div>
+      <button type="button" class="text-gray-400 hover:text-white" onclick="closeModal()">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Body -->
+  <div class="p-6 max-h-96 overflow-y-auto">
+    <!-- Basic Info Badges -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-600 text-red-100">
+        CR {{ enemy.challenge_rating }}
+      </span>
+      
+      {% if enemy.alignment %}
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+        {{ enemy.get_alignment_display }}
+      </span>
+      {% endif %}
+      
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        Prof +{{ enemy.proficiency_bonus }}
+      </span>
+    </div>
+
+    <!-- Combat Stats Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">ARMOR CLASS</div>
+        <div class="text-lg font-bold text-white">{{ enemy.armor_class }}</div>
+      </div>
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">HIT POINTS</div>
+        <div class="text-lg font-bold text-white">{{ enemy.hit_points }}</div>
+      </div>
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">INITIATIVE</div>
+        <div class="text-lg font-bold text-white">{{ enemy.initiative_modifier_formatted }}</div>
+      </div>
+      <div class="bg-gray-700 rounded-lg p-3 text-center">
+        <div class="text-xs text-gray-400 mb-1">SPEED</div>
+        <div class="text-sm font-medium text-white">{{ enemy.speed }}</div>
+      </div>
+    </div>
+
+    <!-- Ability Scores -->
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Ability Scores:</h4>
+      <div class="grid grid-cols-6 gap-2 text-xs">
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">STR</div>
+          <div class="text-white font-bold">{{ enemy.strength }}</div>
+          <div class="text-gray-300">({{ enemy.strength_modifier_formatted }})</div>
+        </div>
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">DEX</div>
+          <div class="text-white font-bold">{{ enemy.dexterity }}</div>
+          <div class="text-gray-300">({{ enemy.dexterity_modifier_formatted }})</div>
+        </div>
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">CON</div>
+          <div class="text-white font-bold">{{ enemy.constitution }}</div>
+          <div class="text-gray-300">({{ enemy.constitution_modifier_formatted }})</div>
+        </div>
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">INT</div>
+          <div class="text-white font-bold">{{ enemy.intelligence }}</div>
+          <div class="text-gray-300">({{ enemy.intelligence_modifier_formatted }})</div>
+        </div>
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">WIS</div>
+          <div class="text-white font-bold">{{ enemy.wisdom }}</div>
+          <div class="text-gray-300">({{ enemy.wisdom_modifier_formatted }})</div>
+        </div>
+        <div class="text-center bg-gray-700 rounded p-2">
+          <div class="text-gray-400">CHA</div>
+          <div class="text-white font-bold">{{ enemy.charisma }}</div>
+          <div class="text-gray-300">({{ enemy.charisma_modifier_formatted }})</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Damage Resistances/Immunities -->
+    {% if enemy.damage_resistances or enemy.damage_immunities or enemy.damage_vulnerabilities %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Damage Properties:</h4>
+      <div class="space-y-1 text-sm">
+        {% if enemy.damage_vulnerabilities %}
+        <div><strong class="text-orange-300">Vulnerabilities:</strong> <span class="text-gray-400">{{ enemy.damage_vulnerabilities }}</span></div>
+        {% endif %}
+        {% if enemy.damage_resistances %}
+        <div><strong class="text-yellow-300">Resistances:</strong> <span class="text-gray-400">{{ enemy.damage_resistances }}</span></div>
+        {% endif %}
+        {% if enemy.damage_immunities %}
+        <div><strong class="text-green-300">Immunities:</strong> <span class="text-gray-400">{{ enemy.damage_immunities }}</span></div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Condition Immunities -->
+    {% if enemy.condition_immunities %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Condition Immunities:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.condition_immunities }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Senses -->
+    {% if enemy.senses %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Senses:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.senses }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Languages -->
+    {% if enemy.languages %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Languages:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.languages }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Special Abilities -->
+    {% if enemy.special_abilities %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Special Abilities:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.special_abilities|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    {% if enemy.actions %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Actions:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.actions|linebreaks }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Legendary Actions -->
+    {% if enemy.legendary_actions %}
+    <div class="mb-4">
+      <h4 class="text-sm font-medium text-gray-300 mb-2">Legendary Actions:</h4>
+      <div class="text-sm text-gray-400">{{ enemy.legendary_actions|linebreaks }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="bg-gray-750 px-6 py-3 border-t border-gray-700 rounded-b-lg">
+    <div class="flex justify-between items-center">
+      <a href="{% url 'campaigns:enemy_detail' campaign_id=campaign.id enemy_id=enemy.id %}" 
+         class="text-indigo-400 hover:text-indigo-300 text-sm transition-colors">
+        <i class="fas fa-external-link-alt mr-1"></i>View Full Details
+      </a>
+      <button type="button" 
+              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-md transition-colors"
+              onclick="closeModal()">
+        Close
+      </button>
+    </div>
+  </div>
+</div>
