@@ -5,12 +5,12 @@ from django.contrib.auth.views import LogoutView
 from dnd_companion import settings
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, CampaignUpdateView, CampaignDeleteView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
-from .views.encounters import EncounterNotesCompressView
+from .views.encounters import EncounterNotesCompressView, EncounterPlayView
 from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
-from .views import CreateCharacterView, UpdateCharacterView
+from .views import CreateCharacterView, UpdateCharacterView, CharacterPopupView
 from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
-from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView, NPCToEnemyConvertView
-from .views import EnemyCreateView, EnemyUpdateView, EnemyDetailView, EnemyDeleteView
+from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView, NPCToEnemyConvertView, NPCPopupView
+from .views import EnemyCreateView, EnemyUpdateView, EnemyDetailView, EnemyDeleteView, EnemyPopupView
 from .views import CombatSessionCreateView, CombatSessionDetailView, CombatSessionUpdateView, CombatSessionDeleteView
 from .views.combat import start_combat, roll_initiative, next_turn, end_combat
 from .views import ChapterNPCListView, ChapterLocationListView, ChapterCharacterListView
@@ -74,6 +74,7 @@ urlpatterns = [
     
     # Encounter Management (Nested under Chapter)
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/add/", EncounterCreateView.as_view(), name="encounter_create"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/play/", EncounterPlayView.as_view(), name="encounter_play"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/edit/", EncounterUpdateView.as_view(), name="encounter_edit"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/delete/", EncounterDeleteView.as_view(), name="encounter_delete"),
     
@@ -107,13 +108,16 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/edit/", NPCUpdateView.as_view(), name="npc_edit"),
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/delete/", NPCDeleteView.as_view(), name="npc_delete"),
     path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/convert-to-enemy/", NPCToEnemyConvertView.as_view(), name="npc_convert_to_enemy"),
+    path("campaigns/<int:campaign_id>/npcs/<int:npc_id>/popup/", NPCPopupView.as_view(), name="npc_popup"),
     path("campaigns/<int:campaign_id>/enemies/add/", EnemyCreateView.as_view(), name="enemy_create"),
     path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/", EnemyDetailView.as_view(), name="enemy_detail"),
     path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/edit/", EnemyUpdateView.as_view(), name="enemy_edit"),
     path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/delete/", EnemyDeleteView.as_view(), name="enemy_delete"),
+    path("campaigns/<int:campaign_id>/enemies/<int:enemy_id>/popup/", EnemyPopupView.as_view(), name="enemy_popup"),
     path("campaigns/<int:campaign_id>/characters/add/", CreateCharacterView.as_view(), name="add_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/view/", CharacterDetailView.as_view(), name="view_character"),
     path("campaigns/<int:campaign_id>/characters/<int:character_id>/edit/", UpdateCharacterView.as_view(), name="update_character"),
+    path("campaigns/<int:campaign_id>/characters/<int:character_id>/popup/", CharacterPopupView.as_view(), name="character_popup"),
     
     # Session Scheduling (Nested under Campaign)
     path("campaigns/<int:campaign_id>/schedule/", SessionScheduleListView.as_view(), name="session_schedule_list"),

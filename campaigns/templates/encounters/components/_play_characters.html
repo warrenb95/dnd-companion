@@ -1,0 +1,95 @@
+<!-- Characters Section -->
+<div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <i class="fas fa-users mr-2 text-blue-400"></i>
+    Players
+    <span class="ml-2 text-sm text-gray-400">({{ characters.count }})</span>
+  </h3>
+  
+  {% if characters %}
+    <div class="space-y-3">
+      {% for character in characters %}
+      <div class="bg-gray-700 rounded-lg p-3 border border-gray-600 hover:border-gray-500 transition-colors cursor-pointer"
+           hx-get="{% url 'campaigns:character_popup' campaign_id=campaign.id character_id=character.id %}"
+           hx-target="#modal-content"
+           hx-trigger="click">
+        <!-- Character Name and Player -->
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-medium text-white">{{ character.character_name }}</h4>
+            <p class="text-xs text-gray-400">{{ character.player_name }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- Heroic Inspiration -->
+            {% if character.heroic_inspiration %}
+            <span class="text-yellow-400" title="Heroic Inspiration">
+              <i class="fas fa-star"></i>
+            </span>
+            {% endif %}
+            
+            <!-- Status Indicator -->
+            <span class="w-2 h-2 rounded-full {% if character.alive %}bg-green-400{% else %}bg-red-400{% endif %}" 
+                  title="{% if character.alive %}Alive{% else %}Dead{% endif %}"></span>
+          </div>
+        </div>
+
+        <!-- Health Bar -->
+        <div class="mb-2">
+          <div class="flex items-center justify-between text-xs mb-1">
+            <span class="text-gray-400">Health</span>
+            <span class="text-gray-300">{{ character.current_hit_points }}/{{ character.maximum_hit_points }}</span>
+          </div>
+          <div class="w-full bg-gray-600 rounded-full h-2">
+            <div class="bg-gradient-to-r {% if character.health_percentage > 60 %}from-green-500 to-green-600{% elif character.health_percentage > 30 %}from-yellow-500 to-yellow-600{% else %}from-red-500 to-red-600{% endif %} h-2 rounded-full transition-all duration-300" 
+                 style="width: {{ character.health_percentage }}%"></div>
+          </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-2 text-xs">
+          <div class="text-center">
+            <span class="text-gray-400 block">AC</span>
+            <span class="text-white font-medium">{{ character.armor_class }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">PP</span>
+            <span class="text-white font-medium">{{ character.passive_perception }}</span>
+          </div>
+          <div class="text-center">
+            <span class="text-gray-400 block">Init</span>
+            <span class="text-white font-medium">{% if character.initiative_modifier >= 0 %}+{% endif %}{{ character.initiative_modifier }}</span>
+          </div>
+        </div>
+
+        <!-- Active Conditions -->
+        {% if character.active_conditions %}
+        <div class="mt-2 pt-2 border-t border-gray-600">
+          <div class="flex flex-wrap gap-1">
+            {% for condition in character.active_conditions %}
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-600 text-red-100">
+              {{ condition }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Character Details (Collapsed) -->
+        <div class="mt-2 pt-2 border-t border-gray-600 text-xs text-gray-400">
+          <div class="grid grid-cols-2 gap-1">
+            <span>{{ character.race }} {{ character.character_class }}</span>
+            <span class="text-right">Level {{ character.level }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-4">
+      <i class="fas fa-user-plus text-gray-500 text-2xl mb-2"></i>
+      <p class="text-gray-500 text-sm">No characters in this campaign</p>
+      <a href="{% url 'campaigns:character_create' campaign_id=campaign.id %}" 
+         class="text-blue-400 hover:text-blue-300 text-xs">Add Character</a>
+    </div>
+  {% endif %}
+</div>

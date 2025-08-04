@@ -174,7 +174,7 @@
               </div>
               <div class="text-center p-3 bg-gray-600 rounded">
                 <div class="text-xs text-gray-400 mb-1">HIT POINTS</div>
-                <div class="text-2xl font-bold text-white">{{ character.current_hit_points }}</div>
+                <div class="text-2xl font-bold text-white">{{ character.current_hit_points }}/{{ character.maximum_hit_points }}</div>
               </div>
               <div class="text-center p-3 bg-gray-600 rounded">
                 <div class="text-xs text-gray-400 mb-1">INITIATIVE</div>
@@ -219,6 +219,20 @@
                 </span>
                 {% endif %}
               </div>
+              
+              <!-- Active Conditions -->
+              {% if character.active_conditions %}
+              <div>
+                <span class="text-gray-400">Active Conditions:</span>
+                <div class="flex flex-wrap gap-1 mt-2">
+                  {% for condition in character.active_conditions %}
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                    {{ condition }}
+                  </span>
+                  {% endfor %}
+                </div>
+              </div>
+              {% endif %}
             </div>
           </div>
         </div>

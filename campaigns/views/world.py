@@ -779,3 +779,43 @@ class CampaignEnemyListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["campaign"] = self.campaign
         return context
+
+
+class NPCPopupView(LoginRequiredMixin, DetailView):
+    model = NPC
+    template_name = "npcs/npc_modal.html"
+    context_object_name = "npc"
+    pk_url_kwarg = 'npc_id'
+
+    def get_queryset(self):
+        # Restrict to NPCs in the specified campaign owned by the user
+        campaign_id = self.kwargs['campaign_id']
+        return NPC.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.object.campaign
+        return context
+
+
+class EnemyPopupView(LoginRequiredMixin, DetailView):
+    model = Enemy
+    template_name = "enemies/enemy_modal.html"
+    context_object_name = "enemy"
+    pk_url_kwarg = 'enemy_id'
+
+    def get_queryset(self):
+        # Restrict to enemies in the specified campaign owned by the user
+        campaign_id = self.kwargs['campaign_id']
+        return Enemy.objects.filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.object.campaign
+        return context

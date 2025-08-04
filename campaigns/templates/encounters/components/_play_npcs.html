@@ -1,0 +1,91 @@
+<!-- NPCs Section -->
+<div class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+    <i class="fas fa-user-friends mr-2 text-green-400"></i>
+    NPCs
+    <span class="ml-2 text-sm text-gray-400">({{ npcs.count }})</span>
+  </h3>
+  
+  {% if npcs %}
+    <div class="space-y-3">
+      {% for npc in npcs %}
+      <div class="bg-gray-700 rounded-lg p-3 border border-gray-600 hover:border-gray-500 transition-colors cursor-pointer"
+           hx-get="{% url 'campaigns:npc_popup' campaign_id=campaign.id npc_id=npc.id %}"
+           hx-target="#modal-content"
+           hx-trigger="click">
+        <!-- NPC Header -->
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-medium text-white">{{ npc.name }}</h4>
+            {% if npc.role %}
+            <p class="text-xs text-gray-400">{{ npc.role }}</p>
+            {% endif %}
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- Status Indicator -->
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+              {% if npc.status == 'alive' %}bg-green-100 text-green-800
+              {% elif npc.status == 'dead' %}bg-red-100 text-red-800
+              {% elif npc.status == 'missing' %}bg-yellow-100 text-yellow-800
+              {% else %}bg-gray-100 text-gray-800{% endif %}">
+              {{ npc.get_status_display }}
+            </span>
+            
+            <!-- Quick Link to Detail -->
+            <a href="{% url 'campaigns:npc_detail' campaign_id=campaign.id npc_id=npc.id %}" 
+               class="text-gray-400 hover:text-white" title="View NPC Details">
+              <i class="fas fa-external-link-alt text-xs"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Stats (if available) -->
+        {% if npc.has_structured_stats %}
+        <div class="grid grid-cols-3 gap-2 text-xs mb-2">
+          {% if npc.armor_class %}
+          <div class="text-center">
+            <span class="text-gray-400 block">AC</span>
+            <span class="text-white font-medium">{{ npc.armor_class }}</span>
+          </div>
+          {% endif %}
+          {% if npc.hit_points %}
+          <div class="text-center">
+            <span class="text-gray-400 block">HP</span>
+            <span class="text-white font-medium">{{ npc.hit_points }}</span>
+          </div>
+          {% endif %}
+          {% if npc.challenge_rating %}
+          <div class="text-center">
+            <span class="text-gray-400 block">CR</span>
+            <span class="text-white font-medium">{{ npc.challenge_rating }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Type and Alignment -->
+        <div class="text-xs text-gray-400">
+          {% if npc.size and npc.creature_type %}
+          <span>{{ npc.get_size_display }} {{ npc.get_creature_type_display }}</span>
+          {% endif %}
+          {% if npc.alignment %}
+          <span class="ml-2">{{ npc.get_alignment_display }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Location -->
+        {% if npc.location %}
+        <div class="mt-2 text-xs text-gray-400">
+          <i class="fas fa-map-marker-alt mr-1"></i>{{ npc.location.name }}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-4">
+      <i class="fas fa-user-friends text-gray-500 text-2xl mb-2"></i>
+      <p class="text-gray-500 text-sm">No NPCs in this encounter</p>
+    </div>
+  {% endif %}
+</div>

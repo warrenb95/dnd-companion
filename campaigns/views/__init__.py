@@ -26,7 +26,9 @@ from .encounters import (
     EncounterNoteCreateView,
     EncounterNoteEditView,
     EncounterNoteUpdateView,
-    EncounterNoteDeleteView
+    EncounterNoteDeleteView,
+    EncounterPlayView,
+    EncounterNotesCompressView
 )
 from .world import (
     LocationCreateView,
@@ -38,10 +40,12 @@ from .world import (
     NPCDetailView,
     NPCDeleteView,
     NPCToEnemyConvertView,
+    NPCPopupView,
     EnemyCreateView,
     EnemyUpdateView,
     EnemyDetailView,
     EnemyDeleteView,
+    EnemyPopupView,
     ChapterNPCListView,
     ChapterLocationListView,
     ChapterCharacterListView,
@@ -53,7 +57,8 @@ from .world import (
 from .characters import (
     CharacterDetailView,
     CreateCharacterView,
-    UpdateCharacterView
+    UpdateCharacterView,
+    CharacterPopupView
 )
 from .auth import LoginView
 from .api import empty_fragment
@@ -102,6 +107,8 @@ __all__ = [
     'EncounterNoteEditView',
     'EncounterNoteUpdateView',
     'EncounterNoteDeleteView',
+    'EncounterPlayView',
+    'EncounterNotesCompressView',
     
     # World views
     'LocationCreateView',
@@ -113,10 +120,12 @@ __all__ = [
     'NPCDetailView',
     'NPCDeleteView',
     'NPCToEnemyConvertView',
+    'NPCPopupView',
     'EnemyCreateView',
     'EnemyUpdateView',
     'EnemyDetailView',
     'EnemyDeleteView',
+    'EnemyPopupView',
     'ChapterNPCListView',
     'ChapterLocationListView',
     'ChapterCharacterListView',
@@ -129,6 +138,7 @@ __all__ = [
     'CharacterDetailView',
     'CreateCharacterView',
     'UpdateCharacterView',
+    'CharacterPopupView',
     
     # Auth views
     'LoginView',

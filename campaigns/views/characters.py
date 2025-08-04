@@ -2,6 +2,7 @@ from django.views.generic import DetailView, CreateView, UpdateView
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.http import HttpResponse
 
 from ..models import Campaign, CharacterSummary
 from ..forms import CharacterSummaryForm
@@ -80,3 +81,23 @@ class UpdateCharacterView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return self.object.campaign.get_absolute_url()
+
+
+class CharacterPopupView(LoginRequiredMixin, DetailView):
+    model = CharacterSummary
+    template_name = "characters/character_modal.html"
+    context_object_name = "character"
+    pk_url_kwarg = 'character_id'
+
+    def get_queryset(self):
+        # Restrict to characters in the specified campaign owned by the user
+        campaign_id = self.kwargs['campaign_id']
+        return CharacterSummary.objects.select_related('campaign').filter(
+            campaign__owner=self.request.user,
+            campaign_id=campaign_id
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["campaign"] = self.object.campaign
+        return context
