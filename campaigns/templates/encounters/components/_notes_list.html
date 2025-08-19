@@ -13,26 +13,6 @@
       {% endif %}
     </h4>
     
-    <div class="flex items-center gap-2">
-      <!-- Compress Notes Button (only show if 2+ notes) -->
-      {% if enc.session_notes.count >= 2 %}
-      <button
-        type="button"
-        hx-post="{% url 'campaigns:encounter_notes_compress' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id %}"
-        hx-target="#notes-list-{{ enc.id }}"
-        hx-swap="outerHTML"
-        hx-confirm="Are you sure you want to combine all {{ enc.session_notes.count }} notes into a single note? This action cannot be undone."
-        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-        class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-md shadow text-sm font-medium transition duration-200 flex items-center"
-        title="Combine all notes into one organized note"
-      >
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        Combine
-      </button>
-      {% endif %}
-      
       <!-- Add Note Button -->
       <button
         type="button"
