@@ -270,13 +270,13 @@ class EncounterNotesCompressView(LoginRequiredMixin, View):
                     content = note.content.strip()
                     
                     # Check if this note is already a combined note (contains session note headers)
-                    if content.startswith("## Session Note #") or "## Session Note #" in content:
+                    if content.startswith("## Session Note") or "## Session Note" in content:
                         # This is already a combined note, just add its content without new headers
                         compressed_parts.append(content)
                     else:
                         # This is a regular note, add a header
                         date_str = note.date.strftime("%B %d, %Y")
-                        compressed_parts.append(f"## Session Note #{i} - {date_str}\n\n{content}")
+                        compressed_parts.append(f"## Session Note - {date_str}\n\n{content}")
                 
                 compressed_content = "\n\n---\n\n".join(compressed_parts)
                 
