@@ -18,6 +18,7 @@ from .views import CampaignNPCListView, CampaignEnemyListView, CampaignLocationL
 from .views import LoginView
 from .views import (
     export_campaign_markdown,
+    export_encounter_markdown,
     save_campaign_summary,
 )
 from . import htmx_views
@@ -77,6 +78,7 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/play/", EncounterPlayView.as_view(), name="encounter_play"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/edit/", EncounterUpdateView.as_view(), name="encounter_edit"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/delete/", EncounterDeleteView.as_view(), name="encounter_delete"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/export/", export_encounter_markdown, name="encounter_export"),
     
     # Session Notes (Nested under Encounter)
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/form/", EncounterNoteFormView.as_view(), name="encounter_note_form"),

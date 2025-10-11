@@ -24,16 +24,23 @@
         </div>
         
         <div class="flex items-center gap-3">
+          <!-- Export Notes Button -->
+          <a href="{% url 'campaigns:encounter_export' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}"
+             class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+             title="Export encounter notes as markdown for LLM input">
+            <i class="fas fa-file-download mr-2"></i>Export Notes
+          </a>
+
           <!-- Combat Button -->
           {% if encounter.enemies.exists or chapter.campaign.characters.exists %}
-          <a href="{% url 'campaigns:combat_session_create' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}" 
+          <a href="{% url 'campaigns:combat_session_create' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}"
              class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors">
             <i class="fas fa-crossed-swords mr-2"></i>Start Combat
           </a>
           {% endif %}
-          
+
           <!-- Back to Chapter Button -->
-          <a href="{% url 'campaigns:chapter_detail' campaign_id=campaign.id chapter_id=chapter.id %}" 
+          <a href="{% url 'campaigns:chapter_detail' campaign_id=campaign.id chapter_id=chapter.id %}"
              class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors">
             <i class="fas fa-arrow-left mr-2"></i>Back to Chapter
           </a>
