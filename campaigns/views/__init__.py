@@ -1,12 +1,13 @@
 # Import all views for backwards compatibility with urls.py
 from .campaigns import (
-    HomeView, 
-    CampaignListView, 
-    CampaignDetailView, 
+    HomeView,
+    CampaignListView,
+    CampaignDetailView,
     CampaignCreateView,
     CampaignUpdateView,
     CampaignDeleteView,
     export_campaign_markdown,
+    export_encounter_markdown,
     save_campaign_summary
 )
 from .chapters import (
@@ -86,6 +87,7 @@ __all__ = [
     'CampaignUpdateView',
     'CampaignDeleteView',
     'export_campaign_markdown',
+    'export_encounter_markdown',
     'save_campaign_summary',
     
     # Chapter views

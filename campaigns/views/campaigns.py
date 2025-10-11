@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Q
 
-from ..models import Campaign
+from ..models import Campaign, Encounter
 from ..forms.campaigns import AddCoDMForm, RemoveCoDMForm
 
 
@@ -227,6 +227,183 @@ def save_campaign_summary(request, campaign_id):
         campaign.generated_summary = content
         campaign.save()
         return redirect(campaign.get_absolute_url())
+
+
+def export_encounter_markdown(request, campaign_id, chapter_id, encounter_id):
+    """
+    Export a single encounter with its chapter context and session notes as a markdown file.
+    Perfect for using as LLM input to plan future chapters.
+    """
+    # Get the encounter and verify ownership
+    encounter = get_object_or_404(
+        Encounter.objects.select_related('chapter__campaign'),
+        pk=encounter_id,
+        chapter_id=chapter_id,
+        chapter__campaign_id=campaign_id,
+        chapter__campaign__owner=request.user
+    )
+
+    chapter = encounter.chapter
+    campaign = chapter.campaign
+
+    # Build markdown content
+    lines = [
+        f"# Chapter {chapter.order}: {chapter.title}",
+        "",
+        f"**Campaign:** {campaign.title}",
+        f"**Status:** {chapter.status.replace('_', ' ').capitalize()}",
+        f"**Level Range:** {chapter.level_range or '_Not specified_'}",
+        "",
+        "## Chapter Summary",
+        "",
+        chapter.summary.strip() if chapter.summary else "_No summary available_",
+        "",
+    ]
+
+    # Add chapter intro if present
+    if chapter.intro:
+        lines += [
+            "## Chapter Introduction",
+            "",
+            chapter.intro.strip(),
+            "",
+        ]
+
+    # Add chapter DM notes if present
+    if chapter.dm_notes:
+        lines += [
+            "## Chapter DM Notes",
+            "",
+            chapter.dm_notes.strip(),
+            "",
+        ]
+
+    lines += [
+        "---",
+        "",
+        f"## Encounter: {encounter.title}",
+        "",
+        f"**Type:** {encounter.get_type_display()}",
+        f"**Danger Level:** {encounter.get_danger_level_display() if encounter.danger_level else '_Not specified_'}",
+    ]
+
+    # Add location if set
+    if encounter.location:
+        lines += [f"**Location:** {encounter.location.name}"]
+
+    # Add NPCs if any
+    npcs = encounter.npcs.all()
+    if npcs:
+        npc_names = ", ".join([npc.name for npc in npcs])
+        lines += [f"**NPCs:** {npc_names}"]
+
+    # Add tags if present
+    if encounter.tags:
+        lines += [f"**Tags:** {encounter.tags}"]
+
+    lines += ["", ""]
+
+    # Add encounter summary
+    lines += [
+        "### Summary",
+        "",
+        encounter.summary.strip() if encounter.summary else "_No summary available_",
+        "",
+    ]
+
+    # Add setup details
+    if encounter.setup:
+        lines += [
+            "### Setup",
+            "",
+            encounter.setup.strip(),
+            "",
+        ]
+
+    # Add read-aloud text
+    if encounter.read_aloud:
+        lines += [
+            "### Read-Aloud Text",
+            "",
+            "> " + encounter.read_aloud.strip().replace("\n", "\n> "),
+            "",
+        ]
+
+    # Add DM notes
+    if encounter.dm_notes:
+        lines += [
+            "### DM Notes",
+            "",
+            encounter.dm_notes.strip(),
+            "",
+        ]
+
+    # Add map reference if present
+    if encounter.map_reference:
+        lines += [
+            f"**Map Reference:** {encounter.map_reference}",
+            "",
+        ]
+
+    # Add session notes
+    session_notes = encounter.session_notes.order_by("date")
+    if session_notes:
+        lines += [
+            "---",
+            "",
+            "## Session Notes",
+            "",
+        ]
+
+        for note in session_notes:
+            lines += [
+                f"### Session on {note.date.strftime('%B %d, %Y')}",
+                "",
+                "#### Session Content",
+                "",
+                note.content.strip(),
+                "",
+            ]
+
+            # Add AI summary if available
+            if note.summary:
+                lines += [
+                    "#### AI Summary",
+                    "",
+                    note.summary.strip(),
+                    "",
+                ]
+
+            lines += ["---", ""]
+    else:
+        lines += [
+            "---",
+            "",
+            "## Session Notes",
+            "",
+            "_No session notes recorded for this encounter yet._",
+            "",
+        ]
+
+    # Add chapter conclusion if present
+    if chapter.conclusion:
+        lines += [
+            "---",
+            "",
+            "## Chapter Conclusion",
+            "",
+            chapter.conclusion.strip(),
+            "",
+        ]
+
+    # Generate filename
+    filename = f"chapter_{chapter.order}_{encounter.title.lower().replace(' ', '_')}_notes.md"
+
+    # Generate response
+    markdown_text = "\n".join(lines)
+    response = HttpResponse(markdown_text, content_type="text/markdown")
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return response
 
 
 class AddCoDMView(LoginRequiredMixin, View):
