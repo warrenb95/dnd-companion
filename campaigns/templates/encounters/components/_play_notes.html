@@ -1,0 +1,127 @@
+{% load markdown_extras %}
+
+<!-- Session Notes Section for Play View -->
+<div id="play-notes-{{ encounter.id }}" class="bg-gray-800 rounded-lg shadow-xl p-4 border border-gray-700">
+  <h3 class="text-lg font-semibold text-white mb-4 flex items-center justify-between">
+    <span>
+      <i class="fas fa-clipboard-list mr-2 text-purple-400"></i>
+      Session Notes
+    </span>
+    {% if encounter.session_notes.exists %}
+    <span class="text-sm text-gray-400 bg-gray-700 px-2 py-1 rounded-full">
+      {{ encounter.session_notes.count }}
+    </span>
+    {% endif %}
+  </h3>
+
+  {% if encounter.session_notes.exists %}
+    <div class="space-y-3 max-h-96 overflow-y-auto pr-2">
+      {% for note in encounter.session_notes.all|slice:":5" %}
+      <div class="bg-gray-700 rounded-lg p-3 border border-gray-600 hover:border-gray-500 transition-colors">
+        <!-- Note Header -->
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs text-gray-400 flex items-center">
+            <i class="fas fa-calendar mr-1"></i>
+            {{ note.date|date:"M d, Y" }}
+          </span>
+          <div class="flex items-center gap-1">
+            <!-- Edit Button -->
+            <button
+              type="button"
+              hx-get="{% url 'campaigns:encounter_note_edit' campaign_id=note.encounter.chapter.campaign.id chapter_id=note.encounter.chapter.id encounter_id=note.encounter.id note_id=note.id %}"
+              hx-target="#modal-content"
+              class="p-1 text-gray-400 hover:text-indigo-400 transition-colors"
+              title="Edit note"
+              onclick="openModal()"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+            </button>
+
+            <!-- Delete Button -->
+            <button
+              type="button"
+              hx-delete="{% url 'campaigns:encounter_note_delete' campaign_id=note.encounter.chapter.campaign.id chapter_id=note.encounter.chapter.id encounter_id=note.encounter.id note_id=note.id %}"
+              hx-target="#play-notes-{{ encounter.id }}"
+              hx-swap="outerHTML"
+              hx-confirm="Are you sure you want to delete this note?"
+              class="p-1 text-gray-400 hover:text-red-400 transition-colors"
+              title="Delete note"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Note Content -->
+        <div class="text-gray-200 text-sm prose prose-invert prose-sm max-w-none line-clamp-3 note-preview">
+          {{ note.content|markdown|truncatewords_html:50 }}
+        </div>
+
+        <!-- Expand Button (if content is long) -->
+        {% if note.content|length > 200 %}
+        <button
+          type="button"
+          class="text-indigo-400 hover:text-indigo-300 text-xs mt-2 flex items-center"
+          onclick="this.previousElementSibling.classList.toggle('line-clamp-3'); this.querySelector('.expand-text').classList.toggle('hidden'); this.querySelector('.collapse-text').classList.toggle('hidden');"
+        >
+          <span class="expand-text">
+            <i class="fas fa-chevron-down mr-1"></i>Show more
+          </span>
+          <span class="collapse-text hidden">
+            <i class="fas fa-chevron-up mr-1"></i>Show less
+          </span>
+        </button>
+        {% endif %}
+
+        <!-- AI Summary if exists -->
+        {% if note.summary %}
+        <div class="mt-3 pt-3 border-t border-gray-600">
+          <div class="flex items-center mb-1">
+            <i class="fas fa-lightbulb text-green-400 text-xs mr-1"></i>
+            <span class="text-xs font-medium text-green-400">AI Summary</span>
+          </div>
+          <div class="text-gray-300 text-xs italic">
+            {{ note.summary|markdown|truncatewords_html:30 }}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+
+      <!-- Show more indicator if there are more notes -->
+      {% if encounter.session_notes.count > 5 %}
+      <div class="text-center py-2">
+        <a href="{% url 'campaigns:chapter_detail' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id %}"
+           class="text-indigo-400 hover:text-indigo-300 text-sm">
+          <i class="fas fa-ellipsis-h mr-1"></i>
+          View all {{ encounter.session_notes.count }} notes
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="text-center py-8 px-4">
+      <div class="bg-gray-700 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-3">
+        <i class="fas fa-pen text-gray-500 text-2xl"></i>
+      </div>
+      <p class="text-gray-400 text-sm mb-2">No session notes yet</p>
+      <p class="text-gray-500 text-xs">
+        Click the floating button at the bottom-left to add your first note
+      </p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

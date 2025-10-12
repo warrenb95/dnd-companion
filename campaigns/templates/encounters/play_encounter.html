@@ -165,23 +165,47 @@
       </div>
     </div>
 
-    <!-- Right Sidebar: Characters, NPCs, Enemies, Location (30%) -->
+    <!-- Right Sidebar: Characters, NPCs, Enemies, Location, Notes (30%) -->
     <div class="xl:col-span-3 space-y-6">
-      
+
       <!-- Characters Section -->
       {% include "encounters/components/_play_characters.html" %}
-      
+
       <!-- NPCs Section -->
       {% include "encounters/components/_play_npcs.html" %}
-      
+
       <!-- Enemies Section -->
       {% include "encounters/components/_play_enemies.html" %}
-      
+
       <!-- Location Section -->
       {% include "encounters/components/_play_location.html" %}
-      
+
+      <!-- Session Notes Section -->
+      {% include "encounters/components/_play_notes.html" %}
+
     </div>
   </div>
+
+  <!-- Floating Action Button for Adding Notes -->
+  <button
+    type="button"
+    class="fixed bottom-6 left-6 z-50 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-5 py-3 shadow-2xl transition-all duration-200 hover:scale-105 hover:shadow-indigo-500/50 group flex items-center gap-2"
+    hx-get="{% url 'campaigns:encounter_note_modal' campaign_id=encounter.chapter.campaign.id chapter_id=encounter.chapter.id encounter_id=encounter.id %}"
+    hx-target="#modal-content"
+    title="Add Session Note"
+  >
+    <!-- SVG Pen Icon -->
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+    </svg>
+    <span class="font-medium text-sm">Add Note</span>
+    <!-- Note count badge -->
+    {% if encounter.session_notes.count > 0 %}
+    <span class="ml-1 bg-purple-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
+      {{ encounter.session_notes.count }}
+    </span>
+    {% endif %}
+  </button>
 </div>
 
 <!-- Location Image Modal -->
@@ -198,7 +222,7 @@
 
 <!-- HTMX Modal Container -->
 <div id="modal-container" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
-  <div id="modal-content">
+  <div id="modal-content" class="w-full max-w-7xl">
     <!-- HTMX content will be loaded here -->
   </div>
 </div>
@@ -234,6 +258,14 @@ document.addEventListener('keydown', function(event) {
 document.body.addEventListener('htmx:afterRequest', function(event) {
   if (event.detail.target.id === 'modal-content') {
     openModal();
+  }
+});
+
+// Close modal after notes list updates (after swap completes)
+document.body.addEventListener('htmx:afterSwap', function(event) {
+  // Check if the swap target is a play-notes element (note create/update)
+  if (event.detail.target.id && event.detail.target.id.startsWith('play-notes-')) {
+    closeModal();
   }
 });
 

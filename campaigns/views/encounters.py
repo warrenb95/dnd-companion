@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.db import transaction
 from django.utils import timezone
+from datetime import date
 
 from ..models import Chapter, Encounter, SessionNote, CharacterSummary
 from ..forms import EncounterForm
@@ -159,21 +160,46 @@ class EncounterNoteFormView(View):
 class EncounterNoteCreateView(View):
     def post(self, request, campaign_id, chapter_id, encounter_id):
         content = request.POST.get("content")
+        note_date = request.POST.get("date")
         encounter = None
 
         if content:
             encounter = get_object_or_404(
-                Encounter.objects.select_related('chapter__campaign').filter(
+                Encounter.objects.select_related('chapter__campaign').prefetch_related('session_notes').filter(
                     chapter__campaign__owner=request.user,
                     chapter__campaign_id=campaign_id,
                     chapter_id=chapter_id
                 ),
                 pk=encounter_id
             )
-            SessionNote.objects.create(encounter=encounter, content=content, owner=request.user)
 
-        # Re-render the updated notes list as HTML
-        return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
+            # Create note with date if provided, otherwise use today
+            if note_date:
+                SessionNote.objects.create(
+                    encounter=encounter,
+                    content=content,
+                    date=note_date,
+                    owner=request.user
+                )
+            else:
+                SessionNote.objects.create(
+                    encounter=encounter,
+                    content=content,
+                    owner=request.user
+                )
+
+            messages.success(request, "Session note added successfully.")
+
+        # Check if this is from the play page modal (return play notes component)
+        # or from chapter detail (return chapter notes list)
+        hx_target = request.headers.get('HX-Target', '')
+        if 'play-notes' in hx_target:
+            # Return the play notes component
+            # Modal will be closed by htmx:afterSwap event listener
+            return render(request, "encounters/components/_play_notes.html", {"encounter": encounter})
+        else:
+            # Return the chapter detail notes list
+            return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
 
 
 class EncounterNoteEditView(LoginRequiredMixin, View):
@@ -187,7 +213,15 @@ class EncounterNoteEditView(LoginRequiredMixin, View):
             ),
             pk=note_id
         )
-        return render(request, "encounters/components/_note_edit_form.html", {"note": note})
+
+        # Check if this is from the play page modal (modal-content target)
+        hx_target = request.headers.get('HX-Target', '')
+        if 'modal-content' in hx_target:
+            # Return the modal edit template
+            return render(request, "encounters/components/_note_edit_modal.html", {"note": note})
+        else:
+            # Return the inline edit form for chapter detail page
+            return render(request, "encounters/components/_note_edit_form.html", {"note": note})
 
 
 class EncounterNoteUpdateView(LoginRequiredMixin, View):
@@ -201,18 +235,25 @@ class EncounterNoteUpdateView(LoginRequiredMixin, View):
             ),
             pk=note_id
         )
-        
+
         content = request.POST.get("content")
         date = request.POST.get("date")
-        
+
         if content and date:
             note.content = content
             note.date = date
             note.save()
             messages.success(request, "Note updated successfully.")
-        
-        # Re-render the updated notes list as HTML
-        return render(request, "encounters/components/_notes_list.html", {"enc": note.encounter})
+
+        # Check if this is from the play page modal
+        hx_target = request.headers.get('HX-Target', '')
+        if 'play-notes' in hx_target:
+            # Return the play notes component
+            # Modal will be closed by htmx:afterSwap event listener
+            return render(request, "encounters/components/_play_notes.html", {"encounter": note.encounter})
+        else:
+            # Return the chapter detail notes list
+            return render(request, "encounters/components/_notes_list.html", {"enc": note.encounter})
 
 
 class EncounterNoteDeleteView(LoginRequiredMixin, View):
@@ -226,13 +267,29 @@ class EncounterNoteDeleteView(LoginRequiredMixin, View):
             ),
             pk=note_id
         )
-        
-        encounter = note.encounter
+
+        encounter_id = note.encounter.id
         note.delete()
         messages.success(request, "Note deleted successfully.")
-        
-        # Re-render the updated notes list as HTML
-        return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
+
+        # Re-query the encounter to get fresh session_notes data
+        encounter = get_object_or_404(
+            Encounter.objects.select_related('chapter__campaign').prefetch_related('session_notes').filter(
+                chapter__campaign__owner=request.user,
+                chapter__campaign_id=campaign_id,
+                chapter_id=chapter_id
+            ),
+            pk=encounter_id
+        )
+
+        # Check if this is from the play page
+        hx_target = request.headers.get('HX-Target', '')
+        if 'play-notes' in hx_target:
+            # Return the play notes component
+            return render(request, "encounters/components/_play_notes.html", {"encounter": encounter})
+        else:
+            # Return the chapter detail notes list
+            return render(request, "encounters/components/_notes_list.html", {"enc": encounter})
 
 
 class EncounterPlayView(LoginRequiredMixin, View):
@@ -276,5 +333,30 @@ class EncounterPlayView(LoginRequiredMixin, View):
             'enemies': all_enemies,
             'location': encounter.location,
         }
-        
+
         return render(request, 'encounters/play_encounter.html', context)
+
+
+class EncounterNoteModalView(LoginRequiredMixin, View):
+    """
+    Returns a modal form for adding session notes during encounter play.
+    Used with HTMX to open the modal without navigation.
+    """
+
+    def get(self, request, campaign_id, chapter_id, encounter_id):
+        # Get the encounter and verify ownership
+        encounter = get_object_or_404(
+            Encounter.objects.select_related('chapter__campaign').filter(
+                chapter__campaign__owner=request.user,
+                chapter__campaign_id=campaign_id,
+                chapter_id=chapter_id
+            ),
+            pk=encounter_id
+        )
+
+        context = {
+            'encounter': encounter,
+            'today': date.today(),
+        }
+
+        return render(request, 'encounters/components/_note_modal.html', context)
