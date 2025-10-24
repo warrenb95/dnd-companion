@@ -107,7 +107,10 @@ class Encounter(models.Model):
         related_name='encounters',
         help_text="NPCs that appear in this specific encounter"
     )
-    map_reference = models.CharField(max_length=100, blank=True)
+    map_reference = models.TextField(
+        blank=True,
+        help_text="Notes about map location, grid coordinates, or other spatial references"
+    )
 
     tags = models.CharField(
         max_length=200,
