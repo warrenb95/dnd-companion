@@ -19,11 +19,14 @@ class EncounterForm(forms.ModelForm):
     class Meta:
         model = Encounter
         exclude = ['chapter', 'owner', 'order']
-        
+        widgets = {
+            'map_reference': forms.Textarea(attrs={'rows': 4}),
+        }
+
     def __init__(self, *args, **kwargs):
         campaign = kwargs.pop('campaign', None)
         super().__init__(*args, **kwargs)
-        
+
         # Filter location choices to only show locations from the current campaign
         if campaign:
             self.fields['location'].queryset = Location.objects.filter(campaign=campaign)
