@@ -85,16 +85,21 @@
             </div>
             {% endif %}
 
-            <!-- Read-Aloud Text -->
-            {% if encounter.read_aloud %}
+            <!-- Read-Aloud Texts -->
+            {% if encounter.read_alouds.exists %}
             <div>
               <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
-                <i class="fas fa-quote-left mr-2 text-green-400"></i>Read-Aloud Text
+                <i class="fas fa-quote-left mr-2 text-green-400"></i>Read-Alouds
               </h3>
-              <div class="bg-indigo-900 bg-opacity-50 border-l-4 border-indigo-500 p-4 rounded">
-                <div class="text-indigo-100 prose prose-invert prose-sm max-w-none italic">
-                  {{ encounter.read_aloud|markdown }}
+              <div class="space-y-3">
+                {% for read_aloud in encounter.read_alouds.all %}
+                <div class="bg-indigo-900 bg-opacity-50 border-l-4 border-indigo-500 p-4 rounded">
+                  <div class="text-indigo-300 font-semibold text-sm mb-2">{{ read_aloud.title }}</div>
+                  <div class="text-indigo-100 prose prose-invert prose-sm max-w-none italic">
+                    {{ read_aloud.text|markdown }}
+                  </div>
                 </div>
+                {% endfor %}
               </div>
             </div>
             {% endif %}

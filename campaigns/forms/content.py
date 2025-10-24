@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import inlineformset_factory
 
-from ..models import Chapter, Encounter
+from ..models import Chapter, Encounter, ReadAloud
 
 
 class ChapterForm(forms.ModelForm):
@@ -59,6 +59,23 @@ class EncounterForm(forms.ModelForm):
             
             # Add help text
             self.fields['enemies'].help_text = 'Hold Ctrl/Cmd to select multiple enemies that appear in this encounter'
+
+
+class ReadAloudForm(forms.ModelForm):
+    class Meta:
+        model = ReadAloud
+        exclude = ['encounter', 'owner', 'order']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500',
+                'placeholder': 'e.g., Opening Scene, When they enter...'
+            }),
+            'text': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 rounded-md border border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500',
+                'rows': 5,
+                'placeholder': 'The descriptive text to read aloud to your players...'
+            }),
+        }
 
 
 # Create an inline formset: relate Encounter to Chapter

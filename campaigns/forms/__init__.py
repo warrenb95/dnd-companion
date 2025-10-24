@@ -1,5 +1,5 @@
 # Import all forms for backwards compatibility
-from .content import ChapterForm, EncounterForm, EncounterFormSet, ChapterUploadForm
+from .content import ChapterForm, EncounterForm, EncounterFormSet, ChapterUploadForm, ReadAloudForm
 from .world import LocationForm, NPCForm, EnemyForm
 from .characters import CharacterSummaryForm
 from .sessions import SessionNoteForm, StyledAuthenticationForm
@@ -9,9 +9,10 @@ from .combat import CombatSessionForm
 __all__ = [
     # Content forms
     'ChapterForm',
-    'EncounterForm', 
+    'EncounterForm',
     'EncounterFormSet',
     'ChapterUploadForm',
+    'ReadAloudForm',
     
     # World forms
     'LocationForm',

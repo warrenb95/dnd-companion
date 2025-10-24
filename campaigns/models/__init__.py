@@ -1,6 +1,6 @@
 # Import all models for Django migrations compatibility
 from .base import Campaign, CampaignCollaborator
-from .content import Chapter, Encounter
+from .content import Chapter, Encounter, ReadAloud
 from .world import Location, NPC, Enemy
 from .characters import CharacterSummary
 from .sessions import SessionNote, ChatMessage, ChapterChatMessage, SessionSchedule, PlayerAvailability, ScheduledSession
@@ -11,8 +11,9 @@ from .combat import CombatSession, CombatParticipant, StatusEffect, CombatAction
 __all__ = [
     'Campaign',
     'CampaignCollaborator',
-    'Chapter', 
+    'Chapter',
     'Encounter',
+    'ReadAloud',
     'Location',
     'NPC',
     'Enemy',

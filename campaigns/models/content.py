@@ -141,3 +141,39 @@ class Encounter(models.Model):
 
     def __str__(self):
         return f"{self.title} (Chapter {self.chapter.order})"
+
+
+class ReadAloud(models.Model):
+    """
+    Read-aloud text (boxed text) for encounters.
+    Each encounter can have multiple read-alouds with titles.
+    """
+    encounter = models.ForeignKey(
+        Encounter,
+        on_delete=models.CASCADE,
+        related_name="read_alouds"
+    )
+    title = models.CharField(
+        max_length=200,
+        help_text="Title or label for this read-aloud section (e.g., 'Opening Scene', 'When they enter the room')"
+    )
+    text = models.TextField(
+        help_text="The descriptive text to read aloud to players"
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Order of this read-aloud in the encounter"
+    )
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='read_alouds'
+    )
+
+    class Meta:
+        ordering = ['order']
+        verbose_name = "Read-Aloud"
+        verbose_name_plural = "Read-Alouds"
+
+    def __str__(self):
+        return f"{self.title} ({self.encounter.title})"

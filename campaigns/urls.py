@@ -6,7 +6,7 @@ from dnd_companion import settings
 
 from .views import CampaignListView, CampaignDetailView, CampaignCreateView, CampaignUpdateView, CampaignDeleteView, ChapterDeleteView, CharacterDetailView, EncounterNoteCreateView, EncounterNoteFormView, EncounterNoteModalView, EncounterNoteEditView, EncounterNoteUpdateView, EncounterNoteDeleteView, HomeView, empty_fragment, ChapterStatusToggleView, ChapterReorderView, UserSettingsView, UpdateProfileView, UpdateAccountView, ChangePasswordView, user_profile_view, SessionScheduleListView, SessionScheduleCreateView, SessionScheduleDetailView, PlayerAvailabilityView, ScheduleSessionView
 from .views.encounters import EncounterPlayView
-from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView
+from .views import ChapterCreateView, ChapterQuickCreateView, ChapterUpdateView, ChapterDetailView, EncounterCreateView, EncounterUpdateView, EncounterDeleteView, ReadAloudCreateView, ReadAloudUpdateView, ReadAloudDeleteView
 from .views import CreateCharacterView, UpdateCharacterView, CharacterPopupView
 from .views import LocationCreateView, LocationUpdateView, LocationDetailView, LocationDeleteView
 from .views import NPCCreateView, NPCUpdateView, NPCDetailView, NPCDeleteView, NPCToEnemyConvertView, NPCPopupView
@@ -87,7 +87,12 @@ urlpatterns = [
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/edit/", EncounterNoteEditView.as_view(), name="encounter_note_edit"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/update/", EncounterNoteUpdateView.as_view(), name="encounter_note_update"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/notes/<int:note_id>/delete/", EncounterNoteDeleteView.as_view(), name="encounter_note_delete"),
-    
+
+    # Read-Alouds (Nested under Encounter)
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/read-alouds/add/", ReadAloudCreateView.as_view(), name="read_aloud_create"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/read-alouds/<int:read_aloud_id>/edit/", ReadAloudUpdateView.as_view(), name="read_aloud_edit"),
+    path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/read-alouds/<int:read_aloud_id>/delete/", ReadAloudDeleteView.as_view(), name="read_aloud_delete"),
+
     # Combat Sessions (Nested under Encounter)
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/start/", CombatSessionCreateView.as_view(), name="combat_session_create"),
     path("campaigns/<int:campaign_id>/chapters/<int:chapter_id>/encounters/<int:encounter_id>/combat/<int:session_id>/", CombatSessionDetailView.as_view(), name="combat_session_detail"),

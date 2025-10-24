@@ -7,8 +7,8 @@ from django.db import transaction
 from django.utils import timezone
 from datetime import date
 
-from ..models import Chapter, Encounter, SessionNote, CharacterSummary
-from ..forms import EncounterForm
+from ..models import Chapter, Encounter, SessionNote, CharacterSummary, ReadAloud
+from ..forms import EncounterForm, ReadAloudForm
 
 
 class EncounterCreateView(LoginRequiredMixin, CreateView):
@@ -360,3 +360,105 @@ class EncounterNoteModalView(LoginRequiredMixin, View):
         }
 
         return render(request, 'encounters/components/_note_modal.html', context)
+
+
+class ReadAloudCreateView(LoginRequiredMixin, CreateView):
+    model = ReadAloud
+    form_class = ReadAloudForm
+    template_name = "encounters/read_aloud_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        # Fetch and cache the encounter object, ensuring user ownership
+        campaign_id = self.kwargs["campaign_id"]
+        chapter_id = self.kwargs["chapter_id"]
+        encounter_id = self.kwargs["encounter_id"]
+        self.encounter = get_object_or_404(
+            Encounter.objects.select_related('chapter__campaign').filter(
+                chapter__campaign__owner=request.user,
+                chapter__campaign_id=campaign_id,
+                chapter_id=chapter_id
+            ),
+            pk=encounter_id
+        )
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["encounter"] = self.encounter
+        context["chapter"] = self.encounter.chapter
+        return context
+
+    def form_valid(self, form):
+        # Auto-assign the read-aloud to the correct encounter and owner
+        form.instance.encounter = self.encounter
+        form.instance.owner = self.request.user
+
+        # Auto-increment the order field
+        last_read_aloud = self.encounter.read_alouds.order_by("-order").first()
+        form.instance.order = (last_read_aloud.order + 1) if last_read_aloud else 1
+
+        messages.success(self.request, f"Read-aloud '{form.instance.title}' created successfully.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirect back to chapter detail view after success
+        return self.encounter.chapter.get_absolute_url()
+
+
+class ReadAloudUpdateView(LoginRequiredMixin, UpdateView):
+    model = ReadAloud
+    form_class = ReadAloudForm
+    template_name = "encounters/read_aloud_form.html"
+    pk_url_kwarg = 'read_aloud_id'
+
+    def get_queryset(self):
+        # Only allow editing read-alouds if the user owns the parent campaign
+        campaign_id = self.kwargs['campaign_id']
+        chapter_id = self.kwargs['chapter_id']
+        encounter_id = self.kwargs['encounter_id']
+        return ReadAloud.objects.select_related('encounter__chapter__campaign').filter(
+            encounter__chapter__campaign__owner=self.request.user,
+            encounter__chapter__campaign_id=campaign_id,
+            encounter__chapter_id=chapter_id,
+            encounter_id=encounter_id
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["encounter"] = self.object.encounter
+        context["chapter"] = self.object.encounter.chapter
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Read-aloud '{form.instance.title}' updated successfully.")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirect back to chapter detail view after success
+        return self.object.encounter.chapter.get_absolute_url()
+
+
+class ReadAloudDeleteView(LoginRequiredMixin, DeleteView):
+    model = ReadAloud
+    template_name = "encounters/read_aloud_delete_confirmation.html"
+    pk_url_kwarg = 'read_aloud_id'
+
+    def get_queryset(self):
+        # Ensure only the read-aloud owner can delete (via campaign ownership)
+        campaign_id = self.kwargs['campaign_id']
+        chapter_id = self.kwargs['chapter_id']
+        encounter_id = self.kwargs['encounter_id']
+        return ReadAloud.objects.select_related('encounter__chapter__campaign').filter(
+            encounter__chapter__campaign__owner=self.request.user,
+            encounter__chapter__campaign_id=campaign_id,
+            encounter__chapter_id=chapter_id,
+            encounter_id=encounter_id
+        )
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(request, f"Read-aloud '{self.object.title}' deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return self.object.encounter.chapter.get_absolute_url()

@@ -63,9 +63,42 @@
             <div><strong>Setup:</strong></div>
             <div class="ml-4 mb-3">{{ enc.setup|markdown }}</div>
             {% endif %}
-            {% if enc.read_aloud %}
-            <div><strong>Read-Aloud:</strong></div>
-            <div class="ml-4 mb-3 p-3 bg-gray-600 rounded border-l-4 border-indigo-500">{{ enc.read_aloud|markdown }}</div>
+            {% if enc.read_alouds.exists %}
+            <div class="mb-2 flex justify-between items-center">
+              <strong>Read-Alouds:</strong>
+              <a href="{% url 'campaigns:read_aloud_create' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id %}"
+                 class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded transition-colors">
+                <i class="fas fa-plus mr-1"></i>Add
+              </a>
+            </div>
+            <div class="ml-4 mb-3 space-y-2">
+              {% for read_aloud in enc.read_alouds.all %}
+              <div class="p-3 bg-gray-600 rounded border-l-4 border-indigo-500">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="font-semibold text-indigo-300 text-sm">{{ read_aloud.title }}</div>
+                  <div class="flex gap-1">
+                    <a href="{% url 'campaigns:read_aloud_edit' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id read_aloud_id=read_aloud.id %}"
+                       class="text-xs text-gray-300 hover:text-white px-2 py-1">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'campaigns:read_aloud_delete' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id read_aloud_id=read_aloud.id %}"
+                       class="text-xs text-red-300 hover:text-red-100 px-2 py-1">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </div>
+                <div>{{ read_aloud.text|markdown }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="mb-2">
+              <strong>Read-Alouds:</strong>
+              <a href="{% url 'campaigns:read_aloud_create' campaign_id=enc.chapter.campaign.id chapter_id=enc.chapter.id encounter_id=enc.id %}"
+                 class="ml-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded transition-colors">
+                <i class="fas fa-plus mr-1"></i>Add Read-Aloud
+              </a>
+            </div>
             {% endif %}
             {% if enc.dm_notes %}
             <div><strong>DM Notes:</strong></div>

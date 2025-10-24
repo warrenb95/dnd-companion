@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Delete Read-Aloud: {{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="my-12 max-w-xl mx-auto px-4">
+  <div class="bg-gray-800 rounded-lg shadow p-6 text-gray-200">
+    <h2 class="text-2xl font-bold text-white mb-4">
+      Delete Read-Aloud: {{ object.title }}
+    </h2>
+
+    <div class="mb-6 p-4 bg-gray-700 rounded-lg">
+      <h3 class="text-lg font-semibold text-white mb-2">Read-Aloud Details</h3>
+      <p class="text-gray-300 mb-2">
+        <strong>Title:</strong> {{ object.title }}
+      </p>
+      <p class="text-gray-300 mb-2">
+        <strong>Encounter:</strong> {{ object.encounter.title }}
+      </p>
+      <p class="text-gray-300 mb-2">
+        <strong>Chapter:</strong> {{ object.encounter.chapter.title }}
+      </p>
+      <p class="text-gray-300 mb-2">
+        <strong>Text Preview:</strong> {{ object.text|truncatewords:20 }}
+      </p>
+    </div>
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+      <div class="bg-red-900 border border-red-600 rounded-lg p-4 mb-4">
+        <p class="text-red-200 font-semibold mb-2">Warning:</p>
+        <p class="text-red-200">
+          Are you sure you want to delete the read-aloud <strong class="text-white">"{{ object.title }}"</strong>?
+        </p>
+        <p class="text-red-200 mt-2">
+          This action cannot be undone.
+        </p>
+      </div>
+
+      {{ form }}
+
+      <div class="flex gap-4">
+        <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+          Delete Read-Aloud
+        </button>
+        <a href="{% url 'campaigns:chapter_detail' campaign_id=object.encounter.chapter.campaign.id chapter_id=object.encounter.chapter.id %}"
+           class="bg-gray-600 hover:bg-gray-500 text-white font-semibold px-4 py-2 rounded-lg transition">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
