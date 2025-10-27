@@ -102,10 +102,8 @@
               {% if enc.map_reference %}
               <div class="mb-3">
                 <strong class="text-blue-400">Map Ref:</strong>
-                <div class="flex flex-wrap gap-2 mt-1">
-                  <span class="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded">
-                    <i class="fas fa-map mr-1"></i>{{ enc.map_reference }}
-                  </span>
+                <div class="mt-1 prose prose-invert prose-sm max-w-none">
+                  <div class="text-xs">{{ enc.map_reference|markdown }}</div>
                 </div>
               </div>
               {% endif %}

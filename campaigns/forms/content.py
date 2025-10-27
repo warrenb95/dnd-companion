@@ -8,12 +8,52 @@ class ChapterForm(forms.ModelForm):
     class Meta:
         model = Chapter
         exclude = ["campaign", "owner", "order"]
+        widgets = {
+            'summary': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Brief overview of the chapter. Markdown supported: **bold**, *italic*, ## Headers, etc.'
+            }),
+            'intro': forms.Textarea(attrs={
+                'rows': 5,
+                'placeholder': 'Adventure hook or opening scene. Markdown supported: **bold**, *italic*, [links](url), etc.'
+            }),
+            'dm_notes': forms.Textarea(attrs={
+                'rows': 6,
+                'placeholder': 'Secrets, pacing tips, foreshadowing. Markdown supported: - bullets, 1. numbered lists, etc.'
+            }),
+            'conclusion': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'How the chapter wraps up or links to future chapters. Markdown supported.'
+            }),
+        }
 
 
 class EncounterForm(forms.ModelForm):
     class Meta:
         model = Encounter
         exclude = ['chapter', 'owner', 'order']
+        widgets = {
+            'summary': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Quick description of encounter purpose. Markdown supported: **bold**, *italic*, etc.'
+            }),
+            'setup': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Scene setup, triggers, and conditions. Markdown supported: - bullets, [links](url), etc.'
+            }),
+            'read_aloud': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Optional boxed text or narration. Markdown supported for emphasis and formatting.'
+            }),
+            'dm_notes': forms.Textarea(attrs={
+                'rows': 5,
+                'placeholder': 'Tactics, loot, stat block refs, etc. Markdown supported: - bullets, 1. lists, etc.'
+            }),
+            'map_reference': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Map location, grid coordinates, or spatial references. Markdown supported.'
+            }),
+        }
 
     def __init__(self, *args, **kwargs):
         campaign = kwargs.pop('campaign', None)
