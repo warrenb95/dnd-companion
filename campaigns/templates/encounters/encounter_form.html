@@ -14,6 +14,9 @@
     <div class="border-b border-gray-700 px-4 sm:px-6 py-4">
       <h2 class="text-xl sm:text-2xl font-semibold text-white">{% if view.object %}Edit Encounter{% else %}Add New Encounter{% endif %}</h2>
       <p class="text-gray-400 mt-1 text-sm sm:text-base">Chapter: {{ chapter.title }}</p>
+      <p class="text-indigo-400 mt-2 text-xs sm:text-sm">
+        <i class="fas fa-markdown mr-1"></i>Markdown formatting supported in text areas: **bold**, *italic*, - bullets, [links](url)
+      </p>
     </div>
     
     <div class="p-4 sm:p-6">

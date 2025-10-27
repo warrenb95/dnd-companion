@@ -139,7 +139,9 @@
                 <i class="fas fa-map mr-2 text-teal-400"></i>Map Reference
               </h3>
               <div class="bg-gray-700 p-3 rounded">
-                <span class="text-gray-300">{{ encounter.map_reference }}</span>
+                <div class="text-gray-300 prose prose-invert prose-sm max-w-none">
+                  {{ encounter.map_reference|markdown }}
+                </div>
               </div>
             </div>
             {% endif %}
