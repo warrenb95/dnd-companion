@@ -1,0 +1,14 @@
+<button
+    type="button"
+    class="time-slot-btn {% if selected %}selected{% endif %} {% if show_error %}error-flash{% endif %}"
+    hx-post="{% url 'campaigns:toggle_time_slot' token %}"
+    hx-vals='{"date": "{{ date_str }}", "time_slot": "{{ time_slot }}"}'
+    hx-include="#player-info-form"
+    hx-swap="outerHTML"
+    hx-target="this"
+>
+    {{ time_slot }}
+</button>
+{% if show_error %}
+<div class="error-message-temp">{{ error_message }}</div>
+{% endif %}

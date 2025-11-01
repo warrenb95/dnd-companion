@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
 from django.forms import modelformset_factory
-from .models import Campaign, Encounter, Chapter, NPC, Enemy, Location
+from .models import Campaign, Encounter, Chapter, NPC, Enemy, Location, SessionSchedule, PlayerAvailability
 from .forms import EncounterForm
 
 @login_required
@@ -427,3 +427,151 @@ def encounter_remove_enemy(request, campaign_id, encounter_id):
     }
     
     return render(request, 'encounters/components/_enemies_section.html', context)
+
+# Session Scheduling HTMX Views (Public - No login required)
+
+@require_http_methods(["POST"])
+def toggle_time_slot(request, token):
+    """
+    Toggle a time slot selection for player availability (HTMX endpoint)
+    """
+    schedule = get_object_or_404(SessionSchedule, shareable_token=token)
+    
+    # Ensure the schedule is still collecting responses
+    if schedule.status != "collecting":
+        return HttpResponse('<span class="text-danger">This poll is closed.</span>')
+    
+    date = request.POST.get('date')
+    time_slot = request.POST.get('time_slot')
+    email = request.POST.get('email', '').strip()
+    player_name = request.POST.get('player_name', '').strip()
+
+    # Basic validation
+    if not email or not date or not time_slot:
+        # Return the button with error state instead of replacing it
+        context = {
+            'time_slot': time_slot,
+            'date_str': date,
+            'selected': False,
+            'token': token,
+            'email': email,
+            'player_name': player_name,
+            'show_error': True,
+            'error_message': 'Please enter your email first'
+        }
+        return render(request, 'sessions/components/_time_slot_button.html', context)
+    
+    # Get or create player availability
+    availability, created = PlayerAvailability.objects.get_or_create(
+        session_schedule=schedule,
+        email=email,
+        defaults={'player_name': player_name if player_name else 'Anonymous'}
+    )
+    
+    # Update player name if provided and record exists
+    if not created and player_name:
+        availability.player_name = player_name
+        availability.save()
+    
+    # Toggle the time slot
+    date_availability = availability.get_availability_for_date(date)
+    is_selected = time_slot in date_availability
+    
+    if is_selected:
+        date_availability.remove(time_slot)
+    else:
+        date_availability.append(time_slot)
+    
+    availability.set_availability_for_date(date, date_availability)
+    availability.save()
+    
+    # Return updated button HTML
+    context = {
+        'time_slot': time_slot,
+        'date_str': date,  # Fixed: use date_str to match template
+        'selected': not is_selected,  # Toggled state
+        'token': token,
+        'email': email,
+        'player_name': player_name
+    }
+
+    return render(request, 'sessions/components/_time_slot_button.html', context)
+
+
+@require_http_methods(["POST"])
+def save_player_info(request, token):
+    """
+    Save/update player info (triggered on blur of name/email fields)
+    """
+    schedule = get_object_or_404(SessionSchedule, shareable_token=token)
+    
+    email = request.POST.get('email', '').strip()
+    player_name = request.POST.get('player_name', '').strip()
+    character_name = request.POST.get('character_name', '').strip()
+    
+    if not email:
+        return HttpResponse('')  # Empty response if no email
+    
+    # Get or create player availability
+    availability, created = PlayerAvailability.objects.get_or_create(
+        session_schedule=schedule,
+        email=email,
+        defaults={
+            'player_name': player_name if player_name else 'Anonymous',
+            'character_name': character_name
+        }
+    )
+    
+    # Update if exists
+    if not created:
+        if player_name:
+            availability.player_name = player_name
+        if character_name is not None:  # Allow clearing character name
+            availability.character_name = character_name
+        availability.save()
+    
+    # Return success indicator (could be a small checkmark or empty)
+    return HttpResponse('')
+
+
+@require_http_methods(["POST"])
+def submit_player_availability(request, token):
+    """
+    Final submission of player availability
+    """
+    schedule = get_object_or_404(SessionSchedule, shareable_token=token)
+    
+    email = request.POST.get('email', '').strip()
+    player_name = request.POST.get('player_name', '').strip()
+    character_name = request.POST.get('character_name', '').strip()
+    
+    if not email or not player_name:
+        context = {
+            'error': 'Please provide your name and email address.'
+        }
+        return render(request, 'sessions/components/_availability_error.html', context)
+    
+    # Get the availability record
+    try:
+        availability = PlayerAvailability.objects.get(
+            session_schedule=schedule,
+            email=email
+        )
+        
+        # Update final info
+        availability.player_name = player_name
+        availability.character_name = character_name
+        availability.save()
+        
+        # Return success message
+        context = {
+            'player_name': availability.player_name,
+            'schedule': schedule
+        }
+        return render(request, 'sessions/components/_availability_success_message.html', context)
+    
+    except PlayerAvailability.DoesNotExist:
+        context = {
+            'error': 'No availability data found. Please select at least one time slot.'
+        }
+        return render(request, 'sessions/components/_availability_error.html', context)
