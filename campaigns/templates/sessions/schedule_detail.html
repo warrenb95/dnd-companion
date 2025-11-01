@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load session_filters %}
 
 {% block title %}{{ schedule.title }} - {{ campaign.title }}{% endblock %}
 
@@ -31,9 +32,6 @@
               <p class="text-gray-300"><strong class="text-white">Session Duration:</strong><br>{{ schedule.session_duration }} hours</p>
             </div>
           </div>
-          {% if schedule.notes %}
-            <p class="text-gray-300 mb-6"><strong class="text-white">Notes:</strong><br>{{ schedule.notes }}</p>
-          {% endif %}
           
           <!-- Shareable Link -->
           <div class="mt-3 p-3 sm:p-4 bg-gray-750 rounded-lg border border-gray-600">
@@ -114,6 +112,7 @@
               <thead class="bg-gray-700">
                 <tr>
                   <th class="text-left py-2 px-2 sm:px-3 text-white font-semibold border-b border-gray-600">Date</th>
+                  <th class="text-left py-2 px-2 sm:px-3 text-white font-semibold border-b border-gray-600">Time</th>
                   {% for response in responses %}
                     <th class="text-center py-2 px-1 sm:px-2 text-white font-semibold border-b border-gray-600 min-w-16 sm:min-w-24">{{ response.player_name }}</th>
                   {% endfor %}
@@ -121,32 +120,37 @@
               </thead>
               <tbody class="bg-gray-800">
                 {% for date_str, data in availability_grid.items %}
-                  {% for time_slot, time_label in time_slots %}
-                    <tr class="border-b border-gray-600">
-                      {% if forloop.first %}
-                        <td rowspan="4" class="py-2 px-2 sm:px-3 text-white font-medium border-r border-gray-600 align-top">
-                          {{ data.date|date:"M j" }}
+                  {% with slots=all_time_slots|get_item:date_str %}
+                    {% for slot in slots %}
+                      <tr class="border-b border-gray-600">
+                        {% if forloop.first %}
+                          <td rowspan="{{ slots|length }}" class="py-2 px-2 sm:px-3 text-white font-medium border-r border-gray-600 align-top">
+                            {{ data.date|date:"M j" }}
+                          </td>
+                        {% endif %}
+                        <td class="py-2 px-2 sm:px-3 text-gray-300 border-r border-gray-600">
+                          {{ slot.label }}
                         </td>
-                      {% endif %}
-                      {% for player in data.players %}
-                        <td class="text-center py-1 px-1 sm:px-2">
-                          {% if time_slot in player.available_times %}
-                            <div class="bg-green-600 text-white rounded px-1 sm:px-2 py-1 text-xs font-medium">
-                              <span class="hidden sm:inline">{{ time_slot|capfirst }}</span>
-                              <span class="sm:hidden">✓</span>
-                            </div>
-                          {% else %}
-                            <span class="text-gray-500">-</span>
-                          {% endif %}
-                        </td>
-                      {% endfor %}
-                    </tr>
-                  {% endfor %}
+                        {% for player in data.players %}
+                          <td class="text-center py-1 px-1 sm:px-2">
+                            {% if slot.label in player.available_times %}
+                              <div class="bg-green-600 text-white rounded px-1 sm:px-2 py-1 text-xs font-medium">
+                                <span class="sm:hidden">✓</span>
+                                <span class="hidden sm:inline">✓</span>
+                              </div>
+                            {% else %}
+                              <span class="text-gray-500">-</span>
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    {% endfor %}
+                  {% endwith %}
                 {% endfor %}
               </tbody>
             </table>
           </div>
-          <p class="text-gray-400 text-xs mt-2">Green boxes indicate when each player is available</p>
+          <p class="text-gray-400 text-xs mt-2">Green checkmarks indicate when each player is available</p>
         </div>
       </div>
     {% endif %}
@@ -204,10 +208,13 @@
                 <label for="selected_time" class="block text-sm font-medium text-white mb-2">Select Time Slot</label>
                 <select name="selected_time" id="selected_time" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base" required>
                   <option value="">Choose a time...</option>
-                  <option value="morning">Morning (9:00 AM - 12:00 PM)</option>
-                  <option value="afternoon">Afternoon (1:00 PM - 5:00 PM)</option>
-                  <option value="evening">Evening (6:00 PM - 10:00 PM)</option>
-                  <option value="late">Late Night (8:00 PM - 12:00 AM)</option>
+                  {% for date_str, slots in all_time_slots.items %}
+                    <optgroup label="{{ date_str|date:"l, M j" }}">
+                      {% for slot in slots %}
+                        <option value="{{ slot.label }}">{{ slot.label }}</option>
+                      {% endfor %}
+                    </optgroup>
+                  {% endfor %}
                 </select>
               </div>
             </div>
@@ -240,19 +247,64 @@
 <script>
 function copyToClipboard() {
   const copyText = document.getElementById("shareLink");
-  copyText.select();
-  copyText.setSelectionRange(0, 99999);
-  navigator.clipboard.writeText(copyText.value);
-  
   const button = event.target.closest('button');
   const originalText = button.innerHTML;
+
+  // Try modern Clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(copyText.value)
+      .then(() => {
+        showCopySuccess(button, originalText);
+      })
+      .catch(() => {
+        // Fallback to older method
+        fallbackCopyTextToClipboard(copyText, button, originalText);
+      });
+  } else {
+    // Use fallback for older browsers or non-HTTPS contexts
+    fallbackCopyTextToClipboard(copyText, button, originalText);
+  }
+}
+
+function fallbackCopyTextToClipboard(inputElement, button, originalText) {
+  inputElement.select();
+  inputElement.setSelectionRange(0, 99999); // For mobile devices
+
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) {
+      showCopySuccess(button, originalText);
+    } else {
+      showCopyError(button, originalText);
+    }
+  } catch (err) {
+    showCopyError(button, originalText);
+  }
+
+  // Remove selection
+  window.getSelection().removeAllRanges();
+}
+
+function showCopySuccess(button, originalText) {
   button.innerHTML = '<i class="fas fa-check mr-1 sm:mr-2"></i><span class="hidden sm:inline">Copied!</span><span class="sm:hidden">✓</span>';
   button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
   button.classList.add('bg-green-600', 'hover:bg-green-700', 'border-green-600', 'hover:border-green-700');
-  
+
   setTimeout(() => {
     button.innerHTML = originalText;
     button.classList.remove('bg-green-600', 'hover:bg-green-700', 'border-green-600', 'hover:border-green-700');
+    button.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
+  }, 2000);
+}
+
+function showCopyError(button, originalText) {
+  button.innerHTML = '<i class="fas fa-times mr-1 sm:mr-2"></i><span class="hidden sm:inline">Failed</span><span class="sm:hidden">✗</span>';
+  button.classList.remove('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
+  button.classList.add('bg-red-600', 'hover:bg-red-700', 'border-red-600', 'hover:border-red-700');
+
+  setTimeout(() => {
+    button.innerHTML = originalText;
+    button.classList.remove('bg-red-600', 'hover:bg-red-700', 'border-red-600', 'hover:border-red-700');
     button.classList.add('bg-indigo-600', 'hover:bg-indigo-700', 'border-indigo-600', 'hover:border-indigo-700');
   }, 2000);
 }

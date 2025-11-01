@@ -1,0 +1,21 @@
+<div class="day-card">
+    <div class="day-header">
+        <h3 class="day-name">{{ day_name }}</h3>
+        <p class="day-date">{{ date|date:"M d, Y" }}</p>
+    </div>
+    <div class="time-slots">
+        {% for slot in time_slots %}
+            <button
+                type="button"
+                class="time-slot-btn {% if slot.selected %}selected{% endif %}"
+                hx-post="{% url 'campaigns:toggle_time_slot' token %}"
+                hx-vals='{"date": "{{ date_str }}", "time_slot": "{{ slot.label }}"}'
+                hx-include="#player-info-form"
+                hx-swap="outerHTML"
+                hx-target="this"
+            >
+                {{ slot.label }}
+            </button>
+        {% endfor %}
+    </div>
+</div>

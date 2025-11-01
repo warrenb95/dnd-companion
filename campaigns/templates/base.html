@@ -2,10 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}D&D Campaign Companion{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script>
+      // Configure HTMX to include CSRF token in all requests
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.addEventListener('htmx:configRequest', function(event) {
+          var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+          event.detail.headers['X-CSRFToken'] = csrfToken;
+        });
+      });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Roboto+Slab:wght@400;700&display=swap"
@@ -109,6 +119,7 @@
         font-weight: 600;
       }
     </style>
+    {% block extra_css %}{% endblock %}
   </head>
   <body class="bg-gray-900 text-white min-h-screen px-4 py-6 sm:px-6">
 
